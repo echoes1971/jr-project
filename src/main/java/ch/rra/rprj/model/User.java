@@ -51,11 +51,18 @@ public class User extends DBEntity {
     private String group_id;
 
 
-    @ManyToMany(cascade = { CascadeType.ALL })
+    //@ManyToMany(cascade = { CascadeType.PERSIST, CascadeType.MERGE } )
+    @ManyToMany(cascade = { CascadeType.ALL } )
     @JoinTable(
             name = "rprj_users_groups",
-            joinColumns = { @JoinColumn(name = "user_id") },
-            inverseJoinColumns = { @JoinColumn(name = "group_id") }
+            joinColumns = {
+                    @JoinColumn(
+                            name = "user_id",
+                            referencedColumnName = "id") },
+            inverseJoinColumns = {
+                    @JoinColumn(
+                            name = "group_id",
+                            referencedColumnName = "id") }
     )
     private Set<Group> groups = new HashSet<>();
 
@@ -167,7 +174,9 @@ public class User extends DBEntity {
 */
     @Override
     public void afterDelete(DBMgr dbMgr) throws DBException {
+        System.out.println("User.afterDelete: start.");
         this._deleteGroup(dbMgr);
+        System.out.println("User.afterDelete: end.");
     }
 /*
     function _after_delete(&$dbmgr) {

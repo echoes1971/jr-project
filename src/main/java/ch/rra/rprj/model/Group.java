@@ -40,7 +40,8 @@ public class Group extends DBEntity {
     @Column(name="description", columnDefinition="TEXT")
     private String description;
 
-    @ManyToMany(mappedBy = "groups")
+    //@ManyToMany(mappedBy = "groups", cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @ManyToMany(mappedBy = "groups", cascade = {CascadeType.ALL})
     private Set<User> users = new HashSet<>();
 
 
@@ -100,6 +101,18 @@ public class Group extends DBEntity {
         }
         tx.commit();
         session.close();
+    }
+
+    @Override
+    public void afterDelete(DBMgr dbMgr) throws DBException {
+        System.out.println("Group.afterDelete: start.");
+        //super.afterDelete(dbMgr);
+        String sql = "delete from rprj_users_groups where group_id='" + this.id + "'";
+        System.out.println("Group.afterDelete: " + sql);
+        boolean ret = dbMgr.db_execute(sql);
+        if(!ret)
+            throw new DBException("Unable to delete record from rprj_users_groups");
+        System.out.println("Group.afterDelete: end.");
     }
 
     private boolean checkUniqueName(Session session) {

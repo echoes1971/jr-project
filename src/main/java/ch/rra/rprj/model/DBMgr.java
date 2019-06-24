@@ -64,14 +64,34 @@ public class DBMgr {
         session.close();
     }
 
-    public void listUsersGroups() {
+    public boolean db_execute(String sql) {
         Session session = sessionFactory.openSession();
-        Query query = session.createSQLQuery("SELECT user_id, group_id FROM rprj_users_groups");
-        List objs = (List) query.list();
+        Transaction tx = session.beginTransaction();
+        try {
+            int res = session.createSQLQuery(sql).executeUpdate();
+            System.out.println("DBMgr.db_execute: res="+res);
+            tx.commit();
+        } catch (HibernateException he) {
+            if(tx!=null) tx.rollback();
+            he.printStackTrace();
+            return false;
+        } finally {
+            session.close();
+        }
+        return true;
+    }
+    public List db_query(String sql) {
+        Session session = sessionFactory.openSession();
+        List objs = (List) session.createSQLQuery(sql).list();
+        session.close();
+        return objs;
+    }
+
+    public void listUsersGroups() {
+        List objs = this.db_query("SELECT user_id, group_id FROM rprj_users_groups");
         printObjectList(objs);
         System.out.println("Objects: " + objs.size());
         System.out.println("");
-        session.close();
     }
 
     public void printObjectList(List objects) {

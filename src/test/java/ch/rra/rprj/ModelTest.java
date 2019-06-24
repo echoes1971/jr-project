@@ -110,6 +110,8 @@ public class ModelTest extends TestCase {
         User user = new User("roberto","echoestrade","Roberto R.A.", "-3");
         System.out.println("Saving: " + user.toString());
 
+        List users_groups;
+
         // Save
         try {
             group = (Group) dbMgr.insert(group);
@@ -121,6 +123,9 @@ public class ModelTest extends TestCase {
             System.out.println("Group 2: " + group.toString());
         } catch(DBException dbex) {
             dbex.printStackTrace();
+        }
+        if(user.getGroup_id()==group.getId()) {
+            fail("User has the extra group as foreign key: " + group.toString());
         }
 
         System.out.println("**** Test Read");
@@ -135,7 +140,9 @@ public class ModelTest extends TestCase {
         } catch(DBException dbex) {
             dbex.printStackTrace();
         }
-        dbMgr.listUsersGroups();
+        users_groups = dbMgr.db_query("SELECT user_id, group_id FROM rprj_users_groups");
+        dbMgr.printObjectList(users_groups);
+        if(users_groups.size()!=3)  fail("Not all rows deleted");
         System.out.println("===============================");
         /**/
         try {
@@ -144,7 +151,9 @@ public class ModelTest extends TestCase {
             dbex.printStackTrace();
         }
         /**/
-        dbMgr.listUsersGroups();
+        users_groups = dbMgr.db_query("SELECT user_id, group_id FROM rprj_users_groups");
+        dbMgr.printObjectList(users_groups);
+        if(users_groups.size()!=3)  fail("Not all rows deleted");
     }
 
     public void testGroups() {
