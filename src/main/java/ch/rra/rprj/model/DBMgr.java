@@ -121,6 +121,19 @@ public class DBMgr {
         }
     }
 
+    public DBEntity refresh(DBEntity dbe) throws DBException {
+        Session session = sessionFactory.openSession();
+        try {
+            session.refresh(dbe);
+        } catch (HibernateException he) {
+            he.printStackTrace();
+            return null;
+        } finally {
+            session.close();
+        }
+        return dbe;
+    }
+
     public DBEntity insert(DBEntity dbe) throws DBException {
         dbe.beforeInsert(this);
         Session session = sessionFactory.openSession();

@@ -40,7 +40,6 @@ public class Group extends DBEntity {
     @Column(name="description", columnDefinition="TEXT")
     private String description;
 
-    //@ManyToMany(mappedBy = "groups", cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @ManyToMany(mappedBy = "groups", cascade = {CascadeType.ALL})
     private Set<User> users = new HashSet<>();
 

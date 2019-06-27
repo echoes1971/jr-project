@@ -51,7 +51,6 @@ public class User extends DBEntity {
     private String group_id;
 
 
-    //@ManyToMany(cascade = { CascadeType.PERSIST, CascadeType.MERGE } )
     @ManyToMany(cascade = { CascadeType.ALL } )
     @JoinTable(
             name = "rprj_users_groups",
@@ -143,7 +142,7 @@ public class User extends DBEntity {
         Transaction tx = session.beginTransaction();
 
         // Check that login name is unique
-        boolean uniqueLogin = this.checkUniqueLogin(session);
+        boolean uniqueLogin = this._checkUniqueLogin(session);
         System.out.println("Check: " + uniqueLogin);
 
         // TODO NO! Throw an exception here!!!
@@ -161,23 +160,44 @@ public class User extends DBEntity {
         }
         tx.commit();
         session.close();
+    }
 
+    @Override
+    public void afterInsert(DBMgr dbMgr) throws DBException {
+        super.afterInsert(dbMgr);
+
+        // Create user's own group
         this._createGroup(dbMgr);
+        // Check that the association with group_id exists in the association table
+        this._checkGroupAssociation(dbMgr);
     }
+
+    @Override
+    public void afterUpdate(DBMgr dbMgr) throws DBException {
+        //super.afterUpdate(dbMgr);
+        this._checkGroupAssociation(dbMgr);
+    }
+
+    @Override
+    public void beforeDelete(DBMgr dbMgr) throws DBException {
+        super.beforeDelete(dbMgr);
+        HashSet<Group> newgroups = new HashSet<>();
+        for(Group g : this.getGroups()) {
+            if(!g.getId().startsWith("-"))
+                newgroups.add(g);
+        }
+        this.setGroups(newgroups);
+    }
+
 /*
-    function _after_insert(&$dbmgr) {
-        $this->_checkGroupAssociation($dbmgr);
-    }
-    function _after_update(&$dbmgr) {
-        $this->_checkGroupAssociation($dbmgr);
-    }
-*/
     @Override
     public void afterDelete(DBMgr dbMgr) throws DBException {
         System.out.println("User.afterDelete: start.");
+        System.out.println("User.afterDelete: id=" + this.id);
         this._deleteGroup(dbMgr);
         System.out.println("User.afterDelete: end.");
     }
+*/
 /*
     function _after_delete(&$dbmgr) {
         $cerca=new DBEUserGroup();
@@ -188,38 +208,68 @@ public class User extends DBEntity {
         }
         $this->_deleteGroup($dbmgr);
     }
-
-    function _checkGroupAssociation(&$dbmgr) {
-        $ug=new DBEUserGroup();
-        $ug->setValue('user_id',$this->getValue('id'));
-        $ug->setValue('group_id',$this->getValue('group_id'));
-        $exists = $dbmgr->exists($ug);
-        if(!$exists)
-            $dbmgr->insert($ug);
-    }
 */
     private void _createGroup(DBMgr dbMgr) throws DBException {
         Group group = new Group(this.getLogin(), "Private group for " + this.getLogin());
-        Set<User> users = new HashSet<>();
-        users.add(this);
-        group.setUsers(users);
+        //Set<User> users = new HashSet<>();
+        //users.add(this);
+        //group.setUsers(users);
         //group.getUsers().add(this);
         group = (Group) dbMgr.insert(group);
-        this.setGroup_id(group.getId());
+        dbMgr.db_execute(
+                "insert into rprj_users_groups values ('" + this.id + "','" + group.getId() + "')");
+        this.getGroups();
+        //this.setGroup_id(group.getId());
     }
     private void _deleteGroup(DBMgr dbMgr) {
         SessionFactory sessionFactory = dbMgr.getSessionFactory();
         Session session = sessionFactory.openSession();
         Transaction tx = session.beginTransaction();
-
+        /*
         Group group = (Group) session.get(Group.class, this.getGroup_id());
         session.delete(group);
+        */
+/*
+        // Delete private group
+        String hql = "Select user_id, group_id FROM rprj_groups"
+                + " where name = '" + this.login + "'";
+        hql = "FROM Group WHERE name = :name";
+        Query query = session.createQuery(hql);
+        query.setParameter("name",this.login);
+        List<Group> results = (List<Group>) query.list();
+        for(Group g : results) {
+            System.out.println("User._deleteGroup: deleting " + g.toString());
+            session.delete(g);
+        }
+*/
+        /*
+        for(Group g : this.getGroups()) {
+            System.out.println("User._deleteGroup: g=" + g.toString());
+            if(g.getUsers().size() == 1
+                    && ((User) g.getUsers().iterator().next()).getId()==this.getId()
+                    && g.getName()==this.getLogin()
+            ) {
+                System.out.println("User._deleteGroup: deleting " + g.toString());
+                session.delete(g);
+            }
+        }
+        */
 
         tx.commit();
         session.close();
     }
-
-    private boolean checkUniqueLogin(Session session) {
+    private void _checkGroupAssociation(DBMgr dbMgr) throws DBException {
+        String hql = "Select user_id, group_id FROM rprj_users_groups"
+                    + " where user_id = '" + this.id + "'"
+                    + "   and group_id = '" + this.group_id + "'";
+        List results = dbMgr.db_query(hql);
+        if(results.size()==0) {
+            System.out.println("insert into rprj_users_groups values ('" + this.id + "','" + this.group_id + "')");
+            dbMgr.db_execute(
+                    "insert into rprj_users_groups values ('" + this.id + "','" + this.group_id + "')");
+        }
+    }
+    private boolean _checkUniqueLogin(Session session) {
         String hql = "Select COUNT(*), U.login FROM User U where login = :login " +
                 "GROUP BY U.login";
         Query query = session.createQuery(hql);

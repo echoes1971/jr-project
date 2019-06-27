@@ -16,6 +16,7 @@ import org.hibernate.query.Query;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.Set;
 import java.util.Vector;
 
 public class ModelTest extends TestCase {
@@ -43,10 +44,15 @@ public class ModelTest extends TestCase {
         User user = new User("roberto","echoestrade","Roberto R.A.", "-3");
         System.out.println("Saving: " + user.toString());
 
+        List users_groups;
         // Save
         try {
             user = (User) dbMgr.insert(user);
             System.out.println("User: " + user.toString());
+            dbMgr.listGroups();
+            users_groups = dbMgr.db_query("SELECT user_id, group_id FROM rprj_users_groups where user_id='" + user.getId() + "'");
+            dbMgr.printObjectList(users_groups);
+            if(users_groups.size()!=2)  fail("Not all associations created");
 
             System.out.println("**** Test Read");
             dbMgr.listUsers();
@@ -61,11 +67,21 @@ public class ModelTest extends TestCase {
                 dbMgr.listUsers();
             }
 
+            user = (User) dbMgr.refresh(user);
+            System.out.println("Refreshed user: " + user.toString());
+
             System.out.println("**** Test Delete");
             user = (User) dbMgr.delete(user);
-            System.out.println("User: " + user.toString());
+            System.out.println("Deleted user: " + user.toString());
+            System.out.println();
             dbMgr.listUsers();
             dbMgr.listGroups();
+            users_groups = dbMgr.db_query("SELECT user_id, group_id FROM rprj_users_groups where user_id='" + user.getId() + "'");
+            dbMgr.printObjectList(users_groups);
+            if(users_groups.size()!=0) {
+                dbMgr.db_execute("delete FROM rprj_users_groups where user_id='" + user.getId() + "'");
+                fail("Not all associations deleted");
+            }
         } catch(DBException dbex) {
             dbex.printStackTrace();
         }
@@ -186,8 +202,10 @@ public class ModelTest extends TestCase {
 
     public void testUserGroup() {
         System.out.println("**** Test Many-to-many");
-        String[] user_names = { "user01", "user02", "user03" };
-        String[] group_names = { "group01", "group02", "group03", "group04" };
+        //String[] user_names = { "user01", "user02", "user03" };
+        //String[] group_names = { "group01", "group02", "group03", "group04" };
+        String[] user_names = { "user01" };
+        String[] group_names = { "group01", "group02" };
 
         // Create users and groups
         System.out.println("* Create users and groups");
@@ -201,6 +219,10 @@ public class ModelTest extends TestCase {
                     "-3"))
                 );
             }
+        } catch(DBException dbex) {
+            dbex.printStackTrace();
+        }
+        try {
             for(String s : group_names) {
                 groups.add((Group) dbMgr.insert(new Group(
                     s,
@@ -213,45 +235,90 @@ public class ModelTest extends TestCase {
 
         dbMgr.listUsers();
         dbMgr.listGroups();
+        dbMgr.listUsersGroups();
+        System.out.println("==============================================================");
+
+
+        // TODO create a many to many relationship and start deleting stuff
+
+        Vector<User> users2 = new Vector<User>();
+        try {
+            int skip = -1;
+            for(User u : users) {
+                int step = -1;
+                User u1 = u;
+                for(Group g : groups) {
+                    step++;
+                    System.out.println("step="+step+"\tskip="+skip);
+                    if(step==skip) continue;
+                    u = (User) dbMgr.refresh(u);
+                    System.out.println("u="+u);
+                    System.out.println("g="+g);
+                    u.getGroups().add(g);
+                    u1 = (User) dbMgr.update(u1);
+                    /*
+                    Set<Group> g1 = u.getGroups();
+                    g1.add(g);
+                    u.setGroups(g1);
+                    dbMgr.update(u);
+                    */
+                    //g.getUsers().add(u);
+                    //dbMgr.update(g);
+                    /*
+                    Set<User> u1 = g.getUsers();
+                    u1.add(u);
+                    g.setUsers(u1);
+                    dbMgr.update(g);
+                     */
+                }
+                users2.add(u1);
+                skip++;
+            }
+            dbMgr.listUsers();
+            dbMgr.listGroups();
+            dbMgr.listUsersGroups();
+            System.out.println("==============================================================");
+        } catch(DBException dbex) {
+            dbex.printStackTrace();
+            fail("Unable to create associations");
+        }
 
         // Delete users and groups
         System.out.println("* Delete users and groups");
         try {
-            for(Group x : groups) { dbMgr.delete(x); }
-            for(User x : users) { dbMgr.delete(x); }
+            for(User x : users2) {
+                //x = (User) dbMgr.refresh(x);
+                System.out.println("Deleting " + x.toString());
+                dbMgr.delete(x);
+            }
         } catch(DBException dbex) {
             dbex.printStackTrace();
+            fail("Error while deleting users");
+        }
+        dbMgr.listUsers();
+        dbMgr.listGroups();
+        dbMgr.listUsersGroups();
+        System.out.println("==============================================================");
+        try {
+            for(Group x : groups) {
+                System.out.println("Deleting " + x.toString());
+                x = (Group) dbMgr.refresh(x);
+                if(x==null) {
+                    System.out.println("         already deleted.");
+                    continue;
+                }
+                System.out.println("Deleting refreshed " + x.toString());
+                dbMgr.delete(x);
+            }
+        } catch(DBException dbex) {
+            dbex.printStackTrace();
+            fail("Error while deleting groups");
         }
 
         dbMgr.listUsers();
         dbMgr.listGroups();
-    }
-
-    public void printObjectList(List objects) {
-        try {
-            for(Object[] obj : (List<Object[]>) objects) {
-                System.out.print("Employee:");
-                for (Object o : obj) {
-                    System.out.print(" " + o);
-                }
-                System.out.println("");
-            }
-        } catch (ClassCastException cce) {
-            try {
-                for (HashMap hm : (List<HashMap>) objects) {
-                    System.out.print("hm>");
-                    for(Object k : hm.keySet()) {
-                        System.out.print(" " + k + ": " + hm.get(k));
-                    }
-                    System.out.println("");
-                    //System.out.println("hm> " + hm);
-                }
-            } catch(ClassCastException cce2) {
-                for (Object obj : objects) {
-                    System.out.println("obj> " + obj);
-                }
-            }
-        }
+        dbMgr.listUsersGroups();
+        System.out.println("==============================================================");
     }
 
 }
