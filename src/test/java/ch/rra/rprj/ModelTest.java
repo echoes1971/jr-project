@@ -40,11 +40,20 @@ public class ModelTest extends TestCase {
     }
 
     public void testUsers() {
+        int initial_users = dbMgr.listUsers();
+        int initial_groups = dbMgr.listGroups();
+        int initial_usersgroups = dbMgr.listUsersGroups();
+
+        int current_users = initial_users;
+        int current_groups = initial_groups;
+        int current_usersgroups = initial_usersgroups;
+
         System.out.println("**** Test Create");
         User user = new User("roberto","echoestrade","Roberto R.A.", "-3");
         System.out.println("Saving: " + user.toString());
 
         List users_groups;
+        List groups;
         // Save
         try {
             user = (User) dbMgr.insert(user);
@@ -80,47 +89,39 @@ public class ModelTest extends TestCase {
             dbMgr.printObjectList(users_groups);
             if(users_groups.size()!=0) {
                 dbMgr.db_execute("delete FROM rprj_users_groups where user_id='" + user.getId() + "'");
-                fail("Not all associations deleted");
+                fail("Not all associations were deleted");
+            }
+            groups = dbMgr.db_query("SELECT id, name, description FROM rprj_groups where name='" + user.getLogin() + "'");
+            dbMgr.printObjectList(groups);
+            if(groups.size()!=0) {
+                dbMgr.db_execute("delete FROM rprj_groups where name='" + user.getLogin() + "'");
+                fail("Not all groups were deleted");
             }
         } catch(DBException dbex) {
             dbex.printStackTrace();
         }
-    }
 
-    public void testManyToMany1() {
-        System.out.println("**** Test ManyToMany");
-        Group group = new Group("a_group", "test many to many");
-        User user = new User("roberto","echoestrade","Roberto R.A.", "-3");
-        user.getGroups().add(group);
-        System.out.println("Saving: " + user.toString());
-
-        // Save
-        try {
-            user = (User) dbMgr.insert(user);
-            group = user.getGroups().iterator().next();
-            System.out.println("User: " + user.toString());
-            System.out.println("Group: " + group.toString());
-        } catch(DBException dbex) {
-            dbex.printStackTrace();
+        current_users = dbMgr.listUsers();
+        current_groups = dbMgr.listGroups();
+        current_usersgroups = dbMgr.listUsersGroups();
+        System.out.println("Users:\t\t"+initial_users+" => "+current_users);
+        System.out.println("Groups:\t\t"+initial_groups+" => "+current_groups);
+        System.out.println("UsersGroups:\t"+initial_usersgroups+" => "+current_usersgroups);
+        System.out.println("==============================================================");
+        if(initial_users!=current_users || initial_groups!=current_groups || initial_usersgroups!=current_usersgroups) {
+            fail("Not all rows deleted!!!!");
         }
-
-        System.out.println("**** Test Read");
-        dbMgr.listUsers();
-        dbMgr.listGroups();
-        dbMgr.listUsersGroups();
-
-        try {
-            dbMgr.delete(group);
-            user.getGroups().remove(group);
-            dbMgr.delete(user);
-        } catch(DBException dbex) {
-            dbex.printStackTrace();
-        }
-
-        dbMgr.listUsersGroups();
     }
 
     public void testManyToMany2() {
+        int initial_users = dbMgr.listUsers();
+        int initial_groups = dbMgr.listGroups();
+        int initial_usersgroups = dbMgr.listUsersGroups();
+
+        int current_users = initial_users;
+        int current_groups = initial_groups;
+        int current_usersgroups = initial_usersgroups;
+
         System.out.println("**** Test ManyToMany");
         Group group = new Group("a_group", "test many to many");
         User user = new User("roberto","echoestrade","Roberto R.A.", "-3");
@@ -132,9 +133,15 @@ public class ModelTest extends TestCase {
         try {
             group = (Group) dbMgr.insert(group);
             System.out.println("Group 1: " + group.toString());
-            user.getGroups().add(group);
+        } catch(DBException dbex) {
+            dbex.printStackTrace();
+        }
+        try {
             user = (User) dbMgr.insert(user);
-            group = user.getGroups().iterator().next();
+            //user = (User) dbMgr.refresh(user);
+            user.getGroups().add(group);
+            user = (User) dbMgr.update(user);
+            //group = user.getGroups().iterator().next();
             System.out.println("User: " + user.toString());
             System.out.println("Group 2: " + group.toString());
         } catch(DBException dbex) {
@@ -149,6 +156,12 @@ public class ModelTest extends TestCase {
         dbMgr.listGroups();
         dbMgr.listUsersGroups();
 
+        try {
+            user = (User) dbMgr.refresh(user);
+        } catch(DBException dbex) {
+            dbex.printStackTrace();
+        }
+
         /**/
         try {
             dbMgr.delete(group);
@@ -158,7 +171,6 @@ public class ModelTest extends TestCase {
         }
         users_groups = dbMgr.db_query("SELECT user_id, group_id FROM rprj_users_groups");
         dbMgr.printObjectList(users_groups);
-        if(users_groups.size()!=3)  fail("Not all rows deleted");
         System.out.println("===============================");
         /**/
         try {
@@ -169,10 +181,28 @@ public class ModelTest extends TestCase {
         /**/
         users_groups = dbMgr.db_query("SELECT user_id, group_id FROM rprj_users_groups");
         dbMgr.printObjectList(users_groups);
-        if(users_groups.size()!=3)  fail("Not all rows deleted");
+
+        current_users = dbMgr.listUsers();
+        current_groups = dbMgr.listGroups();
+        current_usersgroups = dbMgr.listUsersGroups();
+        System.out.println("Users:\t\t"+initial_users+" => "+current_users);
+        System.out.println("Groups:\t\t"+initial_groups+" => "+current_groups);
+        System.out.println("UsersGroups:\t"+initial_usersgroups+" => "+current_usersgroups);
+        System.out.println("==============================================================");
+        if(initial_users!=current_users || initial_groups!=current_groups || initial_usersgroups!=current_usersgroups) {
+            fail("Not all rows deleted!!!!");
+        }
     }
 
     public void testGroups() {
+        int initial_users = dbMgr.listUsers();
+        int initial_groups = dbMgr.listGroups();
+        int initial_usersgroups = dbMgr.listUsersGroups();
+
+        int current_users = initial_users;
+        int current_groups = initial_groups;
+        int current_usersgroups = initial_usersgroups;
+
         System.out.println("**** Test Create");
         Group group = new Group("roberto","Roberto's Group");
         System.out.println("Saving: " + group.toString());
@@ -198,14 +228,35 @@ public class ModelTest extends TestCase {
         } catch(DBException dbex) {
             dbex.printStackTrace();
         }
+
+        current_users = dbMgr.listUsers();
+        current_groups = dbMgr.listGroups();
+        current_usersgroups = dbMgr.listUsersGroups();
+        System.out.println("Users:\t\t"+initial_users+" => "+current_users);
+        System.out.println("Groups:\t\t"+initial_groups+" => "+current_groups);
+        System.out.println("UsersGroups:\t"+initial_usersgroups+" => "+current_usersgroups);
+        System.out.println("==============================================================");
+        if(initial_users!=current_users || initial_groups!=current_groups || initial_usersgroups!=current_usersgroups) {
+            fail("Not all rows deleted!!!!");
+        }
     }
 
     public void testUserGroup() {
-        System.out.println("**** Test Many-to-many");
+        int initial_users = dbMgr.listUsers();
+        int initial_groups = dbMgr.listGroups();
+        int initial_usersgroups = dbMgr.listUsersGroups();
+
+        int current_users = initial_users;
+        int current_groups = initial_groups;
+        int current_usersgroups = initial_usersgroups;
+
+        System.out.println("**** Test User Group");
         //String[] user_names = { "user01", "user02", "user03" };
         //String[] group_names = { "group01", "group02", "group03", "group04" };
-        String[] user_names = { "user01" };
-        String[] group_names = { "group01", "group02" };
+        String[] user_names = { "user01", "user02", "user03", "user04", "user05", "user06", "user07", "user08", "user09"
+            , "user0A", "user0B", "user0C", "user0D", "user0E", "user0F"
+        };
+        String[] group_names = { "group01", "group02", "group03", "group04", "group05", "group06", "group07", "group08", "group09" };
 
         // Create users and groups
         System.out.println("* Create users and groups");
@@ -233,9 +284,12 @@ public class ModelTest extends TestCase {
             dbex.printStackTrace();
         }
 
-        dbMgr.listUsers();
-        dbMgr.listGroups();
-        dbMgr.listUsersGroups();
+        current_users = dbMgr.listUsers();
+        current_groups = dbMgr.listGroups();
+        current_usersgroups = dbMgr.listUsersGroups();
+        System.out.println("Users:\t\t"+initial_users+" => "+current_users);
+        System.out.println("Groups:\t\t"+initial_groups+" => "+current_groups);
+        System.out.println("UsersGroups:\t"+initial_usersgroups+" => "+current_usersgroups);
         System.out.println("==============================================================");
 
 
@@ -246,16 +300,16 @@ public class ModelTest extends TestCase {
             int skip = -1;
             for(User u : users) {
                 int step = -1;
-                User u1 = u;
+                u = (User) dbMgr.refresh(u);
                 for(Group g : groups) {
                     step++;
                     System.out.println("step="+step+"\tskip="+skip);
                     if(step==skip) continue;
-                    u = (User) dbMgr.refresh(u);
-                    System.out.println("u="+u);
+//                    u = (User) dbMgr.refresh(u);
+                    System.out.println("u1="+u);
                     System.out.println("g="+g);
                     u.getGroups().add(g);
-                    u1 = (User) dbMgr.update(u1);
+                    u = (User) dbMgr.update(u);
                     /*
                     Set<Group> g1 = u.getGroups();
                     g1.add(g);
@@ -271,12 +325,16 @@ public class ModelTest extends TestCase {
                     dbMgr.update(g);
                      */
                 }
-                users2.add(u1);
+                if(u!=null)
+                    users2.add(u);
                 skip++;
             }
-            dbMgr.listUsers();
-            dbMgr.listGroups();
-            dbMgr.listUsersGroups();
+            current_users = dbMgr.listUsers();
+            current_groups = dbMgr.listGroups();
+            current_usersgroups = dbMgr.listUsersGroups();
+            System.out.println("Users:\t\t"+initial_users+" => "+current_users);
+            System.out.println("Groups:\t\t"+initial_groups+" => "+current_groups);
+            System.out.println("UsersGroups:\t"+initial_usersgroups+" => "+current_usersgroups);
             System.out.println("==============================================================");
         } catch(DBException dbex) {
             dbex.printStackTrace();
@@ -287,7 +345,10 @@ public class ModelTest extends TestCase {
         System.out.println("* Delete users and groups");
         try {
             for(User x : users2) {
-                //x = (User) dbMgr.refresh(x);
+                x = (User) dbMgr.refresh(x);
+                if(x==null) {
+                    continue;
+                }
                 System.out.println("Deleting " + x.toString());
                 dbMgr.delete(x);
             }
@@ -295,9 +356,12 @@ public class ModelTest extends TestCase {
             dbex.printStackTrace();
             fail("Error while deleting users");
         }
-        dbMgr.listUsers();
-        dbMgr.listGroups();
-        dbMgr.listUsersGroups();
+        current_users = dbMgr.listUsers();
+        current_groups = dbMgr.listGroups();
+        current_usersgroups = dbMgr.listUsersGroups();
+        System.out.println("Users:\t\t"+initial_users+" => "+current_users);
+        System.out.println("Groups:\t\t"+initial_groups+" => "+current_groups);
+        System.out.println("UsersGroups:\t"+initial_usersgroups+" => "+current_usersgroups);
         System.out.println("==============================================================");
         try {
             for(Group x : groups) {
@@ -315,10 +379,16 @@ public class ModelTest extends TestCase {
             fail("Error while deleting groups");
         }
 
-        dbMgr.listUsers();
-        dbMgr.listGroups();
-        dbMgr.listUsersGroups();
+        current_users = dbMgr.listUsers();
+        current_groups = dbMgr.listGroups();
+        current_usersgroups = dbMgr.listUsersGroups();
+        System.out.println("Users:\t\t"+initial_users+" => "+current_users);
+        System.out.println("Groups:\t\t"+initial_groups+" => "+current_groups);
+        System.out.println("UsersGroups:\t"+initial_usersgroups+" => "+current_usersgroups);
         System.out.println("==============================================================");
+        if(initial_users!=current_users || initial_groups!=current_groups || initial_usersgroups!=current_usersgroups) {
+            fail("Not all rows deleted!!!!");
+        }
     }
 
 }

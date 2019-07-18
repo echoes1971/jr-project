@@ -51,7 +51,8 @@ public class User extends DBEntity {
     private String group_id;
 
 
-    @ManyToMany(cascade = { CascadeType.ALL } )
+    //@ManyToMany(cascade = {CascadeType.ALL})
+    @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH})
     @JoinTable(
             name = "rprj_users_groups",
             joinColumns = {
@@ -170,6 +171,7 @@ public class User extends DBEntity {
         this._createGroup(dbMgr);
         // Check that the association with group_id exists in the association table
         this._checkGroupAssociation(dbMgr);
+        dbMgr.refresh(this);
     }
 
     @Override
@@ -183,12 +185,34 @@ public class User extends DBEntity {
         super.beforeDelete(dbMgr);
         HashSet<Group> newgroups = new HashSet<>();
         for(Group g : this.getGroups()) {
-            if(!g.getId().startsWith("-"))
+            if(!g.getId().startsWith("-")) // && g.getUsers().size()==1)
                 newgroups.add(g);
         }
         this.setGroups(newgroups);
     }
 
+    @Override
+    public void afterDelete(DBMgr dbMgr) throws DBException {
+        System.out.println("User.afterDelete: start.");
+        System.out.println("User.afterDelete: groups=" + this.getGroups());
+        // TODO move this in the beforeDelete?
+        // Delete the private group of the user
+        boolean foundPvtGrp = false;
+        for(Group g : this.getGroups()) {
+            if(g.getName().equals(this.getLogin())) { // && g.getUsers().size()==1)
+                dbMgr.delete(g);
+                foundPvtGrp = true;
+                break;
+            }
+        }
+        if(!foundPvtGrp) {
+            // TODO this is way too dangerous
+            dbMgr.db_execute(
+                    "delete from rprj_groups where name='" + this.login + "'");
+        }
+//        this._deleteGroup(dbMgr);
+        System.out.println("User.afterDelete: end.");
+    }
 /*
     @Override
     public void afterDelete(DBMgr dbMgr) throws DBException {
@@ -219,44 +243,6 @@ public class User extends DBEntity {
         dbMgr.db_execute(
                 "insert into rprj_users_groups values ('" + this.id + "','" + group.getId() + "')");
         this.getGroups();
-        //this.setGroup_id(group.getId());
-    }
-    private void _deleteGroup(DBMgr dbMgr) {
-        SessionFactory sessionFactory = dbMgr.getSessionFactory();
-        Session session = sessionFactory.openSession();
-        Transaction tx = session.beginTransaction();
-        /*
-        Group group = (Group) session.get(Group.class, this.getGroup_id());
-        session.delete(group);
-        */
-/*
-        // Delete private group
-        String hql = "Select user_id, group_id FROM rprj_groups"
-                + " where name = '" + this.login + "'";
-        hql = "FROM Group WHERE name = :name";
-        Query query = session.createQuery(hql);
-        query.setParameter("name",this.login);
-        List<Group> results = (List<Group>) query.list();
-        for(Group g : results) {
-            System.out.println("User._deleteGroup: deleting " + g.toString());
-            session.delete(g);
-        }
-*/
-        /*
-        for(Group g : this.getGroups()) {
-            System.out.println("User._deleteGroup: g=" + g.toString());
-            if(g.getUsers().size() == 1
-                    && ((User) g.getUsers().iterator().next()).getId()==this.getId()
-                    && g.getName()==this.getLogin()
-            ) {
-                System.out.println("User._deleteGroup: deleting " + g.toString());
-                session.delete(g);
-            }
-        }
-        */
-
-        tx.commit();
-        session.close();
     }
     private void _checkGroupAssociation(DBMgr dbMgr) throws DBException {
         String hql = "Select user_id, group_id FROM rprj_users_groups"

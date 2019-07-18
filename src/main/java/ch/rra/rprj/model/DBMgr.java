@@ -7,6 +7,7 @@ import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
 import org.hibernate.query.Query;
 import org.hibernate.Transaction;
 
+import javax.persistence.EntityNotFoundException;
 import java.util.HashMap;
 import java.util.List;
 
@@ -40,7 +41,7 @@ public class DBMgr {
 
     public SessionFactory getSessionFactory() { return sessionFactory; }
 
-    public void listUsers() {
+    public int listUsers() {
         Session session = sessionFactory.openSession();
         Query query = session.createQuery("FROM User");
         List<User> users = (List<User>) query.list();
@@ -50,9 +51,10 @@ public class DBMgr {
         System.out.println("Users: " + users.size());
         System.out.println("");
         session.close();
+        return users.size();
     }
 
-    public void listGroups() {
+    public int listGroups() {
         Session session = sessionFactory.openSession();
         Query query = session.createQuery("FROM Group");
         List<Group> dbes = (List<Group>) query.list();
@@ -62,6 +64,7 @@ public class DBMgr {
         System.out.println("Groups: " + dbes.size());
         System.out.println("");
         session.close();
+        return dbes.size();
     }
 
     public boolean db_execute(String sql) {
@@ -87,11 +90,12 @@ public class DBMgr {
         return objs;
     }
 
-    public void listUsersGroups() {
+    public int listUsersGroups() {
         List objs = this.db_query("SELECT user_id, group_id FROM rprj_users_groups");
         printObjectList(objs);
         System.out.println("Objects: " + objs.size());
         System.out.println("");
+        return objs.size();
     }
 
     public void printObjectList(List objects) {
@@ -128,6 +132,11 @@ public class DBMgr {
         } catch (HibernateException he) {
             he.printStackTrace();
             return null;
+        } catch(EntityNotFoundException enfex) {
+            // RRA: maybe because has already been refreshed in memory by the previous passage?
+            // RRA: so i'll ignore it
+            enfex.printStackTrace();
+            //return null;
         } finally {
             session.close();
         }
