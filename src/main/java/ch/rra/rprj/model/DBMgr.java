@@ -4,17 +4,28 @@ import org.hibernate.*;
 import org.hibernate.boot.MetadataSources;
 import org.hibernate.boot.registry.StandardServiceRegistry;
 import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
+import org.hibernate.query.NativeQuery;
 import org.hibernate.query.Query;
 import org.hibernate.Transaction;
 
 import javax.persistence.EntityNotFoundException;
-import java.util.HashMap;
-import java.util.List;
+import javax.persistence.JoinTable;
+import javax.persistence.Table;
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.util.*;
 
 public class DBMgr {
     private SessionFactory sessionFactory;
 
-    public DBMgr() {}
+    private boolean verbose;
+    private User dbeUser;
+
+    public DBMgr() {
+        verbose = false;
+    }
 
     public boolean setUp() throws Exception {
         final StandardServiceRegistry registry = new StandardServiceRegistryBuilder()
@@ -53,7 +64,6 @@ public class DBMgr {
         session.close();
         return users.size();
     }
-
     public int listGroups() {
         Session session = sessionFactory.openSession();
         Query query = session.createQuery("FROM Group");
@@ -66,30 +76,6 @@ public class DBMgr {
         session.close();
         return dbes.size();
     }
-
-    public boolean db_execute(String sql) {
-        Session session = sessionFactory.openSession();
-        Transaction tx = session.beginTransaction();
-        try {
-            int res = session.createSQLQuery(sql).executeUpdate();
-            System.out.println("DBMgr.db_execute: res="+res);
-            tx.commit();
-        } catch (HibernateException he) {
-            if(tx!=null) tx.rollback();
-            he.printStackTrace();
-            return false;
-        } finally {
-            session.close();
-        }
-        return true;
-    }
-    public List db_query(String sql) {
-        Session session = sessionFactory.openSession();
-        List objs = (List) session.createSQLQuery(sql).list();
-        session.close();
-        return objs;
-    }
-
     public int listUsersGroups() {
         List objs = this.db_query("SELECT user_id, group_id FROM rprj_users_groups");
         printObjectList(objs);
@@ -97,7 +83,6 @@ public class DBMgr {
         System.out.println("");
         return objs.size();
     }
-
     public void printObjectList(List objects) {
         try {
             for(Object[] obj : (List<Object[]>) objects) {
@@ -115,7 +100,6 @@ public class DBMgr {
                         System.out.print(" " + k + ": " + hm.get(k));
                     }
                     System.out.println("");
-                    //System.out.println("hm> " + hm);
                 }
             } catch(ClassCastException cce2) {
                 for (Object obj : objects) {
@@ -123,6 +107,48 @@ public class DBMgr {
                 }
             }
         }
+    }
+
+
+    public User getDbeUser() { return dbeUser; }
+    public void setDbeUser(User dbeUser) { this.dbeUser = dbeUser; }
+
+    public boolean db_execute(String sql) {
+        Session session = sessionFactory.openSession();
+        Transaction tx = session.beginTransaction();
+        try {
+            int res = session.createSQLQuery(sql).executeUpdate();
+            if(verbose) System.out.println("DBMgr.db_execute: res="+res);
+            tx.commit();
+        } catch (HibernateException he) {
+            if(tx!=null) tx.rollback();
+            he.printStackTrace();
+            return false;
+        } finally {
+            session.close();
+        }
+        return true;
+    }
+    public List<DBEntity> db_query(String sql) {
+        return db_query(sql,new HashMap<String,Object>(), DBEntity.class,
+                true);
+    }
+    public List<DBEntity> db_query(String sql, HashMap<String,Object> hm,
+                                   Class klass, boolean initializeLazyObjects) {
+        Session session = sessionFactory.openSession();
+        NativeQuery q = session.createNativeQuery(sql);
+        q.addEntity(klass);
+        if(hm!=null) {
+            for(String k : hm.keySet()) {
+                q.setParameter(k, hm.get(k));
+            }
+        }
+        List<DBEntity> dbes = q.getResultList();
+        // This to force the load of lazy objects :-(
+        if(initializeLazyObjects)
+            dbes.stream().forEach((DBEntity dbe) -> dbe.toString());
+        session.close();
+        return dbes;
     }
 
     public DBEntity refresh(DBEntity dbe) throws DBException {
@@ -195,5 +221,91 @@ public class DBMgr {
         }
         dbe.afterDelete(this);
         return dbe;
+    }
+
+    public List<DBEntity> search(DBEntity search) throws DBException {
+        String sql = "";
+
+        // tablename
+        Annotation[] annotations = search.getClass().getAnnotations();
+        String entityname = search.getClass().getSimpleName();
+        String tablename = "";
+        for (Annotation an : annotations) {
+            if(verbose) System.out.println("" + an.toString());
+            if(an instanceof javax.persistence.Table) {
+                tablename = ((Table) an).name();
+                break;
+            }
+        }
+        if(verbose) System.out.println("entityname: " + entityname);
+        if(verbose) System.out.println("tablename: " + tablename);
+
+        // Columns
+        Field[] fields = search.getClass().getDeclaredFields();
+        HashMap<String,Object> hashMap = new HashMap<String,Object>();
+        List<String> clauses = new ArrayList<String>();
+        for (Field field : fields) {
+            String field_name = field.getName();
+            String method_name = "get"
+                    + field_name.substring(0,1).toUpperCase()
+                    + field_name.substring(1).toLowerCase();
+            Method method = null;
+            Object value = null;
+            try {
+                method = search.getClass().getMethod(method_name);
+                value = method.invoke(search);
+            } catch (NoSuchMethodException e) {
+                //e.printStackTrace();
+                if(verbose) System.out.println("ERROR: field_name.method_name NOT FOUND!");
+                continue;
+            } catch (IllegalAccessException | InvocationTargetException e) {
+                e.printStackTrace();
+            }
+            String column_name = field.getName();
+            Annotation[] field_annotations = field.getAnnotations();
+            for(Annotation an : field_annotations) {
+                //if(verbose) System.out.println("  " +an.toString());
+                if(an instanceof javax.persistence.Column) {
+                    column_name = ((javax.persistence.Column)an).name();
+                    //if(verbose) System.out.println("  column_name: " + column_name);
+                    break;
+                } else if(an instanceof JoinTable) {
+                    column_name = "";
+                    break;
+                }
+            }
+            if(column_name.equals(""))
+                continue;
+            if(verbose) System.out.println("" + field.toString());
+            if(verbose) System.out.println(" name:\t" + field_name);
+            //if(verbose) System.out.println(" method name:\t" + method_name);
+            if(verbose) System.out.println(" get:\t" + method);
+            //if(verbose) System.out.println(" " + field);
+            if(verbose) System.out.println(" column:" + column_name);
+            if(verbose) System.out.println(" value:\t" + value
+                    + (value!=null ? " ("+value.getClass()+")" : ""));
+            if(value!=null) {
+                clauses.add(field_name + " = :" + field_name);
+                hashMap.put(field_name, value);
+            }
+        }
+
+        String hql = "SELECT * FROM " + tablename;
+        if(clauses.size()>0) {
+            hql += " WHERE ";
+            for(int i=0 ; i<clauses.size() ; i++) {
+                hql += clauses.get(i);
+                if(i < (clauses.size()-1))
+                    hql += " AND ";
+            }
+            //hql += String.join(" AND ", clauses);
+        }
+        if(verbose) System.out.println("hql:" + hql);
+        if(verbose) System.out.println("hashMap:" + hashMap);
+        //hql = "select * from rprj_users where login = 'adm'";
+        //return (List<DBEntity>) this.db_query(hql);
+        return (List<DBEntity>) this.db_query(hql, hashMap, search.getClass(),true);
+        //session.close();
+        //return null;
     }
 }

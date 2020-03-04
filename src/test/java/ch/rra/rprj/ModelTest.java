@@ -2,10 +2,7 @@ package ch.rra.rprj;
 
 import ch.rra.rprj.model.*;
 import junit.framework.TestCase;
-import org.hibernate.HibernateException;
-import org.hibernate.Session;
-import org.hibernate.SessionFactory;
-import org.hibernate.Transaction;
+import org.hibernate.*;
 import org.hibernate.boot.MetadataSources;
 import org.hibernate.boot.registry.StandardServiceRegistry;
 import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
@@ -313,7 +310,7 @@ public class ModelTest extends TestCase {
                     /*
                     Set<Group> g1 = u.getGroups();
                     g1.add(g);
-                    u.setGroups(g1);
+                    u.setGroups(g1);;
                     dbMgr.update(u);
                     */
                     //g.getUsers().add(u);
@@ -391,4 +388,30 @@ public class ModelTest extends TestCase {
         }
     }
 
+    // ./mvnw -Dtest=ModelTest#testSearch test
+    public void testSearch() {
+        System.out.println("**** Test Read");
+        dbMgr.listUsers();
+        //dbMgr.listGroups();
+        //dbMgr.listUsersGroups();
+
+        System.out.println("**** Test Search");
+        User searchDBE = new User();
+        searchDBE.setLogin("adm");
+        //searchDBE.setPwd("adm");
+        //searchDBE.setFullname("Administrator");
+
+        try {
+            List<DBEntity> res = dbMgr.search(searchDBE);
+            //System.out.println("res=" + res);
+            for(DBEntity dbe : res) {
+                Hibernate.initialize(dbe);
+                System.out.println(dbe.toString());
+            }
+        } catch (DBException e) {
+            e.printStackTrace();
+        }
+
+        System.out.println("TODO");
+    }
 }
