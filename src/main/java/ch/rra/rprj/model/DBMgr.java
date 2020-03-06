@@ -15,7 +15,9 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 
 public class DBMgr {
     private SessionFactory sessionFactory;
@@ -130,14 +132,14 @@ public class DBMgr {
         return true;
     }
     public List<DBEntity> db_query(String sql) {
-        return db_query(sql,new HashMap<String,Object>(), DBEntity.class,
-                true);
+        return db_query(sql,new HashMap<String,Object>(), null,
+                false);
     }
     public List<DBEntity> db_query(String sql, HashMap<String,Object> hm,
                                    Class klass, boolean initializeLazyObjects) {
         Session session = sessionFactory.openSession();
         NativeQuery q = session.createNativeQuery(sql);
-        q.addEntity(klass);
+        if(klass!=null) q.addEntity(klass);
         if(hm!=null) {
             for(String k : hm.keySet()) {
                 q.setParameter(k, hm.get(k));
@@ -224,8 +226,9 @@ public class DBMgr {
     }
 
     public List<DBEntity> search(DBEntity search) throws DBException {
-        String sql = "";
-
+        return search(search, true, null);
+    }
+    public List<DBEntity> search(DBEntity search, boolean uselike, String orderby) throws DBException {
         // tablename
         Annotation[] annotations = search.getClass().getAnnotations();
         String entityname = search.getClass().getSimpleName();
@@ -255,7 +258,6 @@ public class DBMgr {
                 method = search.getClass().getMethod(method_name);
                 value = method.invoke(search);
             } catch (NoSuchMethodException e) {
-                //e.printStackTrace();
                 if(verbose) System.out.println("ERROR: field_name.method_name NOT FOUND!");
                 continue;
             } catch (IllegalAccessException | InvocationTargetException e) {
@@ -267,7 +269,6 @@ public class DBMgr {
                 //if(verbose) System.out.println("  " +an.toString());
                 if(an instanceof javax.persistence.Column) {
                     column_name = ((javax.persistence.Column)an).name();
-                    //if(verbose) System.out.println("  column_name: " + column_name);
                     break;
                 } else if(an instanceof JoinTable) {
                     column_name = "";
@@ -282,10 +283,13 @@ public class DBMgr {
             if(verbose) System.out.println(" get:\t" + method);
             //if(verbose) System.out.println(" " + field);
             if(verbose) System.out.println(" column:" + column_name);
-            if(verbose) System.out.println(" value:\t" + value
-                    + (value!=null ? " ("+value.getClass()+")" : ""));
+            if(verbose) System.out.println(" value:\t" + value + (value!=null ? " ("+value.getClass()+")" : ""));
             if(value!=null) {
-                clauses.add(field_name + " = :" + field_name);
+                if(uselike && value instanceof String) {
+                    clauses.add(field_name + " LIKE :" + field_name);
+                    value = "%" + value + "%";
+                } else
+                    clauses.add(field_name + " = :" + field_name);
                 hashMap.put(field_name, value);
             }
         }
@@ -298,14 +302,11 @@ public class DBMgr {
                 if(i < (clauses.size()-1))
                     hql += " AND ";
             }
-            //hql += String.join(" AND ", clauses);
         }
-        if(verbose) System.out.println("hql:" + hql);
-        if(verbose) System.out.println("hashMap:" + hashMap);
-        //hql = "select * from rprj_users where login = 'adm'";
-        //return (List<DBEntity>) this.db_query(hql);
-        return (List<DBEntity>) this.db_query(hql, hashMap, search.getClass(),true);
-        //session.close();
-        //return null;
+
+        if(orderby!=null && orderby.length()>0)
+            hql += " ORDER BY " + orderby;
+
+        return this.db_query(hql, hashMap, search.getClass(),true);
     }
 }

@@ -2,18 +2,8 @@ package ch.rra.rprj;
 
 import ch.rra.rprj.model.*;
 import junit.framework.TestCase;
-import org.hibernate.*;
-import org.hibernate.boot.MetadataSources;
-import org.hibernate.boot.registry.StandardServiceRegistry;
-import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
-import org.hibernate.engine.spi.SessionFactoryImplementor;
-import org.hibernate.event.service.spi.EventListenerRegistry;
-import org.hibernate.event.spi.EventType;
-import org.hibernate.query.Query;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Set;
 import java.util.Vector;
 
 public class ModelTest extends TestCase {
@@ -397,15 +387,15 @@ public class ModelTest extends TestCase {
 
         System.out.println("**** Test Search");
         User searchDBE = new User();
-        searchDBE.setLogin("adm");
+        //searchDBE.setLogin("adm");
         //searchDBE.setPwd("adm");
         //searchDBE.setFullname("Administrator");
+        searchDBE.setFullname("dmin");
 
         try {
             List<DBEntity> res = dbMgr.search(searchDBE);
-            //System.out.println("res=" + res);
+            System.out.println("res=" + res.size());
             for(DBEntity dbe : res) {
-                Hibernate.initialize(dbe);
                 System.out.println(dbe.toString());
             }
         } catch (DBException e) {
