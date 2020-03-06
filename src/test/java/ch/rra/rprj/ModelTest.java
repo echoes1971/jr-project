@@ -380,11 +380,6 @@ public class ModelTest extends TestCase {
 
     // ./mvnw -Dtest=ModelTest#testSearch test
     public void testSearch() {
-        System.out.println("**** Test Read");
-        dbMgr.listUsers();
-        //dbMgr.listGroups();
-        //dbMgr.listUsersGroups();
-
         System.out.println("**** Test Search");
         User searchDBE = new User();
         //searchDBE.setLogin("adm");
@@ -395,13 +390,49 @@ public class ModelTest extends TestCase {
         try {
             List<DBEntity> res = dbMgr.search(searchDBE);
             System.out.println("res=" + res.size());
+
+            if(res.size()==0) fail("Administrator not found");
+
             for(DBEntity dbe : res) {
                 System.out.println(dbe.toString());
             }
         } catch (DBException e) {
             e.printStackTrace();
         }
-
-        System.out.println("TODO");
     }
+
+    // ./mvnw -Dtest=ModelTest#testDBVersion test
+    public void testDBVersion() {
+        System.out.println("**** Test DB Version");
+
+        System.out.println("DB Version: " + dbMgr.db_version());
+    }
+
+    // ./mvnw -Dtest=ModelTest#testExists test
+    public void testExists() {
+        System.out.println("**** Test Exists");
+        User searchDBE = new User();
+        searchDBE.setFullname("Administrator");
+
+        boolean exists = false;
+        try {
+            exists = dbMgr.exists(searchDBE);
+        } catch (DBException e) {
+            e.printStackTrace();
+        }
+        if(!exists) fail("Administrator does not exists!");
+
+        System.out.println("**** Test Does Not Exists");
+        searchDBE = new User();
+        searchDBE.setFullname("___dmin");
+
+        exists = false;
+        try {
+            exists = dbMgr.exists(searchDBE);
+        } catch (DBException e) {
+            e.printStackTrace();
+        }
+        if(exists) fail("User "+searchDBE.getFullname()+" exists!");
+    }
+
 }

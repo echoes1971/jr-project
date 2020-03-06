@@ -8,7 +8,6 @@ Run the tests with: `./mvnw -Dtest=ModelTest#testSearch test`
 **TODO**
 - DBMgr
   - login()
-  - exists()
 - Port the DBEObject class
 - Port ObjectMgr
 - dbschema.php
@@ -19,4 +18,6 @@ Run the tests with: `./mvnw -Dtest=ModelTest#testSearch test`
 
 **DONE**
 - DBMgr
+  - exists()
+  - db_version()
   - search()

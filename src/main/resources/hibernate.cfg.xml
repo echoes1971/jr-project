@@ -36,6 +36,7 @@
         <property name="hbm2ddl.auto">validate</property>
 
         <!-- Names the annotated entity class -->
+        <mapping class="ch.rra.rprj.model.DBEDBVersion"/>
         <mapping class="ch.rra.rprj.model.Group"/>
         <mapping class="ch.rra.rprj.model.User"/>
 

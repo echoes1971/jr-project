@@ -18,12 +18,14 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Set;
 
 public class DBMgr {
     private SessionFactory sessionFactory;
 
     private boolean verbose;
     private User dbeUser;
+    private Set<Group> user_groups_list;
 
     public DBMgr() {
         verbose = false;
@@ -114,6 +116,28 @@ public class DBMgr {
 
     public User getDbeUser() { return dbeUser; }
     public void setDbeUser(User dbeUser) { this.dbeUser = dbeUser; }
+
+    public Set<Group> getUserGroupsList() { return this.user_groups_list; }
+    public void setUserGroupsList(Set<Group> user_groups_list) { this.user_groups_list = user_groups_list; }
+
+    public boolean hasGroup(String group_id) {
+        return this.user_groups_list.stream().filter(
+                (group) -> group.getId().equals(group_id)
+        ).count() > 0;
+    }
+    //function addGroup($group_id) { if(!in_array($group_id,$this->user_groups_list)) $this->user_groups_list[]=$group_id; }
+
+    public Integer db_version() {
+        DBEDBVersion searchDBE = new DBEDBVersion("rprj",null);
+        Integer ret = -1;
+        try {
+            List<DBEntity> res = this.search(searchDBE);
+            if(res.size()==1) ret = ((DBEDBVersion) res.get(0)).getVersion();
+        } catch (DBException e) {
+            e.printStackTrace();
+        }
+        return ret;
+    }
 
     public boolean db_execute(String sql) {
         Session session = sessionFactory.openSession();
@@ -230,23 +254,39 @@ public class DBMgr {
     }
     public List<DBEntity> search(DBEntity search, boolean uselike, String orderby) throws DBException {
         // tablename
-        Annotation[] annotations = search.getClass().getAnnotations();
         String entityname = search.getClass().getSimpleName();
-        String tablename = "";
-        for (Annotation an : annotations) {
-            if(verbose) System.out.println("" + an.toString());
-            if(an instanceof javax.persistence.Table) {
-                tablename = ((Table) an).name();
-                break;
-            }
-        }
+        String tablename = _getTableName(search);
         if(verbose) System.out.println("entityname: " + entityname);
         if(verbose) System.out.println("tablename: " + tablename);
 
         // Columns
-        Field[] fields = search.getClass().getDeclaredFields();
         HashMap<String,Object> hashMap = new HashMap<String,Object>();
         List<String> clauses = new ArrayList<String>();
+        _getClausesAndValues(search, uselike, hashMap, clauses);
+
+        String hql = "SELECT * FROM " + tablename;
+        if(clauses.size()>0) {
+            hql += " WHERE ";
+            for(int i=0 ; i<clauses.size() ; i++) {
+                hql += clauses.get(i);
+                if(i < (clauses.size()-1))
+                    hql += " AND ";
+            }
+        }
+
+        if(orderby!=null && orderby.length()>0)
+            hql += " ORDER BY " + orderby;
+
+        return this.db_query(hql, hashMap, search.getClass(),true);
+    }
+
+    public boolean exists(DBEntity search) throws DBException {
+        List<DBEntity> res = this.search(search,false,null);
+        return res.size()>0;
+    }
+
+    private void _getClausesAndValues(DBEntity search, boolean uselike, HashMap<String, Object> hashMap, List<String> clauses) {
+        Field[] fields = search.getClass().getDeclaredFields();
         for (Field field : fields) {
             String field_name = field.getName();
             String method_name = "get"
@@ -293,20 +333,18 @@ public class DBMgr {
                 hashMap.put(field_name, value);
             }
         }
+    }
 
-        String hql = "SELECT * FROM " + tablename;
-        if(clauses.size()>0) {
-            hql += " WHERE ";
-            for(int i=0 ; i<clauses.size() ; i++) {
-                hql += clauses.get(i);
-                if(i < (clauses.size()-1))
-                    hql += " AND ";
+    private String _getTableName(DBEntity search) {
+        String ret = "";
+        Annotation[] annotations = search.getClass().getAnnotations();
+        for (Annotation an : annotations) {
+            if(verbose) System.out.println("" + an.toString());
+            if(an instanceof Table) {
+                ret = ((Table) an).name();
+                break;
             }
         }
-
-        if(orderby!=null && orderby.length()>0)
-            hql += " ORDER BY " + orderby;
-
-        return this.db_query(hql, hashMap, search.getClass(),true);
+        return ret;
     }
 }
