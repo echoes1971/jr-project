@@ -39,6 +39,7 @@
         <mapping class="ch.rra.rprj.model.DBEDBVersion"/>
         <mapping class="ch.rra.rprj.model.Group"/>
         <mapping class="ch.rra.rprj.model.User"/>
+        <mapping class="ch.rra.rprj.model.DBELog"/>
 
     </session-factory>
 

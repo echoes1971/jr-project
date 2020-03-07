@@ -15,6 +15,8 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.sql.Date;
+import java.sql.Time;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -295,6 +297,54 @@ public class DBMgr {
         return res.size()>0;
     }
 
+    public DBELog log(String ip, String note, String note2) {
+        Date date = new Date(new java.util.Date().getTime());
+        Time hour = new Time(new java.util.Date().getTime());
+        //System.out.println("Date: " + date);
+        //System.out.println("Time: " + hour);
+
+        // 1. Search today's entry
+        DBELog search = new DBELog();
+        search.setIp(ip);
+        search.setData(date);
+        List<DBEntity> res = this.search(search, false, null);
+
+        DBELog ret = new DBELog();
+        ret.setIp(ip);
+        ret.setData(date);
+        ret.setOra(hour);
+        if(res.size()==0) {
+            DBELog search2 = new DBELog();
+            search2.setIp(ip);
+            List<DBEntity> res2 = this.search(search2, false, "url desc");
+            if(res2.size()>0) {
+                ret.setUrl(((DBELog)res2.get(0)).getUrl());
+            }
+            ret.setCount(1);
+            if(note!=null && note.length()>0) ret.setNote(note);
+            if(note2!=null && note2.length()>0) ret.setNote2(hour+"-"+note2);
+            try {
+                ret = (DBELog) this.insert(ret);
+            } catch (DBException e) {
+                e.printStackTrace();
+                ret = null;
+            }
+        } else {
+            DBELog oldEntry = (DBELog) res.get(0);
+            ret.setCount(oldEntry.getCount() + 1);
+            ret.setNote(oldEntry.getNote());
+            if(note2!=null && note2.length()>0)
+                ret.setNote2(oldEntry.getNote2()+"\n"+hour+"-"+note2);
+            try {
+                ret = (DBELog) this.update(ret);
+            } catch (DBException e) {
+                e.printStackTrace();
+                ret = null;
+            }
+        }
+        return ret;
+    }
+
     private void _getClausesAndValues(DBEntity search, boolean uselike, HashMap<String, Object> hashMap, List<String> clauses) {
         Field[] fields = search.getClass().getDeclaredFields();
         for (Field field : fields) {
@@ -344,7 +394,6 @@ public class DBMgr {
             }
         }
     }
-
     private String _getTableName(DBEntity search) {
         String ret = "";
         Annotation[] annotations = search.getClass().getAnnotations();

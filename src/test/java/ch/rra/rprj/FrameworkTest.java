@@ -2,12 +2,14 @@ package ch.rra.rprj;
 
 import ch.rra.rprj.model.*;
 import junit.framework.TestCase;
-import org.jetbrains.annotations.NotNull;
 
+import java.sql.Date;
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.List;
 import java.util.Vector;
 
-public class ModelTest extends TestCase {
+public class FrameworkTest extends TestCase {
     private DBMgr dbMgr;
 
     @Override
@@ -232,7 +234,7 @@ public class ModelTest extends TestCase {
         }
     }
 
-    // ./mvnw -Dtest=ModelTest#testUserGroup test
+    // ./mvnw -Dtest=FrameworkTest#testUserGroup test
     public void testUserGroup() {
         int initial_users = dbMgr.listUsers();
         int initial_groups = dbMgr.listGroups();
@@ -336,7 +338,7 @@ public class ModelTest extends TestCase {
         }
     }
 
-    // ./mvnw -Dtest=ModelTest#testSearch test
+    // ./mvnw -Dtest=FrameworkTest#testSearch test
     public void testSearch() {
         System.out.println("**** Test Search");
         User searchDBE = new User();
@@ -355,14 +357,14 @@ public class ModelTest extends TestCase {
         }
     }
 
-    // ./mvnw -Dtest=ModelTest#testDBVersion test
+    // ./mvnw -Dtest=FrameworkTest#testDBVersion test
     public void testDBVersion() {
         System.out.println("**** Test DB Version");
 
         System.out.println("DB Version: " + dbMgr.db_version());
     }
 
-    // ./mvnw -Dtest=ModelTest#testExists test
+    // ./mvnw -Dtest=FrameworkTest#testExists test
     public void testExists() {
         System.out.println("**** Test Exists");
         User searchDBE = new User();
@@ -389,7 +391,7 @@ public class ModelTest extends TestCase {
         if (exists) fail("User " + searchDBE.getFullname() + " exists!");
     }
 
-    // ./mvnw -Dtest=ModelTest#testLogin test
+    // ./mvnw -Dtest=FrameworkTest#testLogin test
     public void testLogin() {
         int initial_users = dbMgr.listUsers();
         int initial_groups = dbMgr.listGroups();
@@ -499,4 +501,24 @@ public class ModelTest extends TestCase {
         }
     }
 
+    // ./mvnw -Dtest=FrameworkTest#testLog test
+    public void testLog() {
+        String ip = "192.168.56.110";
+
+        DBELog log = dbMgr.log(ip,"nota uno", "nota due");
+        System.out.println("log: "+log);
+        if(log==null)
+            fail("Unable to create log entry");
+
+        log = dbMgr.log(ip,"nota uno", "nota dueeee");
+        System.out.println("log: "+log);
+        if(log==null)
+            fail("Unable to update log entry");
+
+        try {
+            dbMgr.delete(log);
+        } catch (DBException e) {
+            e.printStackTrace();
+        }
+    }
 }
