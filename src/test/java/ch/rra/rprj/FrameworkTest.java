@@ -503,20 +503,29 @@ public class FrameworkTest extends TestCase {
 
     // ./mvnw -Dtest=FrameworkTest#testLog test
     public void testLog() {
-        String ip = "192.168.56.110";
+        System.out.println("**** Test Log");
 
-        DBELog log = dbMgr.log(ip,"nota uno", "nota due");
+        String ip = "192.168.56.110";
+        String ip2 = "192.168.56.111";
+
+        DBELog log = dbMgr.log(ip,"note one", "note two");
         System.out.println("log: "+log);
         if(log==null)
             fail("Unable to create log entry");
 
-        log = dbMgr.log(ip,"nota uno", "nota dueeee");
+        log = dbMgr.log(ip,"note one", "note three");
         System.out.println("log: "+log);
         if(log==null)
             fail("Unable to update log entry");
 
+        DBELog log2 = dbMgr.log(ip2,"nota uno", "nota due");
+        System.out.println("log2: "+log2);
+        if(log2==null)
+            fail("Unable to create log entry");
+
         try {
             dbMgr.delete(log);
+            dbMgr.delete(log2);
         } catch (DBException e) {
             e.printStackTrace();
         }
