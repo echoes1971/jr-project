@@ -10,7 +10,6 @@ Run the tests with: `./mvnw -Dtest=ModelTest test`
   - Framework
     - DBEObject
     - ObjectMgr
-    - DBELog
   - Contacts
     - DBECountry
     - DBECompany
@@ -38,12 +37,14 @@ Run the tests with: `./mvnw -Dtest=ModelTest test`
 - Implement a rest/json login with Spring
 
 **DONE**
-- Framework
-  - DBMgr
-    - login()
-    - exists()
-    - db_version()
-    - search()
-  - DBEDBVersion
-  - DBEGroup
-  - DBEUser
+- dbschema.php
+  - Framework
+    - DBELog
+    - DBMgr
+      - login()
+      - exists()
+      - db_version()
+      - search()
+    - DBEDBVersion
+    - DBEGroup
+    - DBEUser
