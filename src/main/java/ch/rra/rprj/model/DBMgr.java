@@ -127,15 +127,25 @@ public class DBMgr {
     }
     //function addGroup($group_id) { if(!in_array($group_id,$this->user_groups_list)) $this->user_groups_list[]=$group_id; }
 
+    public User login(String login, String pwd) {
+        User search = new User(login, pwd,null,null);
+        List<DBEntity> res = this.search(search, false, null);
+
+        User user = null;
+
+        if(res.size()==1)
+            user = (User) res.get(0);
+
+        this.setDbeUser(user);
+        this.setUserGroupsList(user==null ? null : user.getGroups());
+        return user;
+    }
+
     public Integer db_version() {
         DBEDBVersion searchDBE = new DBEDBVersion("rprj",null);
         Integer ret = -1;
-        try {
-            List<DBEntity> res = this.search(searchDBE);
-            if(res.size()==1) ret = ((DBEDBVersion) res.get(0)).getVersion();
-        } catch (DBException e) {
-            e.printStackTrace();
-        }
+        List<DBEntity> res = this.search(searchDBE);
+        if(res.size()==1) ret = ((DBEDBVersion) res.get(0)).getVersion();
         return ret;
     }
 
@@ -182,12 +192,12 @@ public class DBMgr {
         try {
             session.refresh(dbe);
         } catch (HibernateException he) {
-            he.printStackTrace();
+            //he.printStackTrace();
             return null;
         } catch(EntityNotFoundException enfex) {
             // RRA: maybe because has already been refreshed in memory by the previous passage?
             // RRA: so i'll ignore it
-            enfex.printStackTrace();
+            //enfex.printStackTrace();
             //return null;
         } finally {
             session.close();
@@ -249,10 +259,10 @@ public class DBMgr {
         return dbe;
     }
 
-    public List<DBEntity> search(DBEntity search) throws DBException {
+    public List<DBEntity> search(DBEntity search) {
         return search(search, true, null);
     }
-    public List<DBEntity> search(DBEntity search, boolean uselike, String orderby) throws DBException {
+    public List<DBEntity> search(DBEntity search, boolean uselike, String orderby) {
         // tablename
         String entityname = search.getClass().getSimpleName();
         String tablename = _getTableName(search);

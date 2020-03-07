@@ -1,13 +1,11 @@
 **JR-Prj**
 
-Start the DB in `~/java/docker/`
+Start the DB in `./docker/` and initialise it as the script says.
 
-Run the tests with: `./mvnw -Dtest=ModelTest#testSearch test`
+Run the tests with: `./mvnw -Dtest=ModelTest test`
 
 
 **TODO**
-- DBMgr
-  - login()
 - Port the DBEObject class
 - Port ObjectMgr
 - dbschema.php
@@ -18,6 +16,7 @@ Run the tests with: `./mvnw -Dtest=ModelTest#testSearch test`
 
 **DONE**
 - DBMgr
+  - login()
   - exists()
   - db_version()
   - search()

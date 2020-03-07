@@ -85,7 +85,7 @@ public class Group extends DBEntity {
 
         // Check that name is unique
         boolean uniqueName = this.checkUniqueName(session);
-        System.out.println("Check uniqueName:\t" + uniqueName);
+        //System.out.println("Check uniqueName:\t" + uniqueName);
 
         if (!uniqueName) {
             //throw new DBException("Name '" + this.name + "' not unique!");
@@ -105,14 +105,14 @@ public class Group extends DBEntity {
 
     @Override
     public void afterDelete(DBMgr dbMgr) throws DBException {
-        System.out.println("Group.afterDelete: start.");
+        //System.out.println("Group.afterDelete: start.");
         //super.afterDelete(dbMgr);
         String sql = "delete from rprj_users_groups where group_id='" + this.id + "'";
-        System.out.println("Group.afterDelete: " + sql);
+        //System.out.println("Group.afterDelete: " + sql);
         boolean ret = dbMgr.db_execute(sql);
         if(!ret)
             throw new DBException("Unable to delete record from rprj_users_groups");
-        System.out.println("Group.afterDelete: end.");
+        //System.out.println("Group.afterDelete: end.");
     }
 
     private boolean checkUniqueName(Session session) {

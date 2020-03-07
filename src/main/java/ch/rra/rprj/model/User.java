@@ -144,7 +144,6 @@ public class User extends DBEntity {
 
         // Check that login name is unique
         boolean uniqueLogin = this._checkUniqueLogin(session);
-        System.out.println("Check: " + uniqueLogin);
 
         // TODO NO! Throw an exception here!!!
         if(!uniqueLogin) {
@@ -193,8 +192,8 @@ public class User extends DBEntity {
 
     @Override
     public void afterDelete(DBMgr dbMgr) throws DBException {
-        System.out.println("User.afterDelete: start.");
-        System.out.println("User.afterDelete: groups=" + this.getGroups());
+        //System.out.println("User.afterDelete: start.");
+        //System.out.println("User.afterDelete: groups=" + this.getGroups());
         // TODO move this in the beforeDelete?
         // Delete the private group of the user
         boolean foundPvtGrp = false;
@@ -211,7 +210,7 @@ public class User extends DBEntity {
                     "delete from rprj_groups where name='" + this.login + "'");
         }
 //        this._deleteGroup(dbMgr);
-        System.out.println("User.afterDelete: end.");
+        //System.out.println("User.afterDelete: end.");
     }
 /*
     @Override
@@ -250,7 +249,7 @@ public class User extends DBEntity {
                     + "   and group_id = '" + this.group_id + "'";
         List results = dbMgr.db_query(hql);
         if(results.size()==0) {
-            System.out.println("insert into rprj_users_groups values ('" + this.id + "','" + this.group_id + "')");
+            //System.out.println("insert into rprj_users_groups values ('" + this.id + "','" + this.group_id + "')");
             dbMgr.db_execute(
                     "insert into rprj_users_groups values ('" + this.id + "','" + this.group_id + "')");
         }
