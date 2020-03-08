@@ -40,6 +40,7 @@
         <mapping class="ch.rra.rprj.model.Group"/>
         <mapping class="ch.rra.rprj.model.User"/>
         <mapping class="ch.rra.rprj.model.DBELog"/>
+        <mapping class="ch.rra.rprj.model.DBEObject"/>
 
     </session-factory>
 

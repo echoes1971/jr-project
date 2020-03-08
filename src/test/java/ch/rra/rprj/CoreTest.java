@@ -3,27 +3,27 @@ package ch.rra.rprj;
 import ch.rra.rprj.model.*;
 import junit.framework.TestCase;
 
-import java.sql.Date;
-import java.time.LocalDate;
-import java.time.LocalTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Vector;
 
-public class FrameworkTest extends TestCase {
-    private DBMgr dbMgr;
+public class CoreTest extends TestCase {
+    private ObjectMgr objMgr;
 
     @Override
     protected void setUp() throws Exception {
         //org.jboss.logging.Logger logger = org.jboss.logging.Logger.getLogger("org.hibernate");
         //java.util.logging.Logger.getLogger("org.hibernate").setLevel(java.util.logging.Level.WARNING);
+        //Logger log = Logger.getLogger("org.hibernate");
+        //log.setLevel(Level.INFO);
 
-        dbMgr = new DBMgr();
-        dbMgr.setUp();
+        objMgr = new ObjectMgr();
+        objMgr.setUp();
     }
 
     @Override
     protected void tearDown() throws Exception {
-        dbMgr.tearDown();
+        objMgr.tearDown();
     }
 
     public void testGenerator() {
@@ -33,9 +33,9 @@ public class FrameworkTest extends TestCase {
     }
 
     public void testUsers() {
-        int initial_users = dbMgr.listUsers();
-        int initial_groups = dbMgr.listGroups();
-        int initial_usersgroups = dbMgr.listUsersGroups();
+        int initial_users = objMgr.listUsers();
+        int initial_groups = objMgr.listGroups();
+        int initial_usersgroups = objMgr.listUsersGroups();
 
         int current_users = initial_users;
         int current_groups = initial_groups;
@@ -49,54 +49,54 @@ public class FrameworkTest extends TestCase {
         List groups;
         // Save
         try {
-            user = (User) dbMgr.insert(user);
+            user = (User) objMgr.insert(user);
             System.out.println("User: " + user.toString());
-            dbMgr.listGroups();
-            users_groups = dbMgr.db_query("SELECT user_id, group_id FROM rprj_users_groups where user_id='" + user.getId() + "'");
-            dbMgr.printObjectList(users_groups);
+            objMgr.listGroups();
+            users_groups = objMgr.db_query("SELECT user_id, group_id FROM rprj_users_groups where user_id='" + user.getId() + "'");
+            objMgr.printObjectList(users_groups);
             if (users_groups.size() != 2) fail("Not all associations created");
 
             System.out.println("**** Test Read");
-            dbMgr.listUsers();
-            dbMgr.listGroups();
-            dbMgr.listUsersGroups();
+            objMgr.listUsers();
+            objMgr.listGroups();
+            objMgr.listUsersGroups();
 
             if (false) {
                 System.out.println("**** Test Update");
                 user.setFullname("Mr.Echoes");
-                user = (User) dbMgr.update(user);
+                user = (User) objMgr.update(user);
                 System.out.println("User: " + user.toString());
-                dbMgr.listUsers();
+                objMgr.listUsers();
             }
 
-            user = (User) dbMgr.refresh(user);
+            user = (User) objMgr.refresh(user);
             System.out.println("Refreshed user: " + user.toString());
 
             System.out.println("**** Test Delete");
-            user = (User) dbMgr.delete(user);
+            user = (User) objMgr.delete(user);
             System.out.println("Deleted user: " + user.toString());
             System.out.println();
-            dbMgr.listUsers();
-            dbMgr.listGroups();
-            users_groups = dbMgr.db_query("SELECT user_id, group_id FROM rprj_users_groups where user_id='" + user.getId() + "'");
-            dbMgr.printObjectList(users_groups);
+            objMgr.listUsers();
+            objMgr.listGroups();
+            users_groups = objMgr.db_query("SELECT user_id, group_id FROM rprj_users_groups where user_id='" + user.getId() + "'");
+            objMgr.printObjectList(users_groups);
             if (users_groups.size() != 0) {
-                dbMgr.db_execute("delete FROM rprj_users_groups where user_id='" + user.getId() + "'");
+                objMgr.db_execute("delete FROM rprj_users_groups where user_id='" + user.getId() + "'");
                 fail("Not all associations were deleted");
             }
-            groups = dbMgr.db_query("SELECT id, name, description FROM rprj_groups where name='" + user.getLogin() + "'");
-            dbMgr.printObjectList(groups);
+            groups = objMgr.db_query("SELECT id, name, description FROM rprj_groups where name='" + user.getLogin() + "'");
+            objMgr.printObjectList(groups);
             if (groups.size() != 0) {
-                dbMgr.db_execute("delete FROM rprj_groups where name='" + user.getLogin() + "'");
+                objMgr.db_execute("delete FROM rprj_groups where name='" + user.getLogin() + "'");
                 fail("Not all groups were deleted");
             }
         } catch (DBException dbex) {
             dbex.printStackTrace();
         }
 
-        current_users = dbMgr.listUsers();
-        current_groups = dbMgr.listGroups();
-        current_usersgroups = dbMgr.listUsersGroups();
+        current_users = objMgr.listUsers();
+        current_groups = objMgr.listGroups();
+        current_usersgroups = objMgr.listUsersGroups();
         System.out.println("Users:\t\t" + initial_users + " => " + current_users);
         System.out.println("Groups:\t\t" + initial_groups + " => " + current_groups);
         System.out.println("UsersGroups:\t" + initial_usersgroups + " => " + current_usersgroups);
@@ -107,9 +107,9 @@ public class FrameworkTest extends TestCase {
     }
 
     public void testManyToMany2() {
-        int initial_users = dbMgr.listUsers();
-        int initial_groups = dbMgr.listGroups();
-        int initial_usersgroups = dbMgr.listUsersGroups();
+        int initial_users = objMgr.listUsers();
+        int initial_groups = objMgr.listGroups();
+        int initial_usersgroups = objMgr.listUsersGroups();
 
         int current_users = initial_users;
         int current_groups = initial_groups;
@@ -124,16 +124,16 @@ public class FrameworkTest extends TestCase {
 
         // Save
         try {
-            group = (Group) dbMgr.insert(group);
+            group = (Group) objMgr.insert(group);
             System.out.println("Group 1: " + group.toString());
         } catch (DBException dbex) {
             dbex.printStackTrace();
         }
         try {
-            user = (User) dbMgr.insert(user);
+            user = (User) objMgr.insert(user);
             //user = (User) dbMgr.refresh(user);
             user.getGroups().add(group);
-            user = (User) dbMgr.update(user);
+            user = (User) objMgr.update(user);
             //group = user.getGroups().iterator().next();
             System.out.println("User: " + user.toString());
             System.out.println("Group 2: " + group.toString());
@@ -145,39 +145,39 @@ public class FrameworkTest extends TestCase {
         }
 
         System.out.println("**** Test Read");
-        dbMgr.listUsers();
-        dbMgr.listGroups();
-        dbMgr.listUsersGroups();
+        objMgr.listUsers();
+        objMgr.listGroups();
+        objMgr.listUsersGroups();
 
         try {
-            user = (User) dbMgr.refresh(user);
+            user = (User) objMgr.refresh(user);
         } catch (DBException dbex) {
             dbex.printStackTrace();
         }
 
         /**/
         try {
-            dbMgr.delete(group);
+            objMgr.delete(group);
             user.getGroups().remove(group);
         } catch (DBException dbex) {
             dbex.printStackTrace();
         }
-        users_groups = dbMgr.db_query("SELECT user_id, group_id FROM rprj_users_groups");
-        dbMgr.printObjectList(users_groups);
+        users_groups = objMgr.db_query("SELECT user_id, group_id FROM rprj_users_groups");
+        objMgr.printObjectList(users_groups);
         System.out.println("===============================");
         /**/
         try {
-            dbMgr.delete(user);
+            objMgr.delete(user);
         } catch (DBException dbex) {
             dbex.printStackTrace();
         }
         /**/
-        users_groups = dbMgr.db_query("SELECT user_id, group_id FROM rprj_users_groups");
-        dbMgr.printObjectList(users_groups);
+        users_groups = objMgr.db_query("SELECT user_id, group_id FROM rprj_users_groups");
+        objMgr.printObjectList(users_groups);
 
-        current_users = dbMgr.listUsers();
-        current_groups = dbMgr.listGroups();
-        current_usersgroups = dbMgr.listUsersGroups();
+        current_users = objMgr.listUsers();
+        current_groups = objMgr.listGroups();
+        current_usersgroups = objMgr.listUsersGroups();
         System.out.println("Users:\t\t" + initial_users + " => " + current_users);
         System.out.println("Groups:\t\t" + initial_groups + " => " + current_groups);
         System.out.println("UsersGroups:\t" + initial_usersgroups + " => " + current_usersgroups);
@@ -188,9 +188,9 @@ public class FrameworkTest extends TestCase {
     }
 
     public void testGroups() {
-        int initial_users = dbMgr.listUsers();
-        int initial_groups = dbMgr.listGroups();
-        int initial_usersgroups = dbMgr.listUsersGroups();
+        int initial_users = objMgr.listUsers();
+        int initial_groups = objMgr.listGroups();
+        int initial_usersgroups = objMgr.listUsersGroups();
 
         int current_users = initial_users;
         int current_groups = initial_groups;
@@ -202,29 +202,29 @@ public class FrameworkTest extends TestCase {
 
         // Save
         try {
-            group = (Group) dbMgr.insert(group);
+            group = (Group) objMgr.insert(group);
             System.out.println("Group: " + group.toString());
 
             System.out.println("**** Test Read");
-            dbMgr.listGroups();
+            objMgr.listGroups();
 
             System.out.println("**** Test Update");
             group.setDescription("Mr.Echoes");
-            group = (Group) dbMgr.update(group);
+            group = (Group) objMgr.update(group);
             System.out.println("Group: " + group.toString());
-            dbMgr.listGroups();
+            objMgr.listGroups();
 
             System.out.println("**** Test Delete");
-            group = (Group) dbMgr.delete(group);
+            group = (Group) objMgr.delete(group);
             System.out.println("Group: " + group.toString());
-            dbMgr.listGroups();
+            objMgr.listGroups();
         } catch (DBException dbex) {
             dbex.printStackTrace();
         }
 
-        current_users = dbMgr.listUsers();
-        current_groups = dbMgr.listGroups();
-        current_usersgroups = dbMgr.listUsersGroups();
+        current_users = objMgr.listUsers();
+        current_groups = objMgr.listGroups();
+        current_usersgroups = objMgr.listUsersGroups();
         System.out.println("Users:\t\t" + initial_users + " => " + current_users);
         System.out.println("Groups:\t\t" + initial_groups + " => " + current_groups);
         System.out.println("UsersGroups:\t" + initial_usersgroups + " => " + current_usersgroups);
@@ -234,11 +234,11 @@ public class FrameworkTest extends TestCase {
         }
     }
 
-    // ./mvnw -Dtest=FrameworkTest#testUserGroup test
+    // ./mvnw -Dtest=CoreTest#testUserGroup test
     public void testUserGroup() {
-        int initial_users = dbMgr.listUsers();
-        int initial_groups = dbMgr.listGroups();
-        int initial_usersgroups = dbMgr.listUsersGroups();
+        int initial_users = objMgr.listUsers();
+        int initial_groups = objMgr.listGroups();
+        int initial_usersgroups = objMgr.listUsersGroups();
 
         int current_users = initial_users;
         int current_groups = initial_groups;
@@ -257,9 +257,9 @@ public class FrameworkTest extends TestCase {
         Vector<User> testUsers = _createTestUsers(user_names);
         Vector<Group> testGroups = _createTestGroups(group_names);
 
-        current_users = dbMgr.listUsers();
-        current_groups = dbMgr.listGroups();
-        current_usersgroups = dbMgr.listUsersGroups();
+        current_users = objMgr.listUsers();
+        current_groups = objMgr.listGroups();
+        current_usersgroups = objMgr.listUsersGroups();
         System.out.println("Users:\t\t" + initial_users + " => " + current_users);
         System.out.println("Groups:\t\t" + initial_groups + " => " + current_groups);
         System.out.println("UsersGroups:\t" + initial_usersgroups + " => " + current_usersgroups);
@@ -273,7 +273,7 @@ public class FrameworkTest extends TestCase {
             int skip = -1;
             for (User u : testUsers) {
                 int step = -1;
-                u = (User) dbMgr.refresh(u);
+                u = (User) objMgr.refresh(u);
                 for (Group g : testGroups) {
                     step++;
                     System.out.println("step=" + step + "\tskip=" + skip);
@@ -282,7 +282,7 @@ public class FrameworkTest extends TestCase {
                     System.out.println("u1=" + u);
                     System.out.println("g=" + g);
                     u.getGroups().add(g);
-                    u = (User) dbMgr.update(u);
+                    u = (User) objMgr.update(u);
                     /*
                     Set<Group> g1 = u.getGroups();
                     g1.add(g);
@@ -302,9 +302,9 @@ public class FrameworkTest extends TestCase {
                     users2.add(u);
                 skip++;
             }
-            current_users = dbMgr.listUsers();
-            current_groups = dbMgr.listGroups();
-            current_usersgroups = dbMgr.listUsersGroups();
+            current_users = objMgr.listUsers();
+            current_groups = objMgr.listGroups();
+            current_usersgroups = objMgr.listUsersGroups();
             System.out.println("Users:\t\t" + initial_users + " => " + current_users);
             System.out.println("Groups:\t\t" + initial_groups + " => " + current_groups);
             System.out.println("UsersGroups:\t" + initial_usersgroups + " => " + current_usersgroups);
@@ -316,18 +316,18 @@ public class FrameworkTest extends TestCase {
 
         // Delete users and groups
         _deleteTestUsers(users2);
-        current_users = dbMgr.listUsers();
-        current_groups = dbMgr.listGroups();
-        current_usersgroups = dbMgr.listUsersGroups();
+        current_users = objMgr.listUsers();
+        current_groups = objMgr.listGroups();
+        current_usersgroups = objMgr.listUsersGroups();
         System.out.println("Users:\t\t" + initial_users + " => " + current_users);
         System.out.println("Groups:\t\t" + initial_groups + " => " + current_groups);
         System.out.println("UsersGroups:\t" + initial_usersgroups + " => " + current_usersgroups);
         System.out.println("==============================================================");
 
         _deleteTestGroups(testGroups);
-        current_users = dbMgr.listUsers();
-        current_groups = dbMgr.listGroups();
-        current_usersgroups = dbMgr.listUsersGroups();
+        current_users = objMgr.listUsers();
+        current_groups = objMgr.listGroups();
+        current_usersgroups = objMgr.listUsersGroups();
         System.out.println("Users:\t\t" + initial_users + " => " + current_users);
         System.out.println("Groups:\t\t" + initial_groups + " => " + current_groups);
         System.out.println("UsersGroups:\t" + initial_usersgroups + " => " + current_usersgroups);
@@ -338,7 +338,7 @@ public class FrameworkTest extends TestCase {
         }
     }
 
-    // ./mvnw -Dtest=FrameworkTest#testSearch test
+    // ./mvnw -Dtest=CoreTest#testSearch test
     public void testSearch() {
         System.out.println("**** Test Search");
         User searchDBE = new User();
@@ -347,7 +347,7 @@ public class FrameworkTest extends TestCase {
         //searchDBE.setFullname("Administrator");
         searchDBE.setFullname("dmin");
 
-        List<DBEntity> res = dbMgr.search(searchDBE);
+        List<DBEntity> res = objMgr.search(searchDBE);
         System.out.println("res=" + res.size());
 
         if (res.size() == 0) fail("Administrator not found");
@@ -357,14 +357,14 @@ public class FrameworkTest extends TestCase {
         }
     }
 
-    // ./mvnw -Dtest=FrameworkTest#testDBVersion test
+    // ./mvnw -Dtest=CoreTest#testDBVersion test
     public void testDBVersion() {
         System.out.println("**** Test DB Version");
 
-        System.out.println("DB Version: " + dbMgr.db_version());
+        System.out.println("DB Version: " + objMgr.db_version());
     }
 
-    // ./mvnw -Dtest=FrameworkTest#testExists test
+    // ./mvnw -Dtest=CoreTest#testExists test
     public void testExists() {
         System.out.println("**** Test Exists");
         User searchDBE = new User();
@@ -372,7 +372,7 @@ public class FrameworkTest extends TestCase {
 
         boolean exists = false;
         try {
-            exists = dbMgr.exists(searchDBE);
+            exists = objMgr.exists(searchDBE);
         } catch (DBException e) {
             e.printStackTrace();
         }
@@ -384,18 +384,18 @@ public class FrameworkTest extends TestCase {
 
         exists = false;
         try {
-            exists = dbMgr.exists(searchDBE);
+            exists = objMgr.exists(searchDBE);
         } catch (DBException e) {
             e.printStackTrace();
         }
         if (exists) fail("User " + searchDBE.getFullname() + " exists!");
     }
 
-    // ./mvnw -Dtest=FrameworkTest#testLogin test
+    // ./mvnw -Dtest=CoreTest#testLogin test
     public void testLogin() {
-        int initial_users = dbMgr.listUsers();
-        int initial_groups = dbMgr.listGroups();
-        int initial_usersgroups = dbMgr.listUsersGroups();
+        int initial_users = objMgr.listUsers();
+        int initial_groups = objMgr.listGroups();
+        int initial_usersgroups = objMgr.listUsersGroups();
 
         int current_users = initial_users;
         int current_groups = initial_groups;
@@ -409,23 +409,23 @@ public class FrameworkTest extends TestCase {
 
         User myuser;
         System.out.println("* Loggin existing user...");
-        myuser = dbMgr.login("user01", "pwd_user01");
+        myuser = objMgr.login("user01", "pwd_user01");
         if(myuser==null) fail("Unable to login existing user");
         System.out.println(myuser);
         System.out.println("* Loggin existing user wrong pwd...");
-        myuser = dbMgr.login("user02", "wd_user0");
+        myuser = objMgr.login("user02", "wd_user0");
         if(myuser!=null) fail("Logged in with wrong password");
         System.out.println(myuser);
         System.out.println("* Loggin non existing user...");
-        myuser = dbMgr.login("__user01", "pwd_user01");
+        myuser = objMgr.login("__user01", "pwd_user01");
         if(myuser!=null) fail("Logged in non existing user");
         System.out.println(myuser);
 
         // Delete test users
         _deleteTestUsers(testUsers);
-        current_users = dbMgr.listUsers();
-        current_groups = dbMgr.listGroups();
-        current_usersgroups = dbMgr.listUsersGroups();
+        current_users = objMgr.listUsers();
+        current_groups = objMgr.listGroups();
+        current_usersgroups = objMgr.listUsersGroups();
         System.out.println("Users:\t\t" + initial_users + " => " + current_users);
         System.out.println("Groups:\t\t" + initial_groups + " => " + current_groups);
         System.out.println("UsersGroups:\t" + initial_usersgroups + " => " + current_usersgroups);
@@ -441,7 +441,7 @@ public class FrameworkTest extends TestCase {
         Vector<Group> groups = new Vector<Group>();
         try {
             for (String s : group_names) {
-                groups.add((Group) dbMgr.insert(new Group(
+                groups.add((Group) objMgr.insert(new Group(
                         s,
                         "Group " + s.substring(0, 1).toUpperCase() + s.substring(1).toLowerCase())
                 ));
@@ -455,13 +455,13 @@ public class FrameworkTest extends TestCase {
         try {
             for (Group x : testGroups) {
                 //System.out.println("Deleting " + x.toString());
-                x = (Group) dbMgr.refresh(x);
+                x = (Group) objMgr.refresh(x);
                 if (x == null) {
                     //System.out.println("         already deleted.");
                     continue;
                 }
                 //System.out.println("Deleting refreshed " + x.toString());
-                dbMgr.delete(x);
+                objMgr.delete(x);
             }
         } catch (DBException dbex) {
             dbex.printStackTrace();
@@ -473,7 +473,7 @@ public class FrameworkTest extends TestCase {
         //System.out.println("* Create test users and groups");
         try {
             for(String s : user_names) {
-                testUsers.add((User) dbMgr.insert(new User(
+                testUsers.add((User) objMgr.insert(new User(
                         s, "pwd_" + s,
                         "User " + s.substring(0, 1).toUpperCase() + s.substring(1).toLowerCase(),
                         "-3"))
@@ -488,12 +488,12 @@ public class FrameworkTest extends TestCase {
         //System.out.println("* Delete Delete test users");
         try {
             for (User x : testUsers) {
-                x = (User) dbMgr.refresh(x);
+                x = (User) objMgr.refresh(x);
                 if (x == null) {
                     continue;
                 }
                 //System.out.println("Deleting " + x.toString());
-                dbMgr.delete(x);
+                objMgr.delete(x);
             }
         } catch (DBException dbex) {
             dbex.printStackTrace();
@@ -501,33 +501,97 @@ public class FrameworkTest extends TestCase {
         }
     }
 
-    // ./mvnw -Dtest=FrameworkTest#testLog test
+    // ./mvnw -Dtest=CoreTest#testLog test
     public void testLog() {
         System.out.println("**** Test Log");
 
         String ip = "192.168.56.110";
         String ip2 = "192.168.56.111";
 
-        DBELog log = dbMgr.log(ip,"note one", "note two");
+        DBELog log = objMgr.log(ip,"note one", "note two");
         System.out.println("log: "+log);
         if(log==null)
             fail("Unable to create log entry");
 
-        log = dbMgr.log(ip,"note one", "note three");
+        log = objMgr.log(ip,"note one", "note three");
         System.out.println("log: "+log);
         if(log==null)
             fail("Unable to update log entry");
 
-        DBELog log2 = dbMgr.log(ip2,"nota uno", "nota due");
+        DBELog log2 = objMgr.log(ip2,"nota uno", "nota due");
         System.out.println("log2: "+log2);
         if(log2==null)
             fail("Unable to create log entry");
 
         try {
-            dbMgr.delete(log);
-            dbMgr.delete(log2);
+            objMgr.delete(log);
+            objMgr.delete(log2);
         } catch (DBException e) {
             e.printStackTrace();
         }
+    }
+
+    // ./mvnw -Dtest=CoreTest#testObject test
+    public void testObject() {
+        System.out.println("**** Test Object");
+        int initial_objects_count = objMgr.search(new DBEObject()).size();
+        int final_objects_count   = initial_objects_count;
+
+        User user = objMgr.login("adm","adm");
+        System.out.println("user: " + user);
+
+        String[] object_names = {"object one", "object two", "object three", "object four"};
+
+        System.out.println("* Insert");
+        List<DBEObject> objects = new ArrayList<DBEObject>();
+        for (String name: object_names) {
+            DBEObject obj = new DBEObject(name, "description of object '" + name + "'");
+            //obj.setDefaultValues(objMgr);
+            System.out.println("obj: " + obj);
+            try {
+                obj = (DBEObject) objMgr.insert(obj);
+                System.out.println("-> " + obj);
+                objects.add(obj);
+            } catch (DBException e) {
+                e.printStackTrace();
+            }
+        }
+        System.out.println("");
+
+        System.out.println("* Search");
+        List<DBEntity> res = objMgr.search(new DBEObject());
+        System.out.println("res: "+res.size());
+        res.stream().forEach((dbe) -> {
+            System.out.println(" " + dbe);
+        });
+        System.out.println("");
+
+        System.out.println("* Delete 1");
+        List<DBEObject> deleted_objects = new ArrayList<DBEObject>();
+        objects.stream().forEach(obj -> {
+            try {
+                obj = (DBEObject) objMgr.delete(obj);
+                deleted_objects.add(obj);
+                System.out.println("-> " + obj);
+            } catch (DBException e) {
+                e.printStackTrace();
+            }
+        });
+        final_objects_count   = objMgr.search(new DBEObject()).size();
+        System.out.println("Objects count: " + initial_objects_count + " -> " + final_objects_count);
+
+        System.out.println("* Delete 2");
+        deleted_objects.stream().forEach(obj -> {
+            try {
+                obj = (DBEObject) objMgr.delete(obj);
+                System.out.println("-> " + obj);
+            } catch (DBException e) {
+                e.printStackTrace();
+            }
+        });
+
+        final_objects_count   = objMgr.search(new DBEObject()).size();
+        System.out.println("Objects count: " + initial_objects_count + " -> " + final_objects_count);
+        if(initial_objects_count!=final_objects_count) fail("Not all objects were deleted");
     }
 }

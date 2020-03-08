@@ -17,21 +17,16 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.sql.Date;
 import java.sql.Time;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 public class DBMgr {
-    private SessionFactory sessionFactory;
+    protected SessionFactory sessionFactory;
 
     private boolean verbose;
     private User dbeUser;
     private Set<Group> user_groups_list;
 
-    public DBMgr() {
-        verbose = false;
-    }
+    public DBMgr() { verbose = false; }
 
     public boolean setUp() throws Exception {
         final StandardServiceRegistry registry = new StandardServiceRegistryBuilder()
@@ -171,8 +166,7 @@ public class DBMgr {
         return db_query(sql,new HashMap<String,Object>(), null,
                 false);
     }
-    public List<DBEntity> db_query(String sql, HashMap<String,Object> hm,
-                                   Class klass, boolean initializeLazyObjects) {
+    public List<DBEntity> db_query(String sql, HashMap<String,Object> hm, Class klass, boolean initializeLazyObjects) {
         Session session = sessionFactory.openSession();
         NativeQuery q = session.createNativeQuery(sql);
         if(klass!=null) q.addEntity(klass);

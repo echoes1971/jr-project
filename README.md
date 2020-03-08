@@ -1,15 +1,19 @@
 **JR-Prj**
 
-Start the DB in `./docker/` and initialise it as the script says.
+Start the DB in `./docker/` and follow the instructions to initialize the DB.
 
 Run the tests with: `./mvnw -Dtest=ModelTest test`
 
 
 **TODO**
 - dbschema.php
-  - Framework
-    - DBEObject
+  - Core
     - ObjectMgr
+      - search
+      - objectById
+      - fullObjectById
+      - objectByName
+      - fullObjectByName
   - Contacts
     - DBECountry
     - DBECompany
@@ -38,13 +42,14 @@ Run the tests with: `./mvnw -Dtest=ModelTest test`
 
 **DONE**
 - dbschema.php
-  - Framework
+  - Core
+    - DBEObject
     - DBELog
     - DBMgr
-      - login()
-      - exists()
-      - db_version()
-      - search()
     - DBEDBVersion
     - DBEGroup
     - DBEUser
+
+**TECH INFO**
+
+Reduce log: see https://github.com/eugenp/tutorials/blob/master/persistence-modules/hibernate5-2/src/test/resources/logback.xml
