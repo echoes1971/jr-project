@@ -4,29 +4,32 @@ import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 public class ObjectMgr extends DBMgr {
 
     public boolean canRead(DBEObject obj) {
         return obj.canRead(' ')
             || (obj.canRead('G') && hasGroup(obj.getGroupId()))
             || (obj.canRead('U')
-                && getDbeUser()!=null && getDbeUser().getId()==obj.getId());
+                && getDbeUser()!=null && getDbeUser().getId().equals(obj.getOwner()));
     }
     public boolean canWrite(DBEObject o) {
         User u = getDbeUser();
-        if(u!=null && u.getId()==o.getCreator())
+        if(u!=null && u.getId().equals(o.getCreator()))
             return true;
         return o.canWrite(' ')
                 || (o.canWrite('G') && hasGroup(o.getGroupId()))
-                || (o.canWrite('U') && u!=null && u.getId()==o.getId());
+                || (o.canWrite('U') && u!=null && u.getId().equals(o.getOwner()));
     }
     public boolean canExecute(DBEObject o) {
         User u = getDbeUser();
-        if(u!=null && u.getId()==o.getCreator())
+        if(u!=null && u.getId().equals(o.getCreator()))
             return true;
         return o.canExecute(' ')
                 || (o.canExecute('G') && hasGroup(o.getGroupId()))
-                || (o.canExecute('U') && u!=null && u.getId()==o.getId());
+                || (o.canExecute('U') && u!=null && u.getId().equals(o.getOwner()));
     }
 
     @Override
@@ -67,6 +70,19 @@ public class ObjectMgr extends DBMgr {
         }
         dbe.afterDelete(this);
         return dbe;
+    }
+
+    @Override
+    public List<DBEntity> search(DBEntity search) {
+        return search(search, true, null, true);
+    }
+
+    public List<DBEntity> search(DBEntity search, boolean uselike, String orderby, boolean ignore_deleted) {
+        if (search instanceof DBEObject && ignore_deleted)
+            ((DBEObject) search).setDeletedBy(null);
+            //$dbe -> setValue('deleted_date', '0000-00-00 00:00:00');
+        List<DBEntity> res = super.search(search, uselike, orderby);
+        return res.stream().filter(x -> !(x instanceof DBEObject) || this.canRead((DBEObject) x)).collect(Collectors.toList());
     }
 
     public DBEObject objectById(String id) {

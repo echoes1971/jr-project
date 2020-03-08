@@ -198,7 +198,8 @@ public class DBEObject extends DBEntity {
         this.creation_date = today;
         this.last_modify_date = today;
         this.deleted_date = null;
-        this.permissions = "rwx------";
+        if(this.permissions==null || this.permissions.length()!=9)
+            this.permissions = "rwx------";
         if(this.father_id==null) {
             this.father_id = "";
         } else {
