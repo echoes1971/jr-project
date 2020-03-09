@@ -1,4 +1,4 @@
-package ch.rra.rprj.model;
+package ch.rra.rprj.model.core;
 
 import java.io.Serializable;
 import java.sql.Date;

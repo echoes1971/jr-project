@@ -1,4 +1,4 @@
-package ch.rra.rprj.model;
+package ch.rra.rprj.model.core;
 
 /*
 mysql> desc rprj_groups;
@@ -11,6 +11,8 @@ mysql> desc rprj_groups;
 +-------------+--------------+------+-----+---------+-------+
  */
 
+import ch.rra.rprj.model.DBException;
+import ch.rra.rprj.model.DBMgr;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
@@ -29,7 +31,7 @@ public class Group extends DBEntity {
     @GeneratedValue(generator="UUID")
     @GenericGenerator(
             name="UUID",
-            strategy="ch.rra.rprj.model.IdGenerator"
+            strategy="ch.rra.rprj.model.core.IdGenerator"
     )
     @Column(name = "id", updatable = false, nullable = false, columnDefinition = "VARCHAR(16)")
     private String id;
@@ -61,7 +63,7 @@ public class Group extends DBEntity {
     }
 
     public String getId() { return id; }
-    //public void setId(String id) { this.id = id; }
+    public void setId(String id) { this.id = id; }
 
     public String getName() { return name; }
     public void setName(String name) { this.name = name; }

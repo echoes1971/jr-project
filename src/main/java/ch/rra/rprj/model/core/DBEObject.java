@@ -1,9 +1,11 @@
-package ch.rra.rprj.model;
+package ch.rra.rprj.model.core;
 
+import ch.rra.rprj.model.DBException;
+import ch.rra.rprj.model.DBMgr;
+import ch.rra.rprj.model.ObjectMgr;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
-import java.sql.Date;
 import java.sql.Timestamp;
 
 /*
@@ -34,7 +36,7 @@ public class DBEObject extends DBEntity {
     @GeneratedValue(generator="UUID")
     @GenericGenerator(
             name="UUID",
-            strategy="ch.rra.rprj.model.IdGenerator"
+            strategy="ch.rra.rprj.model.core.IdGenerator"
     )
     @Column(name = "id", updatable = false, nullable = false, columnDefinition = "VARCHAR(16)")
     private String id;

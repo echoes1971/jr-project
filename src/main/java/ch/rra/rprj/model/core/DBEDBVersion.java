@@ -1,4 +1,4 @@
-package ch.rra.rprj.model;
+package ch.rra.rprj.model.core;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;

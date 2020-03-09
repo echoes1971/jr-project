@@ -12,6 +12,8 @@
     <logger name="org.hibernate.type.descriptor.sql" level="INFO" /><!-- TRACE -->
     <logger name="org.hibernate.stat" level="INFO" /><!-- DEBUG -->
 
+    <logger name="ch.rra.rprj.model.ObjectMgr" level="INFO" /><!-- DEBUG -->
+
     <root level="INFO">
         <appender-ref ref="STDOUT" />
     </root>

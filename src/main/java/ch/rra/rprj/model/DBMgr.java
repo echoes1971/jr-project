@@ -1,5 +1,6 @@
 package ch.rra.rprj.model;
 
+import ch.rra.rprj.model.core.*;
 import org.hibernate.*;
 import org.hibernate.boot.MetadataSources;
 import org.hibernate.boot.registry.StandardServiceRegistry;
@@ -7,14 +8,10 @@ import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
 import org.hibernate.query.NativeQuery;
 import org.hibernate.query.Query;
 import org.hibernate.Transaction;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.persistence.EntityNotFoundException;
-import javax.persistence.JoinTable;
-import javax.persistence.Table;
-import java.lang.annotation.Annotation;
-import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.sql.Date;
 import java.sql.Time;
 import java.util.*;
@@ -22,11 +19,12 @@ import java.util.*;
 public class DBMgr {
     protected SessionFactory sessionFactory;
 
-    private boolean verbose;
+    private Logger logger;
+
     private User dbeUser;
     private Set<Group> user_groups_list;
 
-    public DBMgr() { verbose = false; }
+    public DBMgr() { logger = LoggerFactory.getLogger(getClass()); }
 
     public boolean setUp() throws Exception {
         final StandardServiceRegistry registry = new StandardServiceRegistryBuilder()
@@ -118,9 +116,7 @@ public class DBMgr {
     public void setUserGroupsList(Set<Group> user_groups_list) { this.user_groups_list = user_groups_list; }
 
     public boolean hasGroup(String group_id) {
-        return this.user_groups_list.stream().filter(
-                (group) -> group.getId().equals(group_id)
-        ).count() > 0;
+        return this.user_groups_list.stream().anyMatch((group) -> group.getId().equals(group_id));
     }
     //function addGroup($group_id) { if(!in_array($group_id,$this->user_groups_list)) $this->user_groups_list[]=$group_id; }
 
@@ -151,7 +147,7 @@ public class DBMgr {
         Transaction tx = session.beginTransaction();
         try {
             int res = session.createSQLQuery(sql).executeUpdate();
-            if(verbose) System.out.println("DBMgr.db_execute: res="+res);
+            logger.debug("DBMgr.db_execute: res="+res);
             tx.commit();
         } catch (HibernateException he) {
             if(tx!=null) tx.rollback();
@@ -167,11 +163,13 @@ public class DBMgr {
                 false);
     }
     public List<DBEntity> db_query(String sql, HashMap<String,Object> hm, Class klass, boolean initializeLazyObjects) {
+        logger.debug("db_query: sql="+sql);
         Session session = sessionFactory.openSession();
         NativeQuery q = session.createNativeQuery(sql);
         if(klass!=null) q.addEntity(klass);
         if(hm!=null) {
             for(String k : hm.keySet()) {
+                logger.debug(k+": "+hm.get(k)+" "+(hm.get(k)).getClass().getName());
                 q.setParameter(k, hm.get(k));
             }
         }
@@ -200,7 +198,6 @@ public class DBMgr {
         }
         return dbe;
     }
-
     public DBEntity insert(DBEntity dbe) throws DBException {
         dbe.beforeInsert(this);
         Session session = sessionFactory.openSession();
@@ -218,7 +215,6 @@ public class DBMgr {
         dbe.afterInsert(this);
         return dbe;
     }
-
     public DBEntity update(DBEntity dbe) throws DBException {
         dbe.beforeUpdate(this);
         Session session = sessionFactory.openSession();
@@ -236,7 +232,6 @@ public class DBMgr {
         dbe.afterUpdate(this);
         return dbe;
     }
-
     public DBEntity delete(DBEntity dbe) throws DBException {
         dbe.beforeDelete(this);
         Session session = sessionFactory.openSession();
@@ -255,15 +250,13 @@ public class DBMgr {
         return dbe;
     }
 
-    public List<DBEntity> search(DBEntity search) {
-        return search(search, true, null);
-    }
+    public List<DBEntity> search(DBEntity search) { return search(search, true, null); }
     public List<DBEntity> search(DBEntity search, boolean uselike, String orderby) {
         // tablename
         String entityname = search.getClass().getSimpleName();
-        String tablename = _getTableName(search);
-        if(verbose) System.out.println("entityname: " + entityname);
-        if(verbose) System.out.println("tablename: " + tablename);
+        String tablename = search.getTableName();
+        logger.debug("entityname: " + entityname);
+        logger.debug("tablename: " + tablename);
 
         // Columns
         HashMap<String,Object> hashMap = new HashMap<String,Object>();
@@ -340,6 +333,16 @@ public class DBMgr {
     }
 
     private void _getClausesAndValues(DBEntity search, boolean uselike, HashMap<String, Object> hashMap, List<String> clauses) {
+        HashMap<String, Object> hmValues = search.getValues();
+        hmValues.forEach((k,v) -> {
+            if(uselike && v instanceof String) {
+                clauses.add(k + " LIKE :" + k);
+                v = "%" + v + "%";
+            } else
+                clauses.add(k + " = :" + k);
+            hashMap.put(k,v);
+        });
+        /*
         Field[] fields = search.getClass().getDeclaredFields();
         for (Field field : fields) {
             String field_name = field.getName();
@@ -352,7 +355,7 @@ public class DBMgr {
                 method = search.getClass().getMethod(method_name);
                 value = method.invoke(search);
             } catch (NoSuchMethodException e) {
-                if(verbose) System.out.println("ERROR: field_name.method_name NOT FOUND!");
+                logger.debug("ERROR: field_name.method_name NOT FOUND!");
                 continue;
             } catch (IllegalAccessException | InvocationTargetException e) {
                 e.printStackTrace();
@@ -360,7 +363,7 @@ public class DBMgr {
             String column_name = field.getName();
             Annotation[] field_annotations = field.getAnnotations();
             for(Annotation an : field_annotations) {
-                //if(verbose) System.out.println("  " +an.toString());
+                //logger.debug("  " +an.toString());
                 if(an instanceof javax.persistence.Column) {
                     column_name = ((javax.persistence.Column)an).name();
                     break;
@@ -371,13 +374,13 @@ public class DBMgr {
             }
             if(column_name.equals(""))
                 continue;
-            if(verbose) System.out.println("" + field.toString());
-            if(verbose) System.out.println(" name:\t" + field_name);
-            //if(verbose) System.out.println(" method name:\t" + method_name);
-            if(verbose) System.out.println(" get:\t" + method);
-            //if(verbose) System.out.println(" " + field);
-            if(verbose) System.out.println(" column:" + column_name);
-            if(verbose) System.out.println(" value:\t" + value + (value!=null ? " ("+value.getClass()+")" : ""));
+            logger.debug("" + field.toString());
+            logger.debug(" name:\t" + field_name);
+            //logger.debug(" method name:\t" + method_name);
+            logger.debug(" get:\t" + method);
+            //logger.debug(" " + field);
+            logger.debug(" column:" + column_name);
+            logger.debug(" value:\t" + value + (value!=null ? " ("+value.getClass()+")" : ""));
             if(value!=null) {
                 if(uselike && value instanceof String) {
                     clauses.add(field_name + " LIKE :" + field_name);
@@ -387,17 +390,6 @@ public class DBMgr {
                 hashMap.put(field_name, value);
             }
         }
-    }
-    private String _getTableName(DBEntity search) {
-        String ret = "";
-        Annotation[] annotations = search.getClass().getAnnotations();
-        for (Annotation an : annotations) {
-            if(verbose) System.out.println("" + an.toString());
-            if(an instanceof Table) {
-                ret = ((Table) an).name();
-                break;
-            }
-        }
-        return ret;
+         */
     }
 }

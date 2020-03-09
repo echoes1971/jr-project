@@ -1,4 +1,4 @@
-package ch.rra.rprj.model;
+package ch.rra.rprj.model.core;
 
 import org.hibernate.HibernateException;
 import org.hibernate.engine.spi.SessionImplementor;
