@@ -7,10 +7,6 @@ Run the tests with: `./mvnw -Dtest=ModelTest test`
 
 **TODO**
 - dbschema.php
-  - Core
-    - ObjectMgr
-      - objectByName
-      - fullObjectByName
   - Contacts
     - DBECountry
     - DBECompany
@@ -20,7 +16,6 @@ Run the tests with: `./mvnw -Dtest=ModelTest test`
     - DBEFile
     - DBEFolder
     - DBELink
-    - DBENote
     - DBEPage
     - DBENews
   - Projects
@@ -39,8 +34,12 @@ Run the tests with: `./mvnw -Dtest=ModelTest test`
 
 **DONE**
 - dbschema.php
+  - CMS
+    - DBENote
   - Core
     - ObjectMgr
+      - objectByName
+      - fullObjectByName
       - objectById
       - fullObjectById
       - dbeById: cool stuff

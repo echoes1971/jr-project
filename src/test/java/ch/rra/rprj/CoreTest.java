@@ -656,8 +656,6 @@ public class CoreTest extends TestCase {
 
             for (String name: object_names) {
                 DBEObject obj = new DBEObjectReal(name, "description of object '" + name + "'");
-                //obj.setDefaultValues(objMgr);
-                //obj.setPermissions("rwxrwxrwx");
                 System.out.println("obj: " + obj);
                 try {
                     obj = (DBEObject) objMgr.insert(obj);
@@ -686,6 +684,99 @@ public class CoreTest extends TestCase {
             }
         });
 
+        testUsers.stream().forEach(testUser -> {
+            System.out.println("* User: " + testUser.getLogin() + " " + testUser.getId());
+            objMgr.setDbeUser(testUser);
+            objMgr.setUserGroupsList(testUser.getGroups());
+
+            System.out.println("* Delete 1");
+            List<DBEObject> deleted_objects = new ArrayList<DBEObject>();
+            objects.stream().forEach(obj -> {
+                try {
+                    obj = (DBEObject) objMgr.delete(obj);
+                    deleted_objects.add(obj);
+                    System.out.println("-> " + obj);
+                } catch (DBException e) {
+                    //e.printStackTrace();
+                }
+            });
+
+            System.out.println("* Delete 2");
+            deleted_objects.stream().forEach(obj -> {
+                try {
+                    obj = (DBEObject) objMgr.delete(obj);
+                    System.out.println("-> " + obj);
+                } catch (DBException e) {
+                    //e.printStackTrace();
+                }
+            });
+        });
+
+        // Delete test users
+        _deleteTestUsers(testUsers);
+
+
+        final_objects_count   = objMgr.search(new DBEObjectReal()).size();
+        System.out.println("Objects count: " + initial_objects_count + " -> " + final_objects_count);
+        if(initial_objects_count!=final_objects_count) fail("Not all objects were deleted");
+    }
+
+    // ./mvnw -Dtest=CoreTest#testObjectByName test
+    public void testObjectByName() {
+
+        System.out.println("**** Test Search By NAME");
+        int initial_objects_count = objMgr.search(new DBEObjectReal()).size();
+        int final_objects_count   = initial_objects_count;
+
+        // Create Test Users
+        String[] usernames = {"user01"};
+        //String[] usernames = {"user01","user02","user03","user04","user05"};
+        Vector<User> testUsers = _createTestUsers(usernames);
+
+        List<DBEObject> objects = new ArrayList<DBEObject>();
+
+        System.out.println("* Insert");
+        String[] object_names = {"object one", "object two", "object three", "object four", "object five"};
+        testUsers.stream().forEach(testUser -> {
+            objMgr.setDbeUser(testUser);
+            objMgr.setUserGroupsList(testUser.getGroups());
+
+            for (String name: object_names) {
+                DBEObject obj = new DBEObjectReal(name, "description of object '" + name + "'");
+                System.out.println("obj: " + obj);
+                try {
+                    obj = (DBEObject) objMgr.insert(obj);
+                    System.out.println("-> " + obj);
+                    objects.add(obj);
+                } catch (DBException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+        System.out.println("");
+
+        System.out.println("* Search");
+        testUsers.stream().forEach(testUser -> {
+            System.out.println("* User: " + testUser.getLogin() + " " + testUser.getId());
+            objMgr.setDbeUser(testUser);
+            objMgr.setUserGroupsList(testUser.getGroups());
+
+            for (DBEObject o : objects) {
+                List<DBEObject> objs = objMgr.objectByName(o.getName());
+                objs.forEach(obj -> {
+                    System.out.println("Partial:\t" + obj);
+                });
+                if (objs==null || objs.size()==0) fail("Error searching objects");
+
+                List<DBEObject> objs2 = objMgr.fullObjectByName(o.getName());
+                objs2.forEach(obj2 -> {
+                    System.out.println("Full:\t" + obj2);
+                });
+                if (objs2==null || objs2.size()==0) fail("Error searching full objects");
+            }
+        });
+
+        // Delete objects
         testUsers.stream().forEach(testUser -> {
             System.out.println("* User: " + testUser.getLogin() + " " + testUser.getId());
             objMgr.setDbeUser(testUser);

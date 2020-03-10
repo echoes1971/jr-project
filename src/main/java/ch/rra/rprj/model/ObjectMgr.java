@@ -171,16 +171,17 @@ public class ObjectMgr extends DBMgr {
                     );
         }
         String sql = String.join(" union ", qs);
-        logger.info(sql);
+        logger.debug(sql);
         HashMap<String,Object> hm = new HashMap<>();
         hm.put("id", id);
         List res = this.db_query(sql,hm,DBEObjectReal.class,false);
         if(res.size()==1) {
-            logger.info("SUNCHI: " + ((DBEObjectReal) res.get(0)));
+            logger.debug("SUNCHI: " + ((DBEObjectReal) res.get(0)));
             return (DBEObject) res.get(0);
         }
         // TODO Verify this for DBENotes
         //printObjectList(res);
+/*
         Object[] values = (Object[]) res.get(0);
 
         HashMap<String,Object> hmValues = new HashMap<>();
@@ -199,6 +200,7 @@ public class ObjectMgr extends DBMgr {
         } catch (InstantiationException | IllegalAccessException e) {
             e.printStackTrace();
         }
+*/
         return ret;
     }
     public DBEObject fullObjectById(String id) { return fullObjectById(id,true); }
@@ -235,7 +237,7 @@ public class ObjectMgr extends DBMgr {
         hm.put("id", id);
         List res = this.db_query(sql,hm,null,false);
         logger.debug("fullObjectById: res="+res.size());
-        printObjectList(res);
+        //printObjectList(res);
         Object[] values = (Object[]) res.get(0);
 
         Class myclass = registeredObjectTypes.stream().filter(k -> k.getSimpleName().equals(values[0])).collect(Collectors.toList()).get(0);
@@ -253,6 +255,123 @@ public class ObjectMgr extends DBMgr {
         } catch (InstantiationException | IllegalAccessException e) {
             e.printStackTrace();
         }
+        return ret;
+    }
+
+    public List<DBEObject> objectByName(String name) { return objectByName(name,true); }
+    public List<DBEObject> objectByName(String name, boolean ignore_deleted) {
+        // Search all the subclasses of DBEObject
+        String[] column_list = {"id"
+                ,"owner","group_id","permissions","creator"
+                ,"creation_date","last_modify","last_modify_date"
+                ,"deleted_by","deleted_date"
+                ,"father_id","name","description"
+        };
+        Vector<String> qs = new Vector<String>();
+        for (Class klass : registeredObjectTypes) {
+            DBEntity dbe = null;
+            try {
+                dbe = (DBEntity) klass.newInstance();
+            } catch (InstantiationException | IllegalAccessException e) {
+                e.printStackTrace();
+                continue;
+            }
+            // TODO re-enable the following when there will be more subclasses
+            //if (klass.getName() == "DBEObject" || !(dbe instanceof DBEObject)) continue;
+            qs.add("select '" + klass.getSimpleName() + "' as classname,"
+                    + String.join(",",column_list)
+                    + " from "+dbe.getTableName() + " "
+                    + " where name = :name "
+                    + (ignore_deleted ? "and deleted_by is null " : "")
+            );
+        }
+        String sql = String.join(" union ", qs);
+        logger.debug(sql);
+        HashMap<String,Object> hm = new HashMap<>();
+        hm.put("name", name);
+        List res = this.db_query(sql,hm,DBEObjectReal.class,false);
+        if(res.size()>0) {
+            logger.debug("objectByName: res=" + res.size());
+            return (List<DBEObject>) res;
+        }
+        // TODO Verify this for DBENotes
+        //printObjectList(res);
+/*
+        Object[] values = (Object[]) res.get(0);
+
+        HashMap<String,Object> hmValues = new HashMap<>();
+        int i=1;
+        for(String col : column_list) {
+            logger.info(col+"=>"+values[i]);
+            hmValues.put(col, values[i++]);
+        }
+
+        Class myclass = registeredObjectTypes.stream().filter(k -> k.getSimpleName().equals(values[0])).collect(Collectors.toList()).get(0);
+        try {
+            DBEObject search = (DBEObject) myclass.newInstance();
+            search.setId(id);
+            List<DBEntity> res2 = this.search(search, false, null, ignore_deleted);
+            if(res2.size()==1) ret = (DBEObject) res2.get(0);
+        } catch (InstantiationException | IllegalAccessException e) {
+            e.printStackTrace();
+        }
+*/
+        return null;
+    }
+    public List<DBEObject> fullObjectByName(String name) { return fullObjectByName(name,true); }
+    public List<DBEObject> fullObjectByName(String name, boolean ignore_deleted) {
+        List<DBEObject> ret = new ArrayList<DBEObject>();
+        // Search all the subclasses of DBEObject
+        String[] column_list = {"id"
+                ,"owner","group_id","permissions","creator"
+                ,"creation_date","last_modify","last_modify_date"
+                ,"deleted_by","deleted_date"
+                ,"father_id","name","description"
+        };
+        Vector<String> qs = new Vector<String>();
+        for (Class klass : registeredObjectTypes) {
+            DBEntity dbe = null;
+            try {
+                dbe = (DBEntity) klass.newInstance();
+            } catch (InstantiationException | IllegalAccessException e) {
+                e.printStackTrace();
+                continue;
+            }
+            // TODO re-enable the following when there will be more subclasses
+            //if (klass.getName() == "DBEObject" || !(dbe instanceof DBEObject)) continue;
+            qs.add("select '" + klass.getSimpleName() + "' as classname,"
+                    +String.join(",",column_list)
+                    + " from "+dbe.getTableName() + " "
+                    + " where name = :name "
+                    + (ignore_deleted ? "and deleted_by is null " : "")
+            );
+        }
+        String sql = String.join(" union ", qs);
+        logger.debug("fullObjectByName: sql="+sql);
+        HashMap<String,Object> hm = new HashMap<>();
+        hm.put("name", name);
+        List res = this.db_query(sql,hm,null,false);
+        logger.debug("fullObjectByName: res="+res.size());
+        //printObjectList(res);
+        res.forEach(values -> {
+            Object[] _values = (Object[]) values;
+
+            Class myclass = registeredObjectTypes.stream().filter(k -> k.getSimpleName().equals(_values[0])).collect(Collectors.toList()).get(0);
+            logger.debug("fullObjectById: myclass="+myclass);
+            try {
+                DBEObject search = (DBEObject) myclass.newInstance();
+                search.setId((String) _values[1]);
+                logger.debug("fullObjectByName: search="+search);
+                List<DBEntity> res2 = this.search(search, false, null, ignore_deleted);
+                logger.debug("fullObjectByName: res2="+res2.size());
+                res2.stream().forEach(dbe -> {
+                    logger.debug("fullObjectByName: dbe="+dbe);
+                    ret.add((DBEObject) dbe);
+                });
+            } catch (InstantiationException | IllegalAccessException e) {
+                e.printStackTrace();
+            }
+        });
         return ret;
     }
 }

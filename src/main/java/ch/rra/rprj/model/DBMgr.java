@@ -277,7 +277,6 @@ public class DBMgr {
         if(orderby!=null && orderby.length()>0)
             hql += " ORDER BY " + orderby;
 
-        logger.info("hql: " + hql);
         return this.db_query(hql, hashMap, search.getClass(),true);
     }
 
