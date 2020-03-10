@@ -29,9 +29,12 @@ mysql> desc rprj_objects;
 +------------------+--------------+------+-----+---------------------+-------+
 */
 
+// See: https://en.wikibooks.org/wiki/Java_Persistence/Inheritance
+// See: https://www.baeldung.com/hibernate-inheritance
+
 @Entity
-@Table(name="rprj_objects")
-public class DBEObject extends DBEntity {
+@Inheritance(strategy=InheritanceType.TABLE_PER_CLASS)
+public abstract class DBEObject extends DBEntity {
     @Id
     @GeneratedValue(generator="UUID")
     @GenericGenerator(
@@ -39,37 +42,37 @@ public class DBEObject extends DBEntity {
             strategy="ch.rra.rprj.model.core.IdGenerator"
     )
     @Column(name = "id", updatable = false, nullable = false, columnDefinition = "VARCHAR(16)")
-    private String id;
+    protected String id;
 
     @Column(name = "owner", columnDefinition = "VARCHAR(16)")
-    private String owner;
+    protected String owner;
     @Column(name = "group_id", columnDefinition = "VARCHAR(16)")
-    private String group_id;
+    protected String group_id;
     @Column(name = "permissions", columnDefinition = "CHAR(9)")
-    private String permissions;
+    protected String permissions;
 
     @Column(name = "creator", columnDefinition = "VARCHAR(16)")
-    private String creator;
+    protected String creator;
     @Column(name = "creation_date", columnDefinition = "DATETIME")
-    private Timestamp creation_date;
+    protected Timestamp creation_date;
 
     @Column(name = "last_modify", columnDefinition = "VARCHAR(16)")
-    private String last_modify;
+    protected String last_modify;
     @Column(name = "last_modify_date", columnDefinition = "DATETIME")
-    private Timestamp last_modify_date;
+    protected Timestamp last_modify_date;
 
     @Column(name = "deleted_by", columnDefinition = "VARCHAR(16)")
-    private String deleted_by;
+    protected String deleted_by;
     @Column(name = "deleted_date", columnDefinition = "DATETIME")
-    private Timestamp deleted_date;
+    protected Timestamp deleted_date;
 
     @Column(name = "father_id", columnDefinition = "VARCHAR(16)")
-    private String father_id;
+    protected String father_id;
 
     @Column(name = "name", columnDefinition = "VARCHAR(255)")
-    private String name;
+    protected String name;
     @Column(name="description", columnDefinition="TEXT")
-    private String description;
+    protected String description;
 
     public DBEObject() { }
 

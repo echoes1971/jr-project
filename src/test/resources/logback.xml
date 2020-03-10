@@ -7,12 +7,12 @@
         </encoder>
     </appender>
 
-    <logger name="org.hibernate" level="WARN" /><!-- INFO -->
-    <logger name="org.hibernate.SQL" level="INFO" /><!-- DEBUG -->
-    <logger name="org.hibernate.type.descriptor.sql" level="INFO" /><!-- TRACE -->
-    <logger name="org.hibernate.stat" level="INFO" /><!-- DEBUG -->
+    <logger name="org.hibernate" level="WARN" /><!-- INFO  - WARN -->
+    <logger name="org.hibernate.SQL" level="INFO" /><!-- DEBUG - INFO -->
+    <logger name="org.hibernate.type.descriptor.sql" level="INFO" /><!-- TRACE - INFO -->
+    <logger name="org.hibernate.stat" level="WARN" /><!-- DEBUG - WARN -->
 
-    <logger name="ch.rra.rprj.model.ObjectMgr" level="INFO" /><!-- DEBUG -->
+    <logger name="ch.rra.rprj.model.ObjectMgr" level="INFO" /><!-- DEBUG - INFO -->
 
     <root level="INFO">
         <appender-ref ref="STDOUT" />

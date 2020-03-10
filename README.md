@@ -9,8 +9,6 @@ Run the tests with: `./mvnw -Dtest=ModelTest test`
 - dbschema.php
   - Core
     - ObjectMgr
-      - objectById
-      - fullObjectById
       - objectByName
       - fullObjectByName
   - Contacts
@@ -43,7 +41,9 @@ Run the tests with: `./mvnw -Dtest=ModelTest test`
 - dbschema.php
   - Core
     - ObjectMgr
-      - search
+      - objectById
+      - fullObjectById
+      - dbeById: cool stuff
     - DBEObject
     - DBELog
     - DBMgr

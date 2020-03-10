@@ -22,8 +22,8 @@ if [ -z "$MYSQL_EXISTS" ]; then
   -v $PRJ_HOME/config/mysql:/etc/mysql/conf.d \
   -e MYSQL_ROOT_PASSWORD=mysecret \
   -d mysql:5.7
- echo "Initialize DB with: docker exec -i $MYSQL_APP mysql -pmysecret < ../sql/db_rproject.sql"
 fi
+echo "Initialize/reset DB with: docker exec -i $MYSQL_APP mysql -pmysecret < ../sql/db_rproject.sql"
 
 #echo "Point your browser to: http://localhost:8080/"
 read -p "Press any key to continue... " -n1 -s

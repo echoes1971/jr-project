@@ -41,6 +41,8 @@
         <mapping class="ch.rra.rprj.model.core.User"/>
         <mapping class="ch.rra.rprj.model.core.DBELog"/>
         <mapping class="ch.rra.rprj.model.core.DBEObject"/>
+        <mapping class="ch.rra.rprj.model.core.DBEObjectReal"/>
+        <mapping class="ch.rra.rprj.model.cms.DBENote"/>
 
     </session-factory>
 

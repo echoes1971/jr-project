@@ -13,11 +13,6 @@ public class CoreTest extends TestCase {
 
     @Override
     protected void setUp() throws Exception {
-        //org.jboss.logging.Logger logger = org.jboss.logging.Logger.getLogger("org.hibernate");
-        //java.util.logging.Logger.getLogger("org.hibernate").setLevel(java.util.logging.Level.WARNING);
-        //Logger log = Logger.getLogger("org.hibernate");
-        //log.setLevel(Level.INFO);
-
         objMgr = new ObjectMgr();
         objMgr.setUp();
     }
@@ -536,12 +531,12 @@ public class CoreTest extends TestCase {
     public void testObject() {
 
         System.out.println("**** Test Object");
-        int initial_objects_count = objMgr.search(new DBEObject()).size();
+        int initial_objects_count = objMgr.search(new DBEObjectReal()).size();
         int final_objects_count   = initial_objects_count;
 
         // Create Test Users
-        //String[] usernames = {"user01","user02"};
-        String[] usernames = {"user01","user02","user03","user04","user05"};
+        String[] usernames = {"user01"};
+        //String[] usernames = {"user01","user02","user03","user04","user05"};
         Vector<User> testUsers = _createTestUsers(usernames);
 
         List<DBEObject> objects = new ArrayList<DBEObject>();
@@ -553,7 +548,7 @@ public class CoreTest extends TestCase {
             objMgr.setUserGroupsList(testUser.getGroups());
 
             for (String name: object_names) {
-                DBEObject obj = new DBEObject(name, "description of object '" + name + "'");
+                DBEObject obj = new DBEObjectReal(name, "description of object '" + name + "'");
                 //obj.setDefaultValues(objMgr);
                 //obj.setPermissions("rwxrwxrwx");
                 System.out.println("obj: " + obj);
@@ -574,7 +569,7 @@ public class CoreTest extends TestCase {
             objMgr.setDbeUser(testUser);
             objMgr.setUserGroupsList(testUser.getGroups());
 
-            List<DBEntity> res = objMgr.search(new DBEObject());
+            List<DBEntity> res = objMgr.search(new DBEObjectReal());
             System.out.println("res: "+res.size());
             if(res.size()!=object_names.length) fail("Error with privileges");
             res.stream().forEach((dbe) -> {
@@ -599,7 +594,7 @@ public class CoreTest extends TestCase {
                     //e.printStackTrace();
                 }
             });
-            //final_objects_count   = objMgr.search(new DBEObject()).size();
+            //final_objects_count   = objMgr.search(new DBEObjectReal()).size();
             //System.out.println("Objects count: " + initial_objects_count + " -> " + final_objects_count);
 
             System.out.println("* Delete 2");
@@ -617,16 +612,33 @@ public class CoreTest extends TestCase {
         _deleteTestUsers(testUsers);
 
 
-        final_objects_count   = objMgr.search(new DBEObject()).size();
+        final_objects_count   = objMgr.search(new DBEObjectReal()).size();
         System.out.println("Objects count: " + initial_objects_count + " -> " + final_objects_count);
         if(initial_objects_count!=final_objects_count) fail("Not all objects were deleted");
+    }
+
+    // ./mvnw -Dtest=CoreTest#testDbeById test
+    public void testDbeById() {
+
+        System.out.println("**** Test Search DBE By ID");
+        int initial_objects_count = objMgr.search(new DBEObjectReal()).size();
+
+        System.out.println("* Search");
+        // Test User and Group
+        objMgr.login("adm","adm");
+        DBEntity dbe = objMgr.dbeById("-3");
+        System.out.println("dbe: " + dbe);
+        if(dbe==null) fail("Group not found by ID");
+        dbe = objMgr.dbeById("-1");
+        System.out.println("dbe: " + dbe);
+        if(dbe==null) fail("User not found by ID");
     }
 
     // ./mvnw -Dtest=CoreTest#testObjectById test
     public void testObjectById() {
 
         System.out.println("**** Test Search By ID");
-        int initial_objects_count = objMgr.search(new DBEObject()).size();
+        int initial_objects_count = objMgr.search(new DBEObjectReal()).size();
         int final_objects_count   = initial_objects_count;
 
         // Create Test Users
@@ -643,7 +655,7 @@ public class CoreTest extends TestCase {
             objMgr.setUserGroupsList(testUser.getGroups());
 
             for (String name: object_names) {
-                DBEObject obj = new DBEObject(name, "description of object '" + name + "'");
+                DBEObject obj = new DBEObjectReal(name, "description of object '" + name + "'");
                 //obj.setDefaultValues(objMgr);
                 //obj.setPermissions("rwxrwxrwx");
                 System.out.println("obj: " + obj);
@@ -666,17 +678,13 @@ public class CoreTest extends TestCase {
 
             for (DBEObject o : objects) {
                 DBEObject obj = objMgr.objectById(o.getId());
-                System.out.println("obj: " + obj);
+                System.out.println("Partial:\t" + obj);
                 if (obj == null) fail("Error searching object");
+                DBEObject obj2 = objMgr.fullObjectById(o.getId());
+                System.out.println("Full:\t" + obj2);
+                if (obj2 == null) fail("Error searching full object");
             }
         });
-
-        // Test User and Group
-        objMgr.login("adm","adm");
-        DBEntity dbe = objMgr.dbeById("-5");
-        System.out.println("dbe: " + dbe);
-        dbe = objMgr.dbeById("-1");
-        System.out.println("dbe: " + dbe);
 
         testUsers.stream().forEach(testUser -> {
             System.out.println("* User: " + testUser.getLogin() + " " + testUser.getId());
@@ -710,7 +718,7 @@ public class CoreTest extends TestCase {
         _deleteTestUsers(testUsers);
 
 
-        final_objects_count   = objMgr.search(new DBEObject()).size();
+        final_objects_count   = objMgr.search(new DBEObjectReal()).size();
         System.out.println("Objects count: " + initial_objects_count + " -> " + final_objects_count);
         if(initial_objects_count!=final_objects_count) fail("Not all objects were deleted");
     }

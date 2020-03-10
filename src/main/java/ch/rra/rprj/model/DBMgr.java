@@ -166,6 +166,7 @@ public class DBMgr {
         logger.debug("db_query: sql="+sql);
         Session session = sessionFactory.openSession();
         NativeQuery q = session.createNativeQuery(sql);
+        logger.debug("db_query: klass="+klass);
         if(klass!=null) q.addEntity(klass);
         if(hm!=null) {
             for(String k : hm.keySet()) {
@@ -276,6 +277,7 @@ public class DBMgr {
         if(orderby!=null && orderby.length()>0)
             hql += " ORDER BY " + orderby;
 
+        logger.info("hql: " + hql);
         return this.db_query(hql, hashMap, search.getClass(),true);
     }
 
