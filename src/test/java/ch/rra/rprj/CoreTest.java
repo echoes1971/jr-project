@@ -743,7 +743,7 @@ public class CoreTest extends TestCase {
 
             for (String name: object_names) {
                 DBEObject obj = new DBEObjectReal(name, "description of object '" + name + "'");
-                System.out.println("obj: " + obj);
+                //System.out.println("obj: " + obj);
                 try {
                     obj = (DBEObject) objMgr.insert(obj);
                     System.out.println("-> " + obj);
@@ -764,7 +764,7 @@ public class CoreTest extends TestCase {
             for (DBEObject o : objects) {
                 List<DBEObject> objs = objMgr.objectByName(o.getName());
                 objs.forEach(obj -> {
-                    System.out.println("Partial:\t" + obj);
+                    System.out.println("Partial:" + obj);
                 });
                 if (objs==null || objs.size()==0) fail("Error searching objects");
 

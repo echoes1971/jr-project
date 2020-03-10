@@ -355,6 +355,7 @@ public class ObjectMgr extends DBMgr {
         //printObjectList(res);
         res.forEach(values -> {
             Object[] _values = (Object[]) values;
+            //logger.info("fullObjectByName: _values="+_values[0]+" "+_values[1]);
 
             Class myclass = registeredObjectTypes.stream().filter(k -> k.getSimpleName().equals(_values[0])).collect(Collectors.toList()).get(0);
             logger.debug("fullObjectById: myclass="+myclass);
