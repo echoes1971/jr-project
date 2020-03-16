@@ -1,0 +1,9 @@
+
+
+https://www.baeldung.com/spring-security-login
+  https://www.baeldung.com/spring-security-with-maven
+  https://www.baeldung.com/spring-mvc-tutorial
+
+
+https://spring.io/guides/gs/testing-web/
+https://howtodoinjava.com/spring-boot2/testing/testresttemplate-post-example/

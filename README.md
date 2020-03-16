@@ -4,6 +4,8 @@ Start the DB in `./docker/` and follow the instructions to initialize the DB.
 
 Run the tests with: `./mvnw -Dtest=ModelTest test`
 
+Run spring-boot: `./mvnw spring-boot:run`
+maybe adding some memory before: `export MAVEN_OPTS=-Xmx1024m`
 
 **TODO**
 - dbschema.php
@@ -12,11 +14,11 @@ Run the tests with: `./mvnw -Dtest=ModelTest test`
     - DBECompany
     - DBEPeople
   - CMS
-    - DBEEvent
-    - DBEFile
     - DBEFolder
-    - DBELink
     - DBEPage
+    - DBEFile
+    - DBELink
+    - DBEEvent
     - DBENews
   - Projects
     - DBEProject
