@@ -19,7 +19,7 @@ public class UIController {
     @ResponseBody
     public HashMap<String,String> ui_rootobj() {
         return new HashMap<String, String>() {{
-                put("id", "-10");   put("name", "Home");
+                put("id", "-10");   put("name", "Home"); put("icon", "glyphicon-folder-close");
             }};
     }
 
@@ -28,10 +28,10 @@ public class UIController {
     public Vector<HashMap> ui_topmenu() {
         return new Vector<HashMap>(){{
             add(new HashMap<String, String>() {{
-                put("id", "-13");   put("name", "Downloads");
+                put("id", "-13");   put("name", "Downloads"); put("icon", "glyphicon-folder-close");
             }});
             add(new HashMap<String, String>() {{
-                put("id", "-14");   put("name", "About us");
+                put("id", "-14");   put("name", "About us"); put("icon", "glyphicon-folder-close");
             }});
         }};
     }
@@ -42,13 +42,13 @@ public class UIController {
         // [{'id':'aaa','name':'Parent 1'},{'id':'aab','name':'Parent 2'},{'id':'aac','name':'Parent 3'}]
         return new Vector<HashMap>(){{
             add(new HashMap<String, String>() {{
-                put("id", "aaa");   put("name", "Parent 1");
+                put("id", "aaa");   put("name", "Parent 1"); put("icon", "glyphicon-folder-close");
             }});
             add(new HashMap<String, String>() {{
-                put("id", "aab");   put("name", "Parent 2");
+                put("id", "aab");   put("name", "Parent 2"); put("icon", "glyphicon-folder-close");
             }});
             add(new HashMap<String, String>() {{
-                put("id", "aac");   put("name", "Parent 3");
+                put("id", "aac");   put("name", "Parent 3"); put("icon", "glyphicon-folder-close");
             }});
         }};
     }
