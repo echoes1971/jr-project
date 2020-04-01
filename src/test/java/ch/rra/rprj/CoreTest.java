@@ -261,9 +261,6 @@ public class CoreTest extends TestCase {
         System.out.println("UsersGroups:\t" + initial_usersgroups + " => " + current_usersgroups);
         System.out.println("==============================================================");
 
-
-        // TODO create a many to many relationship and start deleting stuff
-
         Vector<User> users2 = new Vector<User>();
         try {
             int skip = -1;
