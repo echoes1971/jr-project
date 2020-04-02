@@ -10,10 +10,11 @@ import java.util.Vector;
 @Controller
 public class UIController {
 
-    @GetMapping("/")
-    public String app() { return "app.html"; }
+//    @GetMapping("/")
+//    public String app() { return "cippa.html"; }
 
-    // ['-13','Downloads'], ['-14','About us']
+    @GetMapping("/aaa")
+    public String app() { return "/cippa.jsp"; }
 
     @GetMapping("/ui/rootobj")
     @ResponseBody
@@ -25,8 +26,8 @@ public class UIController {
 
     @GetMapping("/ui/topmenu")
     @ResponseBody
-    public Vector<HashMap> ui_topmenu() {
-        return new Vector<HashMap>(){{
+    public Vector<HashMap<String, String>> ui_topmenu() {
+        return new Vector<HashMap<String, String>>(){{
             add(new HashMap<String, String>() {{
                 put("id", "-13");   put("name", "Downloads"); put("icon", "glyphicon-folder-close");
             }});
@@ -38,9 +39,9 @@ public class UIController {
 
     @GetMapping("/ui/parentlist")
     @ResponseBody
-    public Vector<HashMap> ui_parentlist() {
+    public Vector<HashMap<String, String>> ui_parentlist() {
         // [{'id':'aaa','name':'Parent 1'},{'id':'aab','name':'Parent 2'},{'id':'aac','name':'Parent 3'}]
-        return new Vector<HashMap>(){{
+        return new Vector<HashMap<String, String>>(){{
             add(new HashMap<String, String>() {{
                 put("id", "aaa");   put("name", "Parent 1"); put("icon", "glyphicon-folder-close");
             }});
