@@ -1,4 +1,4 @@
-package ch.rra.rprj;
+package ch.rra.rprj.model;
 
 import ch.rra.rprj.model.ObjectMgr;
 import ch.rra.rprj.model.cms.DBENote;

@@ -1,4 +1,4 @@
-package ch.rra.rprj;
+package ch.rra.rprj.controllers;
 
 // See: https://spring.io/guides/gs/testing-web/
 // See: https://howtodoinjava.com/spring-boot2/testing/testresttemplate-post-example/
