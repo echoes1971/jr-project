@@ -7,6 +7,7 @@ import ch.rra.rprj.model.core.User;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.boot.test.web.client.TestRestTemplate;
@@ -14,6 +15,8 @@ import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import java.util.HashMap;
+import java.util.Vector;
+import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -39,10 +42,34 @@ public class HttpRequestTest {
         assertThat(resp).contains("pong");
     }
 
+    @Value("${rprj.rootobj.id}")
+    private String rootObjId;
+
+    // ./mvnw -Dtest=HttpRequestTest#rootObj test
+    @Test
+    public void rootObj() throws Exception {
+        System.out.println("restTemplate: " + restTemplate);
+        HashMap<String, Object> resp = this.restTemplate.getForObject("http://localhost:" + port + "/ui/rootobj",
+                HashMap.class);
+        System.out.println("resp: " + resp);
+        assertThat(resp.get("id")).isEqualTo(rootObjId);
+    }
+
+    // ./mvnw -Dtest=HttpRequestTest#topMenu test
+    @Test
+    public void topMenu() throws Exception {
+        System.out.println("restTemplate: " + restTemplate);
+        Vector<HashMap<String, String>> resp = this.restTemplate.getForObject("http://localhost:" + port + "/ui/topmenu",
+                Vector.class);
+        System.out.println("resp: " + resp);
+        System.out.println("ids: "+resp.stream().map(x -> x.get("id")).collect(Collectors.joining(",")));
+        assertThat(resp.size()>0);
+    }
+
     // ./mvnw -Dtest=HttpRequestTest#loginTest test
     @Test
     public void loginTest() throws Exception {
-        User resp = (User) this.restTemplate.postForObject(
+        User resp = this.restTemplate.postForObject(
                 "http://localhost:" + port + "/login",
                 new HashMap<String,String>(){
                     {
@@ -58,7 +85,7 @@ public class HttpRequestTest {
     // ./mvnw -Dtest=HttpRequestTest#loginNegativeTest test
     @Test
     public void loginNegativeTest() throws Exception {
-        User resp = (User) this.restTemplate.postForObject(
+        User resp = this.restTemplate.postForObject(
                 "http://localhost:" + port + "/login",
                 new HashMap<String,String>(){
                     {

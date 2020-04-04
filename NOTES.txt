@@ -7,3 +7,8 @@ https://www.baeldung.com/spring-security-login
 
 https://spring.io/guides/gs/testing-web/
 https://howtodoinjava.com/spring-boot2/testing/testresttemplate-post-example/
+https://www.tutorialspoint.com/spring_boot/spring_boot_application_properties.htm
+
+Zero date time with JDBC:
+  https://www.oodlestechnologies.com/blogs/How-to-handle-DATETIME-values-with--zero-Timestamp-in-JDBC/
+

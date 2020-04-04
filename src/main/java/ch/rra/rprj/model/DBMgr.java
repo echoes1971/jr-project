@@ -35,7 +35,7 @@ public class DBMgr {
             return true;
         } catch(Exception e) {
             System.out.println("**************************");
-            System.out.println(e);
+            System.out.println(e.getMessage());
             e.printStackTrace();
             StandardServiceRegistryBuilder.destroy(registry);
             return false;
@@ -59,7 +59,7 @@ public class DBMgr {
             System.out.println(u.toString());
         }
         System.out.println("Users: " + users.size());
-        System.out.println("");
+        System.out.println();
         session.close();
         return users.size();
     }
@@ -71,7 +71,7 @@ public class DBMgr {
             System.out.println(dbe.toString());
         }
         System.out.println("Groups: " + dbes.size());
-        System.out.println("");
+        System.out.println();
         session.close();
         return dbes.size();
     }
@@ -79,7 +79,7 @@ public class DBMgr {
         List objs = this.db_query("SELECT user_id, group_id FROM rprj_users_groups");
         printObjectList(objs);
         System.out.println("Objects: " + objs.size());
-        System.out.println("");
+        System.out.println();
         return objs.size();
     }
     public void printObjectList(List objects) {
@@ -89,7 +89,7 @@ public class DBMgr {
                 for (Object o : obj) {
                     System.out.print(" " + o);
                 }
-                System.out.println("");
+                System.out.println();
             }
         } catch (ClassCastException cce) {
             try {
@@ -98,7 +98,7 @@ public class DBMgr {
                     for(Object k : hm.keySet()) {
                         System.out.print(" " + k + ": " + hm.get(k));
                     }
-                    System.out.println("");
+                    System.out.println();
                 }
             } catch(ClassCastException cce2) {
                 for (Object obj : objects) {
@@ -164,13 +164,14 @@ public class DBMgr {
     }
     public List<DBEntity> db_query(String sql, HashMap<String,Object> hm, Class klass, boolean initializeLazyObjects) {
         logger.debug("db_query: sql="+sql);
+        logger.debug("db_query: hm="+hm);
+        logger.debug("db_query: klass="+klass);
         Session session = sessionFactory.openSession();
         NativeQuery q = session.createNativeQuery(sql);
-        logger.debug("db_query: klass="+klass);
         if(klass!=null) q.addEntity(klass);
         if(hm!=null) {
-            for(String k : hm.keySet()) {
-                logger.debug(k+": "+hm.get(k)+" "+(hm.get(k)).getClass().getName());
+            for (String k : hm.keySet()) {
+                //logger.debug(k + ": " + hm.get(k) + " " + (hm.get(k)).getClass().getName());
                 q.setParameter(k, hm.get(k));
             }
         }
@@ -260,8 +261,8 @@ public class DBMgr {
         logger.debug("tablename: " + tablename);
 
         // Columns
-        HashMap<String,Object> hashMap = new HashMap<String,Object>();
-        List<String> clauses = new ArrayList<String>();
+        HashMap<String,Object> hashMap = new HashMap<>();
+        List<String> clauses = new ArrayList<>();
         _getClausesAndValues(search, uselike, hashMap, clauses);
 
         String hql = "SELECT * FROM " + tablename;

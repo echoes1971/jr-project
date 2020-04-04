@@ -106,8 +106,8 @@ public abstract class DBEObject extends DBEntity {
     public String getOwner() { return owner; }
     public void setOwner(String owner) { this.owner = owner; }
 
-    public String getGroupId() { return group_id; }
-    public void setGroupId(String group_id) { this.group_id = group_id; }
+    public String getGroup_id() { return group_id; }
+    public void setGroup_id(String group_id) { this.group_id = group_id; }
 
     public String getPermissions() { return permissions; }
     public void setPermissions(String permissions) { this.permissions = permissions; }
@@ -115,23 +115,23 @@ public abstract class DBEObject extends DBEntity {
     public String getCreator() { return creator; }
     public void setCreator(String creator) { this.creator = creator; }
 
-    public Timestamp getCreationDate() { return creation_date; }
-    public void setCreationDate(Timestamp creation_date) { this.creation_date = creation_date; }
+    public Timestamp getCreation_date() { return creation_date; }
+    public void setCreation_date(Timestamp creation_date) { this.creation_date = creation_date; }
 
-    public String getLastModify() { return last_modify; }
-    public void setLastModify(String last_modify) { this.last_modify = last_modify; }
+    public String getLast_modify() { return last_modify; }
+    public void setLast_modify(String last_modify) { this.last_modify = last_modify; }
 
-    public Timestamp getLastModify_date() { return last_modify_date; }
-    public void setLastModify_date(Timestamp last_modify_date) { this.last_modify_date = last_modify_date; }
+    public Timestamp getLast_modify_date() { return last_modify_date; }
+    public void setLast_modify_date(Timestamp last_modify_date) { this.last_modify_date = last_modify_date; }
 
-    public String getDeletedBy() { return deleted_by; }
-    public void setDeletedBy(String deleted_by) { this.deleted_by = deleted_by; }
+    public String getDeleted_by() { return deleted_by; }
+    public void setDeleted_by(String deleted_by) { this.deleted_by = deleted_by; }
 
-    public Timestamp getDeletedDate() { return deleted_date; }
-    public void setDeletedDate(Timestamp deleted_date) { this.deleted_date = deleted_date; }
+    public Timestamp getDeleted_date() { return deleted_date; }
+    public void setDeleted_date(Timestamp deleted_date) { this.deleted_date = deleted_date; }
 
-    public String getFatherId() { return father_id; }
-    public void setFatherId(String father_id) { this.father_id = father_id; }
+    public String getFather_id() { return father_id; }
+    public void setFather_id(String father_id) { this.father_id = father_id; }
 
     public String getName() { return name; }
     public void setName(String name) { this.name = name; }
@@ -210,7 +210,7 @@ public abstract class DBEObject extends DBEntity {
         } else {
             DBEObject father = objMgr.objectById(this.father_id);
             if(father!=null) {
-                this.group_id = father.getGroupId();
+                this.group_id = father.getGroup_id();
                 this.permissions = father.getPermissions();
             }
         }
@@ -221,7 +221,7 @@ public abstract class DBEObject extends DBEntity {
         super.beforeInsert(dbMgr);
         this.setId(this.getNextUuid());
         this.setDefaultValues((ObjectMgr)dbMgr);
-        this.setDeletedDate(new Timestamp(0));
+        this.setDeleted_date(new Timestamp(0));
     }
 
     @Override

@@ -8,7 +8,7 @@ import javax.persistence.Table;
 import java.sql.Timestamp;
 
 /*
-mysql> desc rprj_notes;
+mysql> desc rprj_pages;
 +------------------+--------------+------+-----+---------------------+-------+
 | Field            | Type         | Null | Key | Default             | Extra |
 +------------------+--------------+------+-----+---------------------+-------+
@@ -25,36 +25,52 @@ mysql> desc rprj_notes;
 | father_id        | varchar(16)  | YES  | MUL | NULL                |       |
 | name             | varchar(255) | NO   |     | NULL                |       |
 | description      | text         | YES  |     | NULL                |       |
+| html             | text         | YES  |     | NULL                |       |
 | fk_obj_id        | varchar(16)  | YES  | MUL | NULL                |       |
+| language         | varchar(5)   | YES  |     | en_us               |       |
 +------------------+--------------+------+-----+---------------------+-------+
 */
 
 @Entity
-@Table(name="rprj_notes")
-public class DBENote extends DBEObject {
+@Table(name="rprj_pages")
+public class DBEPage extends DBEObject {
+    @Column(name = "html", columnDefinition = "TEXT")
+    private String html;
 
     @Column(name = "fk_obj_id", columnDefinition = "VARCHAR(16)")
     private String fk_obj_id;
 
-    public DBENote() {}
+    @Column(name = "language", columnDefinition = "VARCHAR(5)")
+    private String language;
 
-    public DBENote(String name, String description) {
-        super(name,description);
+    public DBEPage() {
     }
 
-    public DBENote(String id, String owner, String group_id, String permissions, String creator, Timestamp creation_date, String last_modify, Timestamp last_modify_date, String deleted_by, Timestamp deleted_date, String father_id, String name, String description, String fk_obj_id) {
+    public DBEPage(String name, String description) {
+        super(name, description);
+    }
+
+    public DBEPage(String id, String owner, String group_id, String permissions, String creator, Timestamp creation_date, String last_modify, Timestamp last_modify_date, String deleted_by, Timestamp deleted_date, String father_id, String name, String description, String html, String fk_obj_id, String language) {
         super(id, owner, group_id, permissions, creator, creation_date, last_modify, last_modify_date, deleted_by, deleted_date, father_id, name, description);
+        this.html = html;
         this.fk_obj_id = fk_obj_id;
+        this.language = language;
     }
 
-    public String getIcon() { return "glyphicon-circle-arrow-right"; }
+    public String getIcon() { return "glyphicon-file"; }
+
+    public String getHtml() { return html; }
+    public void setHtml(String html) { this.html = html; }
 
     public String getFk_obj_id() { return fk_obj_id; }
     public void setFk_obj_id(String fk_obj_id) { this.fk_obj_id = fk_obj_id; }
 
+    public String getLanguage() { return language; }
+    public void setLanguage(String language) { this.language = language; }
+
     @Override
     public String toString() {
-        return "DBENote{" +
+        return "DBEPage{" +
                 "id='" + id + '\'' +
                 (owner!=null ? ", owner='" + owner + '\'' : "") +
                 (group_id!=null ? ", group_id='" + group_id + '\'' : "") +
@@ -70,7 +86,9 @@ public class DBENote extends DBEObject {
                 (father_id!=null ? ", father_id='" + father_id + '\'' : "") +
                 ", name='" + name + '\'' +
                 (description!=null ? ", description='" + description + '\'' : "") +
+                (html!=null ? ", html='" + html + '\'' : "") +
                 (fk_obj_id!=null ? ", fk_obj_id='" + fk_obj_id + '\'' : "") +
+                (language!=null ? ", language='" + language + '\'' : "") +
                 '}';
     }
 }

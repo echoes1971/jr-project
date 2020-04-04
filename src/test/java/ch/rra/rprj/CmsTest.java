@@ -2,7 +2,9 @@ package ch.rra.rprj;
 
 import ch.rra.rprj.model.DBException;
 import ch.rra.rprj.model.ObjectMgr;
+import ch.rra.rprj.model.cms.DBEFolder;
 import ch.rra.rprj.model.cms.DBENote;
+import ch.rra.rprj.model.cms.DBEPage;
 import ch.rra.rprj.model.core.DBEObject;
 import ch.rra.rprj.model.core.DBEntity;
 import ch.rra.rprj.model.core.User;
@@ -38,7 +40,7 @@ public class CmsTest extends TestCase {
         //String[] usernames = {"user01","user02","user03","user04","user05"};
         Vector<User> testUsers = _createTestUsers(usernames);
 
-        List<DBEObject> objects = new ArrayList<DBEObject>();
+        List<DBEObject> objects = new ArrayList<>();
 
         System.out.println("* Insert");
         String[] object_names = {"note one", "note two", "note three", "note four", "note five"};
@@ -112,6 +114,184 @@ public class CmsTest extends TestCase {
 
 
         final_objects_count   = objMgr.search(new DBENote()).size();
+        System.out.println("Objects count: " + initial_objects_count + " -> " + final_objects_count);
+        if(initial_objects_count!=final_objects_count) fail("Not all objects were deleted");
+    }
+
+    // ./mvnw -Dtest=CmsTest#testFolders test
+    public void testFolders() {
+        System.out.println("**** Test Folders");
+        int initial_objects_count = objMgr.search(new DBEFolder()).size();
+        int final_objects_count   = initial_objects_count;
+
+        // Create Test Users
+        String[] usernames = {"user01"};
+        //String[] usernames = {"user01","user02","user03","user04","user05"};
+        Vector<User> testUsers = _createTestUsers(usernames);
+
+        List<DBEObject> objects = new ArrayList<DBEObject>();
+
+        System.out.println("* Insert");
+        String[] object_names = {"folder one", "folder two", "folder three", "folder four", "folder five"};
+        testUsers.stream().forEach(testUser -> {
+            objMgr.setDbeUser(testUser);
+            objMgr.setUserGroupsList(testUser.getGroups());
+
+            for (String name: object_names) {
+                DBEFolder obj = new DBEFolder(name, "description of object '" + name + "'");
+                //obj.setDefaultValues(objMgr);
+                //obj.setPermissions("rwxrwxrwx");
+                System.out.println("obj: " + obj);
+                try {
+                    obj = (DBEFolder) objMgr.insert(obj);
+                    System.out.println("-> " + obj);
+                    objects.add(obj);
+                } catch (DBException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+        System.out.println("");
+
+        System.out.println("* Search");
+        testUsers.stream().forEach(testUser -> {
+            System.out.println("* User: " + testUser.getLogin() + " " + testUser.getId());
+            objMgr.setDbeUser(testUser);
+            objMgr.setUserGroupsList(testUser.getGroups());
+
+            List<DBEntity> res = objMgr.search(new DBEFolder());
+            System.out.println("res: "+res.size());
+            if((res.size()-initial_objects_count)!=object_names.length) fail("Error with privileges");
+            res.stream().forEach((dbe) -> {
+                System.out.println(" " + dbe);
+            });
+            System.out.println("");
+        });
+
+        testUsers.stream().forEach(testUser -> {
+            System.out.println("* User: " + testUser.getLogin() + " " + testUser.getId());
+            objMgr.setDbeUser(testUser);
+            objMgr.setUserGroupsList(testUser.getGroups());
+
+            System.out.println("* Delete 1");
+            List<DBEObject> deleted_objects = new ArrayList<DBEObject>();
+            objects.stream().forEach(obj -> {
+                try {
+                    obj = (DBEObject) objMgr.delete(obj);
+                    deleted_objects.add(obj);
+                    System.out.println("-> " + obj);
+                } catch (DBException e) {
+                    //e.printStackTrace();
+                }
+            });
+            //final_objects_count   = objMgr.search(new DBEObject()).size();
+            //System.out.println("Objects count: " + initial_objects_count + " -> " + final_objects_count);
+
+            System.out.println("* Delete 2");
+            deleted_objects.stream().forEach(obj -> {
+                try {
+                    obj = (DBEObject) objMgr.delete(obj);
+                    System.out.println("-> " + obj);
+                } catch (DBException e) {
+                    //e.printStackTrace();
+                }
+            });
+        });
+
+        // Delete test users
+        _deleteTestUsers(testUsers);
+
+
+        final_objects_count   = objMgr.search(new DBEFolder()).size();
+        System.out.println("Objects count: " + initial_objects_count + " -> " + final_objects_count);
+        if(initial_objects_count!=final_objects_count) fail("Not all objects were deleted");
+    }
+
+    // ./mvnw -Dtest=CmsTest#testPages test
+    public void testPages() {
+        System.out.println("**** Test testPages");
+        int initial_objects_count = objMgr.search(new DBEPage()).size();
+        int final_objects_count   = initial_objects_count;
+
+        // Create Test Users
+        //String[] usernames = {"user01"};
+        String[] usernames = {"user01","user02","user03","user04","user05"};
+        Vector<User> testUsers = _createTestUsers(usernames);
+
+        List<DBEObject> objects = new ArrayList<DBEObject>();
+
+        System.out.println("* Insert");
+        String[] object_names = {"page one", "page two", "page three", "page four", "page five"};
+        testUsers.stream().forEach(testUser -> {
+            objMgr.setDbeUser(testUser);
+            objMgr.setUserGroupsList(testUser.getGroups());
+
+            for (String name: object_names) {
+                DBEPage obj = new DBEPage(name, "description of object '" + name + "'");
+                //obj.setDefaultValues(objMgr);
+                //obj.setPermissions("rwxrwxrwx");
+                System.out.println("obj: " + obj);
+                try {
+                    obj = (DBEPage) objMgr.insert(obj);
+                    System.out.println("-> " + obj);
+                    objects.add(obj);
+                } catch (DBException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+        System.out.println("");
+
+        System.out.println("* Search");
+        testUsers.stream().forEach(testUser -> {
+            System.out.println("* User: " + testUser.getLogin() + " " + testUser.getId());
+            objMgr.setDbeUser(testUser);
+            objMgr.setUserGroupsList(testUser.getGroups());
+
+            List<DBEntity> res = objMgr.search(new DBEPage());
+            System.out.println("res: "+res.size());
+            if((res.size()-initial_objects_count)!=object_names.length) fail("Error with privileges");
+            res.stream().forEach((dbe) -> {
+                System.out.println(" " + dbe);
+            });
+            System.out.println("");
+        });
+
+        testUsers.stream().forEach(testUser -> {
+            System.out.println("* User: " + testUser.getLogin() + " " + testUser.getId());
+            objMgr.setDbeUser(testUser);
+            objMgr.setUserGroupsList(testUser.getGroups());
+
+            System.out.println("* Delete 1");
+            List<DBEObject> deleted_objects = new ArrayList<DBEObject>();
+            objects.stream().forEach(obj -> {
+                try {
+                    obj = (DBEObject) objMgr.delete(obj);
+                    deleted_objects.add(obj);
+                    System.out.println("-> " + obj);
+                } catch (DBException e) {
+                    //e.printStackTrace();
+                }
+            });
+            //final_objects_count   = objMgr.search(new DBEObject()).size();
+            //System.out.println("Objects count: " + initial_objects_count + " -> " + final_objects_count);
+
+            System.out.println("* Delete 2");
+            deleted_objects.stream().forEach(obj -> {
+                try {
+                    obj = (DBEObject) objMgr.delete(obj);
+                    System.out.println("-> " + obj);
+                } catch (DBException e) {
+                    //e.printStackTrace();
+                }
+            });
+        });
+
+        // Delete test users
+        _deleteTestUsers(testUsers);
+
+
+        final_objects_count   = objMgr.search(new DBEPage()).size();
         System.out.println("Objects count: " + initial_objects_count + " -> " + final_objects_count);
         if(initial_objects_count!=final_objects_count) fail("Not all objects were deleted");
     }

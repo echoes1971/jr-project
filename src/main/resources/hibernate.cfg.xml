@@ -17,14 +17,14 @@
         <property name="dialect">org.hibernate.dialect.MySQL57Dialect</property>
 
         <property name="connection.driver_class">com.mysql.jdbc.Driver</property>
-        <property name="connection.url">jdbc:mysql://127.0.0.1:3306/rproject</property>
+        <property name="connection.url">jdbc:mysql://127.0.0.1:3306/rproject?zeroDateTimeBehavior=convertToNull</property>
         <!-- property name="connection.url">jdbc:mysql://172.17.0.1:3306/rproject</property -->
         <property name="connection.username">root</property>
         <property name="connection.password">mysecret</property>
 
 
         <!-- JDBC connection pool (use the built-in) -->
-        <property name="connection.pool_size">1</property>
+        <!-- property name="connection.pool_size">1</property -->
 
         <!-- Disable the second-level cache  -->
         <property name="cache.provider_class">org.hibernate.cache.internal.NoCacheProvider</property>
@@ -42,7 +42,9 @@
         <mapping class="ch.rra.rprj.model.core.DBELog"/>
         <mapping class="ch.rra.rprj.model.core.DBEObject"/>
         <mapping class="ch.rra.rprj.model.core.DBEObjectReal"/>
+        <mapping class="ch.rra.rprj.model.cms.DBEFolder"/>
         <mapping class="ch.rra.rprj.model.cms.DBENote"/>
+        <mapping class="ch.rra.rprj.model.cms.DBEPage"/>
 
     </session-factory>
 

@@ -1,6 +1,8 @@
 package ch.rra.rprj.model;
 
+import ch.rra.rprj.model.cms.DBEFolder;
 import ch.rra.rprj.model.cms.DBENote;
+import ch.rra.rprj.model.cms.DBEPage;
 import ch.rra.rprj.model.core.*;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
@@ -22,18 +24,22 @@ public class ObjectMgr extends DBMgr {
     private List<Class> typesWithId = Arrays.asList(new Class[]{
             User.class,
             Group.class,
+            DBEFolder.class,
             DBENote.class,
-            DBEObjectReal.class
+            DBEObjectReal.class,
+            DBEPage.class
     });
     // TODO add all the sublasses and remove DBEObject
     private List<Class> registeredObjectTypes = Arrays.asList(new Class[]{
+            DBEFolder.class,
             DBENote.class,
-            DBEObjectReal.class
+            DBEObjectReal.class,
+            DBEPage.class
     });
 
     public boolean canRead(DBEObject obj) {
         return obj.canRead(' ')
-            || (obj.canRead('G') && hasGroup(obj.getGroupId()))
+            || (obj.canRead('G') && hasGroup(obj.getGroup_id()))
             || (obj.canRead('U')
                 && getDbeUser()!=null && getDbeUser().getId().equals(obj.getOwner()));
     }
@@ -42,7 +48,7 @@ public class ObjectMgr extends DBMgr {
         if(u!=null && u.getId().equals(o.getCreator()))
             return true;
         return o.canWrite(' ')
-                || (o.canWrite('G') && hasGroup(o.getGroupId()))
+                || (o.canWrite('G') && hasGroup(o.getGroup_id()))
                 || (o.canWrite('U') && u!=null && u.getId().equals(o.getOwner()));
     }
     public boolean canExecute(DBEObject o) {
@@ -50,7 +56,7 @@ public class ObjectMgr extends DBMgr {
         if(u!=null && u.getId().equals(o.getCreator()))
             return true;
         return o.canExecute(' ')
-                || (o.canExecute('G') && hasGroup(o.getGroupId()))
+                || (o.canExecute('G') && hasGroup(o.getGroup_id()))
                 || (o.canExecute('U') && u!=null && u.getId().equals(o.getOwner()));
     }
 
@@ -100,8 +106,7 @@ public class ObjectMgr extends DBMgr {
     }
     public List<DBEntity> search(DBEntity search, boolean uselike, String orderby, boolean ignore_deleted) {
         if (search instanceof DBEObject && ignore_deleted)
-            ((DBEObject) search).setDeletedBy(null);
-            //$dbe -> setValue('deleted_date', '0000-00-00 00:00:00');
+            ((DBEObject) search).setDeleted_by(null);
         List<DBEntity> res = super.search(search, uselike, orderby);
         return res.stream().filter(x -> !(x instanceof DBEObject) || this.canRead((DBEObject) x)).collect(Collectors.toList());
     }
@@ -109,9 +114,9 @@ public class ObjectMgr extends DBMgr {
     public DBEntity dbeById(String id) {
         DBEntity ret = null;
         // Search all the subclasses of DBEntity with an ID
-        Vector<String> qs = new Vector<String>();
+        Vector<String> qs = new Vector<>();
         for (Class klass : typesWithId) {
-            DBEntity dbe = null;
+            DBEntity dbe;
             try {
                 dbe = (DBEntity) klass.newInstance();
             } catch (InstantiationException | IllegalAccessException e) {
@@ -152,9 +157,9 @@ public class ObjectMgr extends DBMgr {
                 ,"creation_date","last_modify","last_modify_date"
                 ,"deleted_by","deleted_date"
                 ,"father_id","name","description"};
-        Vector<String> qs = new Vector<String>();
+        Vector<String> qs = new Vector<>();
         for (Class klass : registeredObjectTypes) {
-            DBEntity dbe = null;
+            DBEntity dbe;
             try {
                 dbe = (DBEntity) klass.newInstance();
             } catch (InstantiationException | IllegalAccessException e) {
@@ -175,8 +180,8 @@ public class ObjectMgr extends DBMgr {
         HashMap<String,Object> hm = new HashMap<>();
         hm.put("id", id);
         List res = this.db_query(sql,hm,DBEObjectReal.class,false);
+        logger.debug("res: "+res.size());
         if(res.size()==1) {
-            logger.debug("SUNCHI: " + ((DBEObjectReal) res.get(0)));
             return (DBEObject) res.get(0);
         }
         // TODO Verify this for DBENotes
@@ -241,16 +246,11 @@ public class ObjectMgr extends DBMgr {
         Object[] values = (Object[]) res.get(0);
 
         Class myclass = registeredObjectTypes.stream().filter(k -> k.getSimpleName().equals(values[0])).collect(Collectors.toList()).get(0);
-        logger.info("fullObjectById: myclass="+myclass);
+        //logger.info("fullObjectById: myclass="+myclass);
         try {
             DBEObject search = (DBEObject) myclass.newInstance();
             search.setId(id);
-            logger.debug("fullObjectById: search="+search);
             List<DBEntity> res2 = this.search(search, false, null, ignore_deleted);
-            logger.debug("fullObjectById: res2="+res2.size());
-            res2.stream().forEach(dbe -> {
-                logger.debug("fullObjectById: dbe="+dbe);
-            });
             if(res2.size()==1) ret = (DBEObject) res2.get(0);
         } catch (InstantiationException | IllegalAccessException e) {
             e.printStackTrace();
@@ -267,9 +267,9 @@ public class ObjectMgr extends DBMgr {
                 ,"deleted_by","deleted_date"
                 ,"father_id","name","description"
         };
-        Vector<String> qs = new Vector<String>();
+        Vector<String> qs = new Vector<>();
         for (Class klass : registeredObjectTypes) {
-            DBEntity dbe = null;
+            DBEntity dbe;
             try {
                 dbe = (DBEntity) klass.newInstance();
             } catch (InstantiationException | IllegalAccessException e) {
@@ -320,7 +320,7 @@ public class ObjectMgr extends DBMgr {
     }
     public List<DBEObject> fullObjectByName(String name) { return fullObjectByName(name,true); }
     public List<DBEObject> fullObjectByName(String name, boolean ignore_deleted) {
-        List<DBEObject> ret = new ArrayList<DBEObject>();
+        List<DBEObject> ret = new ArrayList<>();
         // Search all the subclasses of DBEObject
         String[] column_list = {"id"
                 ,"owner","group_id","permissions","creator"
@@ -328,9 +328,9 @@ public class ObjectMgr extends DBMgr {
                 ,"deleted_by","deleted_date"
                 ,"father_id","name","description"
         };
-        Vector<String> qs = new Vector<String>();
+        Vector<String> qs = new Vector<>();
         for (Class klass : registeredObjectTypes) {
-            DBEntity dbe = null;
+            DBEntity dbe;
             try {
                 dbe = (DBEntity) klass.newInstance();
             } catch (InstantiationException | IllegalAccessException e) {

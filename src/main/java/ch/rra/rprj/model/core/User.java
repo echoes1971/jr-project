@@ -77,6 +77,9 @@ public class User extends DBEntity {
         this.group_id = group_id;
     }
 
+    public String getIcon() { return "glyphicon-user"; }
+
+
     public String getId() {
         return id;
     }

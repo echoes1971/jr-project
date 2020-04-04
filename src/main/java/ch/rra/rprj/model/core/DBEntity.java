@@ -34,21 +34,19 @@ public class DBEntity {
         return ret;
     }
 
+    public String getIcon() { return "glyphicon-cog"; }
+
     public HashMap<String, Object> getValues() {
-        return getValues(new HashMap<String,Object>());
+        return getValues(new HashMap<>());
     }
     public HashMap<String, Object> getValues(HashMap<String, Object> hashMap) {
         List<Field> fields = new ArrayList<>();
         Field[] this_fields = getClass().getDeclaredFields();
         if(this_fields!=null)
-            for(Field f : this_fields) {
-                fields.add(f);
-            }
+            fields.addAll(Arrays.asList(this_fields));
         if(getClass().getSuperclass().getSimpleName().equals("DBEObject")) {
             Field[] super_fields = getClass().getSuperclass().getDeclaredFields();
-            for(Field f : super_fields) {
-                fields.add(f);
-            }
+            fields.addAll(Arrays.asList(super_fields));
         }
         for (Field field : fields) {
             String field_name = field.getName();
@@ -56,7 +54,7 @@ public class DBEntity {
                     + field_name.substring(0,1).toUpperCase()
                     + field_name.substring(1).toLowerCase();
             // Value
-            Method method = null;
+            Method method;
             Object value = null;
             try {
                 method = getClass().getMethod(method_name);

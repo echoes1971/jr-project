@@ -33,6 +33,9 @@
 @REM MAVEN_SKIP_RC - flag to disable loading of mavenrc files
 @REM ----------------------------------------------------------------------------
 
+set JAVA_HOME=C:\Program Files\JetBrains\IntelliJ IDEA 2019.3.4\jbr
+
+
 @REM Begin all REM lines with '@' in case MAVEN_BATCH_ECHO is 'on'
 @echo off
 @REM set title of command window

@@ -9,13 +9,13 @@ maybe adding some memory before: `export MAVEN_OPTS=-Xmx1024m`
 
 **TODO**
 - dbschema.php
+  - Core
+    - DBEntity: setValues
   - Contacts
     - DBECountry
     - DBECompany
     - DBEPeople
   - CMS
-    - DBEFolder
-    - DBEPage
     - DBEFile
     - DBELink
     - DBEEvent
@@ -37,7 +37,9 @@ maybe adding some memory before: `export MAVEN_OPTS=-Xmx1024m`
 **DONE**
 - dbschema.php
   - CMS
+    - DBEFolder
     - DBENote
+    - DBEPage
   - Core
     - ObjectMgr
       - objectByName
