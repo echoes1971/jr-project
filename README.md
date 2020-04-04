@@ -8,18 +8,23 @@ Run spring-boot: `./mvnw spring-boot:run`
 maybe adding some memory before: `export MAVEN_OPTS=-Xmx1024m`
 
 **TODO**
+- Angular FE
+  - manage current object
+  - menu items: display correctly
+- Controllers
+  - UIController
+    - getCurrentObject
+    - getParentsList
+    - getMenuItems
 - dbschema.php
   - Core
     - DBEntity: setValues
   - Contacts
-    - DBECountry
     - DBECompany
     - DBEPeople
   - CMS
     - DBEFile
-    - DBELink
     - DBEEvent
-    - DBENews
   - Projects
     - DBEProject
     - DBEProjectCompanyRole
@@ -38,8 +43,12 @@ maybe adding some memory before: `export MAVEN_OPTS=-Xmx1024m`
 - dbschema.php
   - CMS
     - DBEFolder
+    - DBELink
+    - DBENews
     - DBENote
     - DBEPage
+  - Contacts
+    - DBECountry
   - Core
     - ObjectMgr
       - objectByName

@@ -89,7 +89,8 @@ public class UIController {
     @ResponseBody
     public Vector<HashMap<String, Object>> ui_topmenu(HttpSession httpSession) {
         List<DBEntity> res = getTopMenu(httpSession);
-        return (Vector<HashMap<String, Object>>) res.stream().map(DBEntity::getValues).collect(Collectors.toCollection((Supplier<Vector>) Vector::new));
+        return (Vector<HashMap<String, Object>>)
+                res.stream().map(DBEntity::getValues).collect(Collectors.toCollection((Supplier<Vector>) Vector::new));
     }
 
     @GetMapping("/ui/parentlist")

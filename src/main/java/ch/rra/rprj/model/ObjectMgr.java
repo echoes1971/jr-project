@@ -1,8 +1,7 @@
 package ch.rra.rprj.model;
 
-import ch.rra.rprj.model.cms.DBEFolder;
-import ch.rra.rprj.model.cms.DBENote;
-import ch.rra.rprj.model.cms.DBEPage;
+import ch.rra.rprj.model.cms.*;
+import ch.rra.rprj.model.contacts.DBECountry;
 import ch.rra.rprj.model.core.*;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
@@ -24,7 +23,10 @@ public class ObjectMgr extends DBMgr {
     private List<Class> typesWithId = Arrays.asList(new Class[]{
             User.class,
             Group.class,
+            DBECountry.class,
             DBEFolder.class,
+            DBELink.class,
+            DBENews.class,
             DBENote.class,
             DBEObjectReal.class,
             DBEPage.class
@@ -32,6 +34,8 @@ public class ObjectMgr extends DBMgr {
     // TODO add all the sublasses and remove DBEObject
     private List<Class> registeredObjectTypes = Arrays.asList(new Class[]{
             DBEFolder.class,
+            DBELink.class,
+            DBENews.class,
             DBENote.class,
             DBEObjectReal.class,
             DBEPage.class
@@ -150,7 +154,6 @@ public class ObjectMgr extends DBMgr {
 
     public DBEObject objectById(String id) { return objectById(id,true); }
     public DBEObject objectById(String id, boolean ignore_deleted) {
-        DBEObject ret = null;
         // Search all the subclasses of DBEObject
         String[] column_list = {"id"
                 ,"owner","group_id","permissions","creator"
@@ -206,7 +209,7 @@ public class ObjectMgr extends DBMgr {
             e.printStackTrace();
         }
 */
-        return ret;
+        return null;
     }
     public DBEObject fullObjectById(String id) { return fullObjectById(id,true); }
     public DBEObject fullObjectById(String id, boolean ignore_deleted) {
@@ -217,9 +220,9 @@ public class ObjectMgr extends DBMgr {
                 ,"creation_date","last_modify","last_modify_date"
                 ,"deleted_by","deleted_date"
                 ,"father_id","name","description"};
-        Vector<String> qs = new Vector<String>();
+        Vector<String> qs = new Vector<>();
         for (Class klass : registeredObjectTypes) {
-            DBEntity dbe = null;
+            DBEntity dbe;
             try {
                 dbe = (DBEntity) klass.newInstance();
             } catch (InstantiationException | IllegalAccessException e) {

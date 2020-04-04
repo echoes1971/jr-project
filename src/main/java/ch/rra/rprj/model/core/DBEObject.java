@@ -142,7 +142,7 @@ public abstract class DBEObject extends DBEntity {
     public boolean isDeleted() { return this.deleted_by!=null && this.deleted_by.length()>0; }
     public boolean canRead(char kind) {
         if(this.permissions==null || this.permissions.length()!=9) return true;
-        boolean ret = false;
+        boolean ret;
         switch (kind) {
             case 'U':
                 ret = this.permissions.charAt(0+0)=='r';
@@ -158,7 +158,7 @@ public abstract class DBEObject extends DBEntity {
     }
     public boolean canWrite(char kind) {
         if(this.permissions==null || this.permissions.length()!=9) return true;
-        boolean ret = false;
+        boolean ret;
         switch (kind) {
             case 'U':
                 ret = this.permissions.charAt(1+0)=='w';
@@ -174,7 +174,7 @@ public abstract class DBEObject extends DBEntity {
     }
     public boolean canExecute(char kind) {
         if(this.permissions==null || this.permissions.length()!=9) return true;
-        boolean ret = false;
+        boolean ret;
         switch (kind) {
             case 'U':
                 ret = this.permissions.charAt(2+0)=='x';

@@ -42,8 +42,7 @@ public class DBEntity {
     public HashMap<String, Object> getValues(HashMap<String, Object> hashMap) {
         List<Field> fields = new ArrayList<>();
         Field[] this_fields = getClass().getDeclaredFields();
-        if(this_fields!=null)
-            fields.addAll(Arrays.asList(this_fields));
+        fields.addAll(Arrays.asList(this_fields));
         if(getClass().getSuperclass().getSimpleName().equals("DBEObject")) {
             Field[] super_fields = getClass().getSuperclass().getDeclaredFields();
             fields.addAll(Arrays.asList(super_fields));
@@ -51,8 +50,10 @@ public class DBEntity {
         for (Field field : fields) {
             String field_name = field.getName();
             String method_name = "get"
-                    + field_name.substring(0,1).toUpperCase()
-                    + field_name.substring(1).toLowerCase();
+                + (field_name.substring(0,1).toUpperCase().equals(field_name.substring(0,1)) ?
+                    field_name :
+                    field_name.substring(0,1).toUpperCase() + field_name.substring(1).toLowerCase());
+
             // Value
             Method method;
             Object value = null;

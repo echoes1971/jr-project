@@ -252,7 +252,7 @@ public class User extends DBEntity {
         String hql = "Select user_id, group_id FROM rprj_users_groups"
                     + " where user_id = '" + this.id + "'"
                     + "   and group_id = '" + this.group_id + "'";
-        List results = dbMgr.db_query(hql);
+        List<DBEntity> results = dbMgr.db_query(hql);
         if(results.size()==0) {
             //System.out.println("insert into rprj_users_groups values ('" + this.id + "','" + this.group_id + "')");
             dbMgr.db_execute(

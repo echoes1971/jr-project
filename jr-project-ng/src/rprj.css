@@ -388,8 +388,8 @@ input.search {
   background-color: rgba(0,0,0,0.4);
 }
 #top_menu {
-  margin:0em;
-  padding:0em;
+  margin:0;
+  padding:0;
 }
 #top_menu a:link, #top_menu a:active, #top_menu a:visited, #top_menu a:hover {
   margin:auto 4px;

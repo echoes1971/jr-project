@@ -43,8 +43,11 @@
         <mapping class="ch.rra.rprj.model.core.DBEObject"/>
         <mapping class="ch.rra.rprj.model.core.DBEObjectReal"/>
         <mapping class="ch.rra.rprj.model.cms.DBEFolder"/>
+        <mapping class="ch.rra.rprj.model.cms.DBELink"/>
+        <mapping class="ch.rra.rprj.model.cms.DBENews"/>
         <mapping class="ch.rra.rprj.model.cms.DBENote"/>
         <mapping class="ch.rra.rprj.model.cms.DBEPage"/>
+        <mapping class="ch.rra.rprj.model.contacts.DBECountry"/>
 
     </session-factory>
 

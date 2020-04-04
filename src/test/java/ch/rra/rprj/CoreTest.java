@@ -136,7 +136,7 @@ public class CoreTest extends TestCase {
         } catch (DBException dbex) {
             dbex.printStackTrace();
         }
-        if (user.getGroup_id() == group.getId()) {
+        if (user.getGroup_id().equals(group.getId())) {
             fail("User has the extra group as foreign key: " + group.toString());
         }
 
@@ -261,7 +261,7 @@ public class CoreTest extends TestCase {
         System.out.println("UsersGroups:\t" + initial_usersgroups + " => " + current_usersgroups);
         System.out.println("==============================================================");
 
-        Vector<User> users2 = new Vector<User>();
+        Vector<User> users2 = new Vector<>();
         try {
             int skip = -1;
             for (User u : testUsers) {
@@ -431,7 +431,7 @@ public class CoreTest extends TestCase {
     }
 
     private Vector<Group> _createTestGroups(String[] group_names) {
-        Vector<Group> groups = new Vector<Group>();
+        Vector<Group> groups = new Vector<>();
         try {
             for (String s : group_names) {
                 groups.add((Group) objMgr.insert(new Group(
@@ -462,7 +462,7 @@ public class CoreTest extends TestCase {
         }
     }
     private Vector<User> _createTestUsers(String[] user_names) {
-        Vector<User> testUsers = new Vector<User>();
+        Vector<User> testUsers = new Vector<>();
         //System.out.println("* Create test users and groups");
         try {
             for(String s : user_names) {
@@ -536,7 +536,7 @@ public class CoreTest extends TestCase {
         //String[] usernames = {"user01","user02","user03","user04","user05"};
         Vector<User> testUsers = _createTestUsers(usernames);
 
-        List<DBEObject> objects = new ArrayList<DBEObject>();
+        List<DBEObject> objects = new ArrayList<>();
 
         System.out.println("* Insert");
         String[] object_names = {"object one", "object two", "object three", "object four", "object five"};
@@ -558,7 +558,7 @@ public class CoreTest extends TestCase {
                 }
             }
         });
-        System.out.println("");
+        System.out.println();
 
         System.out.println("* Search");
         testUsers.stream().forEach(testUser -> {
@@ -569,10 +569,8 @@ public class CoreTest extends TestCase {
             List<DBEntity> res = objMgr.search(new DBEObjectReal());
             System.out.println("res: "+res.size());
             if(res.size()!=object_names.length) fail("Error with privileges");
-            res.stream().forEach((dbe) -> {
-                System.out.println(" " + dbe);
-            });
-            System.out.println("");
+            res.stream().forEach((dbe) -> System.out.println(" " + dbe));
+            System.out.println();
         });
 
         testUsers.stream().forEach(testUser -> {
@@ -581,7 +579,7 @@ public class CoreTest extends TestCase {
             objMgr.setUserGroupsList(testUser.getGroups());
 
             System.out.println("* Delete 1");
-            List<DBEObject> deleted_objects = new ArrayList<DBEObject>();
+            List<DBEObject> deleted_objects = new ArrayList<>();
             objects.stream().forEach(obj -> {
                 try {
                     obj = (DBEObject) objMgr.delete(obj);
@@ -643,7 +641,7 @@ public class CoreTest extends TestCase {
         //String[] usernames = {"user01","user02","user03","user04","user05"};
         Vector<User> testUsers = _createTestUsers(usernames);
 
-        List<DBEObject> objects = new ArrayList<DBEObject>();
+        List<DBEObject> objects = new ArrayList<>();
 
         System.out.println("* Insert");
         String[] object_names = {"object one", "object two", "object three", "object four", "object five"};
@@ -663,7 +661,7 @@ public class CoreTest extends TestCase {
                 }
             }
         });
-        System.out.println("");
+        System.out.println();
 
         System.out.println("* Search");
         testUsers.stream().forEach(testUser -> {
@@ -687,7 +685,7 @@ public class CoreTest extends TestCase {
             objMgr.setUserGroupsList(testUser.getGroups());
 
             System.out.println("* Delete 1");
-            List<DBEObject> deleted_objects = new ArrayList<DBEObject>();
+            List<DBEObject> deleted_objects = new ArrayList<>();
             objects.stream().forEach(obj -> {
                 try {
                     obj = (DBEObject) objMgr.delete(obj);
@@ -730,7 +728,7 @@ public class CoreTest extends TestCase {
         //String[] usernames = {"user01","user02","user03","user04","user05"};
         Vector<User> testUsers = _createTestUsers(usernames);
 
-        List<DBEObject> objects = new ArrayList<DBEObject>();
+        List<DBEObject> objects = new ArrayList<>();
 
         System.out.println("* Insert");
         String[] object_names = {"object one", "object two", "object three", "object four", "object five"};
@@ -750,7 +748,7 @@ public class CoreTest extends TestCase {
                 }
             }
         });
-        System.out.println("");
+        System.out.println();
 
         System.out.println("* Search");
         testUsers.stream().forEach(testUser -> {
@@ -760,16 +758,12 @@ public class CoreTest extends TestCase {
 
             for (DBEObject o : objects) {
                 List<DBEObject> objs = objMgr.objectByName(o.getName());
-                objs.forEach(obj -> {
-                    System.out.println("Partial:" + obj);
-                });
-                if (objs==null || objs.size()==0) fail("Error searching objects");
+                objs.forEach(obj -> System.out.println("Partial:" + obj));
+                if (objs.size()==0) fail("Error searching objects");
 
                 List<DBEObject> objs2 = objMgr.fullObjectByName(o.getName());
-                objs2.forEach(obj2 -> {
-                    System.out.println("Full:\t" + obj2);
-                });
-                if (objs2==null || objs2.size()==0) fail("Error searching full objects");
+                objs2.forEach(obj2 -> System.out.println("Full:\t" + obj2));
+                if (objs2.size()==0) fail("Error searching full objects");
             }
         });
 
@@ -780,7 +774,7 @@ public class CoreTest extends TestCase {
             objMgr.setUserGroupsList(testUser.getGroups());
 
             System.out.println("* Delete 1");
-            List<DBEObject> deleted_objects = new ArrayList<DBEObject>();
+            List<DBEObject> deleted_objects = new ArrayList<>();
             objects.stream().forEach(obj -> {
                 try {
                     obj = (DBEObject) objMgr.delete(obj);

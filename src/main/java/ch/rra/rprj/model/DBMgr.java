@@ -159,8 +159,7 @@ public class DBMgr {
         return true;
     }
     public List<DBEntity> db_query(String sql) {
-        return db_query(sql,new HashMap<String,Object>(), null,
-                false);
+        return db_query(sql, new HashMap<>(), null, false);
     }
     public List<DBEntity> db_query(String sql, HashMap<String,Object> hm, Class klass, boolean initializeLazyObjects) {
         logger.debug("db_query: sql="+sql);
@@ -178,7 +177,7 @@ public class DBMgr {
         List<DBEntity> dbes = q.getResultList();
         // This to force the load of lazy objects :-(
         if(initializeLazyObjects)
-            dbes.stream().forEach((DBEntity dbe) -> dbe.toString());
+            dbes.stream().forEach(Object::toString);
         session.close();
         return dbes;
     }
@@ -344,54 +343,5 @@ public class DBMgr {
                 clauses.add(k + " = :" + k);
             hashMap.put(k,v);
         });
-        /*
-        Field[] fields = search.getClass().getDeclaredFields();
-        for (Field field : fields) {
-            String field_name = field.getName();
-            String method_name = "get"
-                    + field_name.substring(0,1).toUpperCase()
-                    + field_name.substring(1).toLowerCase();
-            Method method = null;
-            Object value = null;
-            try {
-                method = search.getClass().getMethod(method_name);
-                value = method.invoke(search);
-            } catch (NoSuchMethodException e) {
-                logger.debug("ERROR: field_name.method_name NOT FOUND!");
-                continue;
-            } catch (IllegalAccessException | InvocationTargetException e) {
-                e.printStackTrace();
-            }
-            String column_name = field.getName();
-            Annotation[] field_annotations = field.getAnnotations();
-            for(Annotation an : field_annotations) {
-                //logger.debug("  " +an.toString());
-                if(an instanceof javax.persistence.Column) {
-                    column_name = ((javax.persistence.Column)an).name();
-                    break;
-                } else if(an instanceof JoinTable) {
-                    column_name = "";
-                    break;
-                }
-            }
-            if(column_name.equals(""))
-                continue;
-            logger.debug("" + field.toString());
-            logger.debug(" name:\t" + field_name);
-            //logger.debug(" method name:\t" + method_name);
-            logger.debug(" get:\t" + method);
-            //logger.debug(" " + field);
-            logger.debug(" column:" + column_name);
-            logger.debug(" value:\t" + value + (value!=null ? " ("+value.getClass()+")" : ""));
-            if(value!=null) {
-                if(uselike && value instanceof String) {
-                    clauses.add(field_name + " LIKE :" + field_name);
-                    value = "%" + value + "%";
-                } else
-                    clauses.add(field_name + " = :" + field_name);
-                hashMap.put(field_name, value);
-            }
-        }
-         */
     }
 }
