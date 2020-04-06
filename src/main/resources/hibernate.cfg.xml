@@ -47,7 +47,9 @@
         <mapping class="ch.rra.rprj.model.cms.DBENews"/>
         <mapping class="ch.rra.rprj.model.cms.DBENote"/>
         <mapping class="ch.rra.rprj.model.cms.DBEPage"/>
+        <mapping class="ch.rra.rprj.model.contacts.DBECompany"/>
         <mapping class="ch.rra.rprj.model.contacts.DBECountry"/>
+        <mapping class="ch.rra.rprj.model.contacts.DBEPeople"/>
 
     </session-factory>
 

@@ -19,9 +19,6 @@ maybe adding some memory before: `export MAVEN_OPTS=-Xmx1024m`
 - dbschema.php
   - Core
     - DBEntity: setValues
-  - Contacts
-    - DBECompany
-    - DBEPeople
   - CMS
     - DBEFile
     - DBEEvent
@@ -36,6 +33,7 @@ maybe adding some memory before: `export MAVEN_OPTS=-Xmx1024m`
     - DBETimetrack
     - DBETodo
     - DBETodoTipo
+  - Foreign keys?
     
 - Implement a rest/json login with Spring
 
@@ -49,6 +47,8 @@ maybe adding some memory before: `export MAVEN_OPTS=-Xmx1024m`
     - DBEPage
   - Contacts
     - DBECountry
+    - DBECompany
+    - DBEPeople
   - Core
     - ObjectMgr
       - objectByName
