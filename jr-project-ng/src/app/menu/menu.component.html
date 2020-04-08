@@ -1,6 +1,0 @@
-<table class="menu">
-  <tr><th class="menu"><a href="main.php?obj_id={{ rootObj.id }}">{{ rootObj.name }}</a></th></tr>
-</table>
-<table class="menu">
-  <tr *ngFor="let menuItem of menuItems"><td class="menu" >{{ indent }}<span class="glyphicon {{ menuItem.icon }}">&nbsp;</span> <a href="main.php?obj_id={{ menuItem.id }}">{{ menuItem.name }}</a></td></tr>
-</table>

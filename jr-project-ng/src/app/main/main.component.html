@@ -1,0 +1,15 @@
+<div class="col-2">
+  <table class="menu">
+    <tr><th class="menu"><a [routerLink]="['/obj', rootObj.id]">{{ rootObj.name }}</a></th></tr>
+  </table>
+  <table class="menu">
+    <tr *ngFor="let menuItem of menuItems"><td class="menu" >{{ indent }}<span class="glyphicon {{ menuItem.icon }}">&nbsp;</span> <a [routerLink]="['/obj', menuItem.id]">{{ menuItem.name }}</a></td></tr>
+  </table>
+</div>
+<div class="middle_content col-10">
+  <div class="r_breadcrumb">
+    <ul class="r_breadcrumb"><li *ngFor="let breadcrumb of parentsList; first as isFirst" class="r_breadcrumb"><span *ngIf="!isFirst"> &gt; </span><a  class="r_breadcrumb" [routerLink]="['/obj', breadcrumb.id]">{{ breadcrumb.name }}</a></li></ul>
+  </div>
+  <div class="r_breadcrumb col-sm-1"><div id="r_breadcrumb_after"></div></div>
+  <div [innerHTML]="currentObj.html"></div>
+</div>

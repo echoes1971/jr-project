@@ -246,6 +246,7 @@ public class ObjectMgr extends DBMgr {
         List res = this.db_query(sql,hm,null,false);
         logger.debug("fullObjectById: res="+res.size());
         //printObjectList(res);
+        if(res.size()==0) return null;
         Object[] values = (Object[]) res.get(0);
 
         Class myclass = registeredObjectTypes.stream().filter(k -> k.getSimpleName().equals(values[0])).collect(Collectors.toList()).get(0);

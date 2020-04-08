@@ -168,23 +168,6 @@ hr.amiga {
   /*     background: linear-gradient(to right, red,orange,yellow,green,blue,indigo,violet); */
 }
 
-div.r_breadcrumb {
-  padding:0;
-}
-ul.r_breadcrumb {
-  list-style-type: none;
-  display: block;
-  background-color: rgba(0,0,0,0.1);
-  margin: 0.1em;
-  border: 0;
-  border-radius: 4px; -webkit-border-radius: 4px;
-  padding: 0.4em 1em;
-}
-li.r_breadcrumb, a.r_breadcrumb:link, a.r_breadcrumb:active, a.r_breadcrumb:visited, a.r_breadcrumb:hover {
-  display: inline;
-  font-size: 12px;
-  font-weight: bold;
-}
 ul.obj_actions {
   display:inline;
   list-style-position: inside;
@@ -195,26 +178,6 @@ li.obj_actions {
   display:block;
   font-size: 12px;
   font-weight: bold;
-}
-
-table.menu {
-  color:#666666;
-  /*  background-color: rgba(0,0,0,0.1); */
-}
-th.menu {
-  font-size: 12px;
-  font-weight: bold;
-  margin: 0.1em;
-  border: 0;
-  padding: 0.4em 1em;
-}
-td.menu {
-  font-size: 12px;
-  font-weight: normal;
-}
-input.menu {
-  color: #eeeeee;
-  border: 1px solid #9FA3A6;
 }
 
 .login { padding: 2px; }

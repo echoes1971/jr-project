@@ -55,6 +55,30 @@ public class HttpRequestTest {
         assertThat(resp.get("id")).isEqualTo(rootObjId);
     }
 
+    // ./mvnw -Dtest=HttpRequestTest#currentObj test
+    @Test
+    public void currentObj() throws Exception {
+        System.out.println("restTemplate: " + restTemplate);
+        String objId = "-10";
+        HashMap<String, Object> resp = this.restTemplate.getForObject("http://localhost:" + port + "/ui/obj/" + objId,
+                HashMap.class);
+        System.out.println("resp: " + resp);
+        boolean check = resp.get("id").equals(objId) || resp.get("father_id").equals(objId);
+        assertThat(check).isTrue();
+        //assertThat(resp.get("id")).isEqualTo(objId);
+    }
+
+    // ./mvnw -Dtest=HttpRequestTest#currentObjEmpty test
+    @Test
+    public void currentObjEmpty() throws Exception {
+        System.out.println("restTemplate: " + restTemplate);
+        String objId = "-10";
+        HashMap<String, Object> resp = this.restTemplate.getForObject("http://localhost:" + port + "/ui/obj/",
+                HashMap.class);
+        System.out.println("resp: " + resp);
+        //assertThat(resp.get("id")).isEqualTo(objId);
+    }
+
     // ./mvnw -Dtest=HttpRequestTest#topMenu test
     @Test
     public void topMenu() throws Exception {

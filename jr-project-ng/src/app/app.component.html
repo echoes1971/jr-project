@@ -15,32 +15,17 @@
       </button>
       <div class="collapse navbar-collapse" id="navbarSupportedContent">
         <ul class="navbar-nav mr-auto">
-          <li class="nav-item"><a href="main.php?obj_id={{ rootObj.id }}">{{ rootObj.name }}</a></li>
-          <li class="nav-item" *ngFor="let menuItem of menuTop"><a href="main.php?obj_id={{ menuItem.id }}">{{ menuItem.name }}</a></li>
-          <li *ngIf="myUser" class="nav-item"><a href="mng/gestione.php">Manage</a></li>
+          <li class="nav-item"><a [routerLink]="['/obj', rootObj.id]" routerLinkActive="active">{{ rootObj.name }}</a></li>
+          <li class="nav-item" *ngFor="let menuItem of menuTop"><a [routerLink]="['/obj', menuItem.id]" routerLinkActive="active">{{ menuItem.name }}</a></li>
+          <li *ngIf="myUser" class="nav-item"><a routerLink="/mng">Manage</a></li>
         </ul>
       </div>
       <div id="user_div" class="dropdown"><a *ngIf="!myUser" href="mng/login.php?obj_id=-10">Login</a><b *ngIf="myUser">User:&nbsp;{{ myUser.fullname }}</b><a *ngIf="myUser" href="logout_do.php">Logout</a></div>
-      <form name="" action="main.php" class="form-inline "><input type="search" aria-label="Search" id="search_object" name="search_object" type="text" /></form>
+      <form name="" action="/search" class="form-inline "><input aria-label="Search" id="search_object" name="search_object" type="text" /></form>
     </nav>
   </div>
+  <div class="row"><router-outlet></router-outlet></div>
   <div class="row">
-    <div class="col-2">
-      <app-menu></app-menu>
-    </div>
-    <div class="middle_content col-10">
-      <div class="row">
-        <div class="r_breadcrumb col-12">
-          <ul class="r_breadcrumb"><li *ngFor="let breadcrumb of parentsList; first as isFirst" class="r_breadcrumb"><span *ngIf="!isFirst"> &gt; </span><a  class="r_breadcrumb" href="main.php?obj_id={{ breadcrumb.id }}">{{ breadcrumb.name }}</a></li></ul>
-        </div>
-        <div class="r_breadcrumb col-sm-1"><div id="r_breadcrumb_after"></div></div>
-      </div>
-      <div class="row">
-        aaa
-      </div>
-    </div>
-  </div>
-  <div class="row">
-    <div id="footer" class="col-12"><div class="copyright"><b>&copy; 2020 by <a href="main.php?obj_id={{ rootObj.id }}">Roberto Rocco-Angeloni</a> - All rights reserved. - Powered by <a href="https://github.com/echoes1971/jr-project">R-Project</a>.</b></div></div>
+    <div id="footer" class="col-12"><div class="copyright"><b>&copy; 2020 by <a [routerLink]="['/obj', rootObj.id]">Roberto Rocco-Angeloni</a> - All rights reserved. - Powered by <a href="https://github.com/echoes1971/jr-project">R-Project</a>.</b></div></div>
   </div>
 </div>

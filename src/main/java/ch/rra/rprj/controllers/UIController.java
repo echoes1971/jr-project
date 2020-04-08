@@ -2,6 +2,8 @@ package ch.rra.rprj.controllers;
 
 import ch.rra.rprj.model.ObjectMgr;
 import ch.rra.rprj.model.cms.DBEFolder;
+import ch.rra.rprj.model.cms.DBEPage;
+import ch.rra.rprj.model.core.DBEObject;
 import ch.rra.rprj.model.core.DBEntity;
 import ch.rra.rprj.model.core.User;
 import org.slf4j.Logger;
@@ -9,6 +11,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpSession;
@@ -26,6 +29,8 @@ public class UIController {
 
     @Value("${rprj.rootobj.id}")
     private String rootObjId;
+
+    private String currentObjId;
 
     private List<DBEntity> fetchChildren(HttpSession httpSession, DBEFolder father) {
         ObjectMgr objMgr = getObjectMgr(httpSession);
@@ -60,6 +65,28 @@ public class UIController {
         return ret;
     }
 
+    private DBEObject getCurrentObject(String objId, HttpSession httpSession) {
+        DBEObject ret; // = (DBEFolder) httpSession.getAttribute("currentObj");
+        //if(ret==null) {
+            ObjectMgr objMgr = getObjectMgr(httpSession);
+            ret = objMgr.fullObjectById(objId);
+            logger.info(ret + "");
+            if(ret instanceof DBEFolder) {
+                DBEPage search = new DBEPage();
+                search.setFather_id(objId);
+                search.setName("index");
+                List<DBEntity> res = objMgr.search(search);
+                if(res.size()==1) {
+                    ret = (DBEObject) res.get(0);
+                    logger.info("=> " + ret.toString());
+                }
+            }
+
+            //httpSession.setAttribute("currentObj", ret);
+        //}
+        return ret;
+    }
+
     private List<DBEntity> getTopMenu(HttpSession httpSession) {
         List<DBEntity> ret = (List<DBEntity>) httpSession.getAttribute("topMenu");
         if(ret==null) {
@@ -83,6 +110,27 @@ public class UIController {
     public HashMap<String,Object> ui_rootobj(HttpSession httpSession) {
         DBEFolder ret = getRootObject(httpSession);
         return ret.getValues();
+    }
+
+    @GetMapping("/ui/obj/")
+    @ResponseBody
+    public HashMap<String,Object> ui_currentobj_empty(HttpSession httpSession) {
+        currentObjId = rootObjId;
+        //System.out.println("UIController.ui_currentobj: currentObjId="+currentObjId);
+        DBEObject ret = getCurrentObject(currentObjId, httpSession);
+        return ret.getValues();
+    }
+
+    @GetMapping("/ui/obj/{objId}")
+    @ResponseBody
+    public HashMap<String,Object> ui_currentobj(@PathVariable String objId, HttpSession httpSession) {
+        //currentObjId = objId!=null && objId.length()>0 ? objId : rootObjId;
+        String _currentObjId = objId==null || objId.equals("null") ? rootObjId : objId;
+        //System.out.println("UIController.ui_currentobj: objId="+objId);
+        //System.out.println("UIController.ui_currentobj: rootObjId="+rootObjId);
+        //System.out.println("UIController.ui_currentobj: _currentObjId="+_currentObjId);
+        DBEObject ret = getCurrentObject(_currentObjId, httpSession);
+        return ret==null ? new HashMap<>() : ret.getValues();
     }
 
     @GetMapping("/ui/topmenu")
