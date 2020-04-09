@@ -4,6 +4,7 @@ import ch.rra.rprj.model.ObjectMgr;
 import ch.rra.rprj.model.cms.DBEFolder;
 import ch.rra.rprj.model.cms.DBEPage;
 import ch.rra.rprj.model.core.DBEObject;
+import ch.rra.rprj.model.core.DBEObjectReal;
 import ch.rra.rprj.model.core.DBEntity;
 import ch.rra.rprj.model.core.User;
 import org.slf4j.Logger;
@@ -32,11 +33,13 @@ public class UIController {
 
     private String currentObjId;
 
-    private List<DBEntity> fetchChildren(HttpSession httpSession, DBEFolder father) {
+    private List<DBEntity> fetchChildren(HttpSession httpSession, DBEFolder father, boolean withoutIndexPage) {
         ObjectMgr objMgr = getObjectMgr(httpSession);
-        DBEFolder search = new DBEFolder();
+        //DBEFolder search = new DBEFolder();
+        DBEObject search = new DBEObjectReal();
         search.setFather_id(father.getId());
         List<DBEntity> res = objMgr.search(search,false,"",true);
+        if(withoutIndexPage) res = res.stream().filter(x -> !((DBEObject)x).getName().equals("index")).collect(Collectors.toList());
         return father.sortChildren(res);
     }
 
@@ -91,7 +94,7 @@ public class UIController {
         List<DBEntity> ret = (List<DBEntity>) httpSession.getAttribute("topMenu");
         if(ret==null) {
             DBEFolder rootObj = getRootObject(httpSession);
-            ret = fetchChildren(httpSession, rootObj);
+            ret = fetchChildren(httpSession, rootObj, true);
             httpSession.setAttribute("topMenu", ret);
         }
         return ret;
