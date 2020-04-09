@@ -150,7 +150,6 @@ public class ObjectMgr extends DBMgr {
             }
         } else
             res = super.search(search, uselike, orderby);
-        //res.stream().forEach(x -> System.out.println(""+x));
         return res.stream().filter(x -> !(x instanceof DBEObject) || this.canRead((DBEObject) x)).collect(Collectors.toList());
     }
     private String _buildSelectString(String sClauses, boolean ignore_deleted) {
@@ -224,34 +223,6 @@ public class ObjectMgr extends DBMgr {
     public DBEObject objectById(String id) { return objectById(id,true); }
     public DBEObject objectById(String id, boolean ignore_deleted) {
         // Search all the subclasses of DBEObject
-        /*
-        String[] column_list = {"id"
-                ,"owner","group_id","permissions","creator"
-                ,"creation_date","last_modify","last_modify_date"
-                ,"deleted_by","deleted_date"
-                ,"father_id","name","description"};
-        Vector<String> qs = new Vector<>();
-        for (Class klass : registeredObjectTypes) {
-            DBEntity dbe;
-            try {
-                dbe = (DBEntity) klass.newInstance();
-            } catch (InstantiationException | IllegalAccessException e) {
-                e.printStackTrace();
-                continue;
-            }
-            // TODO re-enable the following when there will be more subclasses
-            //if (klass.getName() == "DBEObject" || !(dbe instanceof DBEObject)) continue;
-            qs.add("select '" + klass.getSimpleName() + "' as classname,"
-                    + String.join(",",column_list)
-                    + " from "+dbe.getTableName() + " "
-                    + " where id = :id "
-                    + (ignore_deleted ? "and deleted_by is null " : "")
-                    );
-        }
-        String sql = String.join(" union ", qs);
-        logger.debug(sql);
-        */
-        logger.info("objectById: SUNCHI");
         String sql = _buildSelectString("id = :id", ignore_deleted);
         HashMap<String,Object> hm = new HashMap<>();
         hm.put("id", id);
@@ -260,72 +231,21 @@ public class ObjectMgr extends DBMgr {
         if(res.size()==1) {
             return (DBEObject) res.get(0);
         }
-        // TODO Verify this for DBENotes
-        //printObjectList(res);
-/*
-        Object[] values = (Object[]) res.get(0);
-
-        HashMap<String,Object> hmValues = new HashMap<>();
-        int i=1;
-        for(String col : column_list) {
-            logger.info(col+"=>"+values[i]);
-            hmValues.put(col, values[i++]);
-        }
-
-        Class myclass = registeredObjectTypes.stream().filter(k -> k.getSimpleName().equals(values[0])).collect(Collectors.toList()).get(0);
-        try {
-            DBEObject search = (DBEObject) myclass.newInstance();
-            search.setId(id);
-            List<DBEntity> res2 = this.search(search, false, null, ignore_deleted);
-            if(res2.size()==1) ret = (DBEObject) res2.get(0);
-        } catch (InstantiationException | IllegalAccessException e) {
-            e.printStackTrace();
-        }
-*/
         return null;
     }
     public DBEObject fullObjectById(String id) { return fullObjectById(id,true); }
     public DBEObject fullObjectById(String id, boolean ignore_deleted) {
         DBEObject ret = null;
-/*
-        // Search all the subclasses of DBEObject
-        String[] column_list = {"id"
-                ,"owner","group_id","permissions","creator"
-                ,"creation_date","last_modify","last_modify_date"
-                ,"deleted_by","deleted_date"
-                ,"father_id","name","description"};
-        Vector<String> qs = new Vector<>();
-        for (Class klass : registeredObjectTypes) {
-            DBEntity dbe;
-            try {
-                dbe = (DBEntity) klass.newInstance();
-            } catch (InstantiationException | IllegalAccessException e) {
-                e.printStackTrace();
-                continue;
-            }
-            // TODO re-enable the following when there will be more subclasses
-            //if (klass.getName() == "DBEObject" || !(dbe instanceof DBEObject)) continue;
-            qs.add("select '" + klass.getSimpleName() + "' as classname,"
-                    +String.join(",",column_list)
-                    + " from "+dbe.getTableName() + " "
-                    + " where id = :id "
-                    + (ignore_deleted ? "and deleted_by is null " : "")
-            );
-        }
-        String sql = String.join(" union ", qs);
-*/
         String sql = _buildSelectString("id = :id", ignore_deleted);
         logger.debug("fullObjectById: sql="+sql);
         HashMap<String,Object> hm = new HashMap<>();
         hm.put("id", id);
         List res = this.db_query(sql,hm,null,false);
         logger.debug("fullObjectById: res="+res.size());
-        //printObjectList(res);
         if(res.size()==0) return null;
         Object[] values = (Object[]) res.get(0);
 
         Class myclass = registeredObjectTypes.stream().filter(k -> k.getSimpleName().equals(values[0])).collect(Collectors.toList()).get(0);
-        //logger.info("fullObjectById: myclass="+myclass);
         try {
             DBEObject search = (DBEObject) myclass.newInstance();
             search.setId(id);
@@ -340,31 +260,7 @@ public class ObjectMgr extends DBMgr {
     public List<DBEObject> objectByName(String name) { return objectByName(name,true); }
     public List<DBEObject> objectByName(String name, boolean ignore_deleted) {
         // Search all the subclasses of DBEObject
-        String[] column_list = {"id"
-                ,"owner","group_id","permissions","creator"
-                ,"creation_date","last_modify","last_modify_date"
-                ,"deleted_by","deleted_date"
-                ,"father_id","name","description"
-        };
-        Vector<String> qs = new Vector<>();
-        for (Class klass : registeredObjectTypes) {
-            DBEntity dbe;
-            try {
-                dbe = (DBEntity) klass.newInstance();
-            } catch (InstantiationException | IllegalAccessException e) {
-                e.printStackTrace();
-                continue;
-            }
-            // TODO re-enable the following when there will be more subclasses
-            //if (klass.getName() == "DBEObject" || !(dbe instanceof DBEObject)) continue;
-            qs.add("select '" + klass.getSimpleName() + "' as classname,"
-                    + String.join(",",column_list)
-                    + " from "+dbe.getTableName() + " "
-                    + " where name = :name "
-                    + (ignore_deleted ? "and deleted_by is null " : "")
-            );
-        }
-        String sql = String.join(" union ", qs);
+        String sql = _buildSelectString("name = :name", ignore_deleted);
         logger.debug(sql);
         HashMap<String,Object> hm = new HashMap<>();
         hm.put("name", name);
@@ -373,34 +269,13 @@ public class ObjectMgr extends DBMgr {
             logger.debug("objectByName: res=" + res.size());
             return (List<DBEObject>) res;
         }
-        // TODO Verify this for DBENotes
-        //printObjectList(res);
-/*
-        Object[] values = (Object[]) res.get(0);
-
-        HashMap<String,Object> hmValues = new HashMap<>();
-        int i=1;
-        for(String col : column_list) {
-            logger.info(col+"=>"+values[i]);
-            hmValues.put(col, values[i++]);
-        }
-
-        Class myclass = registeredObjectTypes.stream().filter(k -> k.getSimpleName().equals(values[0])).collect(Collectors.toList()).get(0);
-        try {
-            DBEObject search = (DBEObject) myclass.newInstance();
-            search.setId(id);
-            List<DBEntity> res2 = this.search(search, false, null, ignore_deleted);
-            if(res2.size()==1) ret = (DBEObject) res2.get(0);
-        } catch (InstantiationException | IllegalAccessException e) {
-            e.printStackTrace();
-        }
-*/
         return null;
     }
     public List<DBEObject> fullObjectByName(String name) { return fullObjectByName(name,true); }
     public List<DBEObject> fullObjectByName(String name, boolean ignore_deleted) {
         List<DBEObject> ret = new ArrayList<>();
         // Search all the subclasses of DBEObject
+/*
         String[] column_list = {"id"
                 ,"owner","group_id","permissions","creator"
                 ,"creation_date","last_modify","last_modify_date"
@@ -426,6 +301,8 @@ public class ObjectMgr extends DBMgr {
             );
         }
         String sql = String.join(" union ", qs);
+*/
+        String sql = _buildSelectString("name = :name", ignore_deleted);
         logger.debug("fullObjectByName: sql="+sql);
         HashMap<String,Object> hm = new HashMap<>();
         hm.put("name", name);
