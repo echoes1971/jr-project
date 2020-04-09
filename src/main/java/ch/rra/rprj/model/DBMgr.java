@@ -333,7 +333,7 @@ public class DBMgr {
         return ret;
     }
 
-    private void _getClausesAndValues(DBEntity search, boolean uselike, HashMap<String, Object> hashMap, List<String> clauses) {
+    protected void _getClausesAndValues(DBEntity search, boolean uselike, HashMap<String, Object> hashMap, List<String> clauses) {
         HashMap<String, Object> hmValues = search.getValues();
         hmValues.forEach((k,v) -> {
             if(uselike && v instanceof String) {

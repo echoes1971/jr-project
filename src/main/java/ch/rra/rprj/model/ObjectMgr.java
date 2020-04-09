@@ -111,8 +111,77 @@ public class ObjectMgr extends DBMgr {
     public List<DBEntity> search(DBEntity search, boolean uselike, String orderby, boolean ignore_deleted) {
         if (search instanceof DBEObject && ignore_deleted)
             ((DBEObject) search).setDeleted_by(null);
-        List<DBEntity> res = super.search(search, uselike, orderby);
+        List<DBEntity> res = new Vector<>();
+        if(search instanceof DBEObjectReal) {
+            // Columns
+            HashMap<String,Object> hashMap = new HashMap<>();
+            List<String> clauses = new ArrayList<>();
+            _getClausesAndValues(search, uselike, hashMap, clauses);
+
+            String sClauses = "";
+            if(clauses.size()>0) {
+                for(int i=0 ; i<clauses.size() ; i++) {
+                    sClauses += clauses.get(i);
+                    if(i < (clauses.size()-1))
+                        sClauses += " AND ";
+                }
+            }
+            logger.debug("sClauses: "+sClauses);
+
+            String hql = _buildSelectString(sClauses, ignore_deleted);
+            logger.debug("hql: "+hql);
+
+            List res2 = this.db_query(hql, hashMap, null,false);
+            logger.debug("res: "+res2.size());
+
+            for(Object x : res2) {
+                Object[] values =  (Object[]) x;
+
+                Class myclass = registeredObjectTypes.stream().filter(k -> k.getSimpleName().equals(values[0])).collect(Collectors.toList()).get(0);
+                logger.debug("search: myclass="+myclass);
+                try {
+                    DBEObject _search = (DBEObject) myclass.newInstance();
+                    _search.setId((String) values[1]);
+                    List<DBEntity> _res = super.search(_search, false, null);
+                    if(_res.size()==1) res.add(_res.get(0));
+                } catch (InstantiationException | IllegalAccessException e) {
+                    e.printStackTrace();
+                }
+            }
+        } else
+            res = super.search(search, uselike, orderby);
+        //res.stream().forEach(x -> System.out.println(""+x));
         return res.stream().filter(x -> !(x instanceof DBEObject) || this.canRead((DBEObject) x)).collect(Collectors.toList());
+    }
+    private String _buildSelectString(String sClauses, boolean ignore_deleted) {
+        logger.debug("_buildSelectString: sClauses="+sClauses);
+        String[] column_list = {"id"
+                ,"owner","group_id","permissions","creator"
+                ,"creation_date","last_modify","last_modify_date"
+                ,"deleted_by","deleted_date"
+                ,"father_id","name","description"};
+        Vector<String> qs = new Vector<>();
+        for (Class klass : registeredObjectTypes) {
+            DBEntity dbe;
+            try {
+                dbe = (DBEntity) klass.newInstance();
+            } catch (InstantiationException | IllegalAccessException e) {
+                e.printStackTrace();
+                continue;
+            }
+            // TODO re-enable the following when there will be more subclasses
+            //if (klass.getName() == "DBEObject" || !(dbe instanceof DBEObject)) continue;
+            qs.add("select '" + klass.getSimpleName() + "' as classname,"
+                    + String.join(",",column_list)
+                    + " from "+dbe.getTableName() + " "
+                    + " where " + sClauses + " "
+                    + (ignore_deleted ? (sClauses.length()>0 ? "and" : "") + " deleted_by is null " : "")
+            );
+        }
+        //qs.stream().forEach(s -> { System.out.println("s: " + s); });
+        String sql = String.join(" union ", qs);
+        logger.debug("_buildSelectString: sql="+sql);
+        return sql;
     }
 
     public DBEntity dbeById(String id) {
@@ -155,6 +224,7 @@ public class ObjectMgr extends DBMgr {
     public DBEObject objectById(String id) { return objectById(id,true); }
     public DBEObject objectById(String id, boolean ignore_deleted) {
         // Search all the subclasses of DBEObject
+        /*
         String[] column_list = {"id"
                 ,"owner","group_id","permissions","creator"
                 ,"creation_date","last_modify","last_modify_date"
@@ -180,6 +250,9 @@ public class ObjectMgr extends DBMgr {
         }
         String sql = String.join(" union ", qs);
         logger.debug(sql);
+        */
+        logger.info("objectById: SUNCHI");
+        String sql = _buildSelectString("id = :id", ignore_deleted);
         HashMap<String,Object> hm = new HashMap<>();
         hm.put("id", id);
         List res = this.db_query(sql,hm,DBEObjectReal.class,false);
@@ -214,6 +287,7 @@ public class ObjectMgr extends DBMgr {
     public DBEObject fullObjectById(String id) { return fullObjectById(id,true); }
     public DBEObject fullObjectById(String id, boolean ignore_deleted) {
         DBEObject ret = null;
+/*
         // Search all the subclasses of DBEObject
         String[] column_list = {"id"
                 ,"owner","group_id","permissions","creator"
@@ -238,8 +312,9 @@ public class ObjectMgr extends DBMgr {
                     + (ignore_deleted ? "and deleted_by is null " : "")
             );
         }
-        //qs.stream().forEach(s -> { System.out.println("s: " + s); });
         String sql = String.join(" union ", qs);
+*/
+        String sql = _buildSelectString("id = :id", ignore_deleted);
         logger.debug("fullObjectById: sql="+sql);
         HashMap<String,Object> hm = new HashMap<>();
         hm.put("id", id);
@@ -369,10 +444,10 @@ public class ObjectMgr extends DBMgr {
                 logger.debug("fullObjectByName: search="+search);
                 List<DBEntity> res2 = this.search(search, false, null, ignore_deleted);
                 logger.debug("fullObjectByName: res2="+res2.size());
-                res2.stream().forEach(dbe -> {
+                for(DBEntity dbe : res2) {
                     logger.debug("fullObjectByName: dbe="+dbe);
                     ret.add((DBEObject) dbe);
-                });
+                }
             } catch (InstantiationException | IllegalAccessException e) {
                 e.printStackTrace();
             }
