@@ -32,23 +32,21 @@ public class HttpRequestTest {
     @Autowired
     private TestRestTemplate restTemplate;
 
+    @Value("${rprj.rootobj.id}")
+    private String rootObjId;
+
     // ./mvnw -Dtest=HttpRequestTest#pingTest test
     @Test
     public void pingTest() throws Exception {
-        System.out.println("restTemplate: " + restTemplate);
         String resp = this.restTemplate.getForObject("http://localhost:" + port + "/ping",
                 String.class);
         System.out.println("resp: " + resp);
         assertThat(resp).contains("pong");
     }
 
-    @Value("${rprj.rootobj.id}")
-    private String rootObjId;
-
     // ./mvnw -Dtest=HttpRequestTest#rootObj test
     @Test
     public void rootObj() throws Exception {
-        System.out.println("restTemplate: " + restTemplate);
         HashMap<String, Object> resp = this.restTemplate.getForObject("http://localhost:" + port + "/ui/rootobj",
                 HashMap.class);
         System.out.println("resp: " + resp);
@@ -58,7 +56,6 @@ public class HttpRequestTest {
     // ./mvnw -Dtest=HttpRequestTest#currentObj test
     @Test
     public void currentObj() throws Exception {
-        System.out.println("restTemplate: " + restTemplate);
         String objId = "-10";
         HashMap<String, Object> resp = this.restTemplate.getForObject("http://localhost:" + port + "/ui/obj/" + objId,
                 HashMap.class);
@@ -71,7 +68,6 @@ public class HttpRequestTest {
     // ./mvnw -Dtest=HttpRequestTest#currentObjEmpty test
     @Test
     public void currentObjEmpty() throws Exception {
-        System.out.println("restTemplate: " + restTemplate);
         String objId = "-10";
         HashMap<String, Object> resp = this.restTemplate.getForObject("http://localhost:" + port + "/ui/obj/",
                 HashMap.class);
@@ -82,7 +78,6 @@ public class HttpRequestTest {
     // ./mvnw -Dtest=HttpRequestTest#currentObjEmpty test
     @Test
     public void parentList() throws Exception {
-        //System.out.println("restTemplate: " + restTemplate);
         String objId = "-20";
         Vector<HashMap<String, Object>> resp = this.restTemplate.getForObject(
                 "http://localhost:" + port + "/ui/parentlist/" + objId, Vector.class);
@@ -112,9 +107,8 @@ public class HttpRequestTest {
     // ./mvnw -Dtest=HttpRequestTest#topMenu test
     @Test
     public void topMenu() throws Exception {
-        System.out.println("restTemplate: " + restTemplate);
-        Vector<HashMap<String, String>> resp = this.restTemplate.getForObject("http://localhost:" + port + "/ui/topmenu",
-                Vector.class);
+        Vector<HashMap<String, String>> resp = this.restTemplate.getForObject(
+                "http://localhost:" + port + "/ui/topmenu", Vector.class);
         System.out.println("resp: " + resp);
         System.out.println("ids: "+resp.stream().map(x -> x.get("id")).collect(Collectors.joining(",")));
         assertThat(resp.size()>0);

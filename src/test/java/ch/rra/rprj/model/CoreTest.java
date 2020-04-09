@@ -1,6 +1,6 @@
 package ch.rra.rprj.model;
 
-import ch.rra.rprj.model.*;
+import ch.rra.rprj.model.cms.DBENote;
 import ch.rra.rprj.model.core.*;
 import junit.framework.TestCase;
 
@@ -526,9 +526,8 @@ public class CoreTest extends TestCase {
 
     // ./mvnw -Dtest=CoreTest#testObject test
     public void testObject() {
-
         System.out.println("**** Test Object");
-        int initial_objects_count = objMgr.search(new DBEObjectReal()).size();
+        int initial_objects_count = objMgr.search(new DBENote()).size();
         int final_objects_count   = initial_objects_count;
 
         // Create Test Users
@@ -545,7 +544,7 @@ public class CoreTest extends TestCase {
             objMgr.setUserGroupsList(testUser.getGroups());
 
             for (String name: object_names) {
-                DBEObject obj = new DBEObjectReal(name, "description of object '" + name + "'");
+                DBEObject obj = new DBENote(name, "description of object '" + name + "'");
                 //obj.setDefaultValues(objMgr);
                 //obj.setPermissions("rwxrwxrwx");
                 System.out.println("obj: " + obj);
@@ -566,7 +565,7 @@ public class CoreTest extends TestCase {
             objMgr.setDbeUser(testUser);
             objMgr.setUserGroupsList(testUser.getGroups());
 
-            List<DBEntity> res = objMgr.search(new DBEObjectReal());
+            List<DBEntity> res = objMgr.search(new DBENote());
             System.out.println("res: "+res.size());
             if(res.size()!=object_names.length) fail("Error with privileges");
             res.stream().forEach((dbe) -> System.out.println(" " + dbe));
@@ -589,7 +588,7 @@ public class CoreTest extends TestCase {
                     //e.printStackTrace();
                 }
             });
-            //final_objects_count   = objMgr.search(new DBEObjectReal()).size();
+            //final_objects_count   = objMgr.search(new DBENote()).size();
             //System.out.println("Objects count: " + initial_objects_count + " -> " + final_objects_count);
 
             System.out.println("* Delete 2");
@@ -607,16 +606,14 @@ public class CoreTest extends TestCase {
         _deleteTestUsers(testUsers);
 
 
-        final_objects_count   = objMgr.search(new DBEObjectReal()).size();
+        final_objects_count   = objMgr.search(new DBENote()).size();
         System.out.println("Objects count: " + initial_objects_count + " -> " + final_objects_count);
         if(initial_objects_count!=final_objects_count) fail("Not all objects were deleted");
     }
 
     // ./mvnw -Dtest=CoreTest#testDbeById test
     public void testDbeById() {
-
         System.out.println("**** Test Search DBE By ID");
-        int initial_objects_count = objMgr.search(new DBEObjectReal()).size();
 
         System.out.println("* Search");
         // Test User and Group
@@ -631,9 +628,8 @@ public class CoreTest extends TestCase {
 
     // ./mvnw -Dtest=CoreTest#testObjectById test
     public void testObjectById() {
-
         System.out.println("**** Test Search By ID");
-        int initial_objects_count = objMgr.search(new DBEObjectReal()).size();
+        int initial_objects_count = objMgr.search(new DBENote()).size();
         int final_objects_count   = initial_objects_count;
 
         // Create Test Users
@@ -650,7 +646,7 @@ public class CoreTest extends TestCase {
             objMgr.setUserGroupsList(testUser.getGroups());
 
             for (String name: object_names) {
-                DBEObject obj = new DBEObjectReal(name, "description of object '" + name + "'");
+                DBEObject obj = new DBENote(name, "description of object '" + name + "'");
                 System.out.println("obj: " + obj);
                 try {
                     obj = (DBEObject) objMgr.insert(obj);
@@ -711,16 +707,15 @@ public class CoreTest extends TestCase {
         _deleteTestUsers(testUsers);
 
 
-        final_objects_count   = objMgr.search(new DBEObjectReal()).size();
+        final_objects_count   = objMgr.search(new DBENote()).size();
         System.out.println("Objects count: " + initial_objects_count + " -> " + final_objects_count);
         if(initial_objects_count!=final_objects_count) fail("Not all objects were deleted");
     }
 
     // ./mvnw -Dtest=CoreTest#testObjectByName test
     public void testObjectByName() {
-
         System.out.println("**** Test Search By NAME");
-        int initial_objects_count = objMgr.search(new DBEObjectReal()).size();
+        int initial_objects_count = objMgr.search(new DBENote()).size();
         int final_objects_count   = initial_objects_count;
 
         // Create Test Users
@@ -737,7 +732,7 @@ public class CoreTest extends TestCase {
             objMgr.setUserGroupsList(testUser.getGroups());
 
             for (String name: object_names) {
-                DBEObject obj = new DBEObjectReal(name, "description of object '" + name + "'");
+                DBEObject obj = new DBENote(name, "description of object '" + name + "'");
                 //System.out.println("obj: " + obj);
                 try {
                     obj = (DBEObject) objMgr.insert(obj);
@@ -800,7 +795,7 @@ public class CoreTest extends TestCase {
         _deleteTestUsers(testUsers);
 
 
-        final_objects_count   = objMgr.search(new DBEObjectReal()).size();
+        final_objects_count   = objMgr.search(new DBENote()).size();
         System.out.println("Objects count: " + initial_objects_count + " -> " + final_objects_count);
         if(initial_objects_count!=final_objects_count) fail("Not all objects were deleted");
     }
