@@ -70,7 +70,7 @@ public class UIController {
         //if(ret==null) {
             ObjectMgr objMgr = getObjectMgr(httpSession);
             ret = objMgr.fullObjectById(objId);
-            logger.info(ret + "");
+            //logger.info(ret + "");
             if(ret instanceof DBEFolder) {
                 DBEPage search = new DBEPage();
                 search.setFather_id(objId);
@@ -78,7 +78,7 @@ public class UIController {
                 List<DBEntity> res = objMgr.search(search);
                 if(res.size()==1) {
                     ret = (DBEObject) res.get(0);
-                    logger.info("=> " + ret.toString());
+                    //logger.info("=> " + ret.toString());
                 }
             }
 
@@ -141,26 +141,17 @@ public class UIController {
                 res.stream().map(DBEntity::getValues).collect(Collectors.toCollection((Supplier<Vector>) Vector::new));
     }
 
-    @GetMapping("/ui/parentlist")
+    @GetMapping("/ui/parentlist/{objId}")
     @ResponseBody
-    public Vector<HashMap<String, String>> ui_parentlist() {
-        // [{'id':'aaa','name':'Parent 1'},{'id':'aab','name':'Parent 2'},{'id':'aac','name':'Parent 3'}]
-        return new Vector<>() {{
-            add(new HashMap<>() {{
-                put("id", "aaa");
-                put("name", "Parent 1");
-                put("icon", "glyphicon-folder-close");
-            }});
-            add(new HashMap<>() {{
-                put("id", "aab");
-                put("name", "Parent 2");
-                put("icon", "glyphicon-folder-close");
-            }});
-            add(new HashMap<>() {{
-                put("id", "aac");
-                put("name", "Parent 3");
-                put("icon", "glyphicon-folder-close");
-            }});
-        }};
+    public Vector<HashMap<String, Object>> ui_parentlist(@PathVariable String objId, HttpSession httpSession) {
+        ObjectMgr objMgr = getObjectMgr(httpSession);
+        Vector<HashMap<String,Object>> ret = new Vector<>();
+        DBEObject myCurrentObject = objMgr.fullObjectById(objId);
+        while(myCurrentObject!=null && !myCurrentObject.getId().equals(rootObjId)) {
+            if(!myCurrentObject.getName().equals("index")) ret.add(0, myCurrentObject.getValues());
+            myCurrentObject = objMgr.fullObjectById(myCurrentObject.getFather_id());
+        }
+        if(myCurrentObject!=null) ret.add(0, myCurrentObject.getValues());
+        return ret;
     }
 }

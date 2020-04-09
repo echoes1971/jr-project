@@ -22,18 +22,14 @@ a:hover { color: #000000; }
 form { margin: 0; }
 
 h1,h2,h3 {
-  color: rgba(255,255,255,0.8);
+  color: rgba(0,0,0,0.8);
   margin:0;
 }
 h1 {
   font-weight: bold;
   font-size: 2.0em;
-  /* CSS3 */
-  /*  text-shadow: 3px 3px 3px #a1a1a1; */
 }
 h3 {
-  /* CSS3 */
-  /*  text-shadow: 1px 1px 1px #a1a1a1; */
 }
 
 hr {

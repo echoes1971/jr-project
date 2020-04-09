@@ -9,12 +9,9 @@ maybe adding some memory before: `export MAVEN_OPTS=-Xmx1024m`
 
 **TODO**
 - Angular FE
-  - manage current object
   - menu items: display correctly
 - Controllers
   - UIController
-    - getCurrentObject
-    - getParentsList
     - getMenuItems
 - dbschema.php
   - Core
@@ -38,6 +35,12 @@ maybe adding some memory before: `export MAVEN_OPTS=-Xmx1024m`
 - Implement a rest/json login with Spring
 
 **DONE**
+- Angular FE
+  - manage current object
+- Controllers
+  - UIController
+    - getCurrentObject
+    - getParentsList
 - dbschema.php
   - CMS
     - DBEFolder

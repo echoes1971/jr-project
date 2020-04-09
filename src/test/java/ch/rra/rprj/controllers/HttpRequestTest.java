@@ -79,6 +79,36 @@ public class HttpRequestTest {
         //assertThat(resp.get("id")).isEqualTo(objId);
     }
 
+    // ./mvnw -Dtest=HttpRequestTest#currentObjEmpty test
+    @Test
+    public void parentList() throws Exception {
+        //System.out.println("restTemplate: " + restTemplate);
+        String objId = "-20";
+        Vector<HashMap<String, Object>> resp = this.restTemplate.getForObject(
+                "http://localhost:" + port + "/ui/parentlist/" + objId, Vector.class);
+        System.out.println("resp: " + resp.size());
+        resp.forEach(hm -> {
+            System.out.println(" " + hm.get("id") + "\t" + hm.get("father_id") + "\t" + hm.get("name"));
+        });
+        assertThat(resp.size()).isEqualTo(1);
+
+        objId = "-21";
+        resp = this.restTemplate.getForObject("http://localhost:" + port + "/ui/parentlist/" + objId, Vector.class);
+        System.out.println("resp: " + resp.size());
+        resp.forEach(hm -> {
+            System.out.println(" " + hm.get("id") + "\t" + hm.get("father_id") + "\t" + hm.get("name"));
+        });
+        assertThat(resp.size()).isEqualTo(2);
+
+        objId = "-24";
+        resp = this.restTemplate.getForObject("http://localhost:" + port + "/ui/parentlist/" + objId, Vector.class);
+        System.out.println("resp: " + resp.size());
+        resp.forEach(hm -> {
+            System.out.println(" " + hm.get("id") + "\t" + hm.get("father_id") + "\t" + hm.get("name"));
+        });
+        assertThat(resp.size()).isEqualTo(2);
+    }
+
     // ./mvnw -Dtest=HttpRequestTest#topMenu test
     @Test
     public void topMenu() throws Exception {

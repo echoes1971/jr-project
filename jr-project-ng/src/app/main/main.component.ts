@@ -4,6 +4,7 @@ import {ActivatedRoute} from '@angular/router';
 import {ObjLight} from '../objlight';
 import {ObjPage} from '../objpage';
 
+/*
 const myObserver = {
   next: x => {
     console.log('Observer got a next value: ');
@@ -12,7 +13,7 @@ const myObserver = {
   error: err => console.error('Observer got an error: ' + err),
   complete: () => console.log('Observer got a complete notification'),
 };
-
+*/
 
 @Component({
   selector: 'app-main',
@@ -38,6 +39,7 @@ export class MainComponent implements OnInit {
         this.coreService.currentObjId = params.get('objId');
         // console.log('Current Object ID: ' + this.currentObjId);
         this.coreService.getCurrentObj().subscribe(data => { this.currentObj = data; });
+        this.coreService.getParents().subscribe((data: ObjLight[]) => { this.parentsList = data; });
       },
       error: err => console.error('Observer got an error: ' + err),
       complete: () => console.log('Observer got a complete notification')
@@ -45,10 +47,14 @@ export class MainComponent implements OnInit {
 
     // this.route.paramMap.subscribe(myObserver);
 
-    this.coreService.getRootObj().subscribe(data => { this.rootObj = data; });
+    this.coreService.getRootObj().subscribe(data => {
+      this.rootObj = data;
+      this.coreService.getParents().subscribe((data2: ObjLight[]) => { this.parentsList = data2; });
+    });
     this.coreService.getCurrentObj().subscribe(data => { this.currentObj = data; });
+
     this.menuItems = this.coreService.getMenuItems();
-    this.coreService.getParents().subscribe((data: ObjLight[]) => { this.parentsList = data; });
+    // this.coreService.getMenuItems().subscribe(data => { this.menuItems = data; });
   }
 
 }

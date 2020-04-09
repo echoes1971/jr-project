@@ -23,7 +23,10 @@ export class CoreService {
     this.rootObj = this.http.get<ObjLight>('/ui/rootobj');
     this.currentObj = this.http.get<ObjPage>('/ui/obj/' + this.currentObjId);
     this.menuTop = this.http.get<ObjLight[]>('/ui/topmenu');
-    this.parentsList = this.http.get<ObjLight[]>('/ui/parentlist');
+    this.rootObj.subscribe(data => {
+      this.currentObjId = data.id;
+      this.parentsList = this.http.get<ObjLight[]>('/ui/parentlist/' + this.currentObjId);
+    });
   }
 
   getRootObj() { return this.rootObj; }
@@ -44,6 +47,9 @@ export class CoreService {
     ];
   }
 
-  getParents() { return this.parentsList; }
+  getParents() {
+    this.parentsList = this.http.get<ObjLight[]>('/ui/parentlist/' + this.currentObjId);
+    return this.parentsList;
+  }
 
 }
