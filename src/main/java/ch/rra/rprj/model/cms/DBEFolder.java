@@ -65,14 +65,11 @@ public class DBEFolder extends DBEObject {
     public String getChilds_sort_order() { return childs_sort_order; }
     public void setChilds_sort_order(String childs_sort_order) { this.childs_sort_order = childs_sort_order; }
 
-    public List<DBEntity> sortChildren(List<DBEntity> childs) {
+    public List<DBEObject> sortChildren(List<DBEObject> childs) {
         if(this.childs_sort_order==null || this.childs_sort_order.length()==0) return childs;
-        List<DBEObject> tmp = childs.stream().map(x -> ((DBEObject)x)).collect(Collectors.toList());
         List<String> order = Arrays.asList(this.childs_sort_order.split(","));
-        //System.out.println("order:"+order);
-        List<String> ids = tmp.stream().map(DBEObject::getId).collect(Collectors.toList());
-        //System.out.println("ids:"+ids);
-        tmp.sort((t0, t1) -> {
+        List<String> ids = childs.stream().map(DBEObject::getId).collect(Collectors.toList());
+        childs.sort((t0, t1) -> {
             String id1 = t0.getId();
             String id2 = t1.getId();
             int pos1 = order.indexOf(id1);
@@ -87,8 +84,7 @@ public class DBEFolder extends DBEObject {
             }
             return pos1 < pos2 ? -1 : (pos1 > pos2 ? 1 : 0);
         });
-        //System.out.println("-> "+(tmp.stream().map(obj -> obj.getId()).collect(Collectors.toList())));
-        return tmp.stream().map(x -> ((DBEntity)x)).collect(Collectors.toList());
+        return childs;
     }
 
     @Override
