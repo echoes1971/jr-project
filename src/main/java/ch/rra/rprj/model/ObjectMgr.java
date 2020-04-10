@@ -1,7 +1,9 @@
 package ch.rra.rprj.model;
 
 import ch.rra.rprj.model.cms.*;
+import ch.rra.rprj.model.contacts.DBECompany;
 import ch.rra.rprj.model.contacts.DBECountry;
+import ch.rra.rprj.model.contacts.DBEPeople;
 import ch.rra.rprj.model.core.*;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
@@ -24,21 +26,26 @@ public class ObjectMgr extends DBMgr {
             User.class,
             Group.class,
             DBECountry.class,
+
+            DBECompany.class,
             DBEFolder.class,
             DBELink.class,
             DBENews.class,
             DBENote.class,
             DBEObjectReal.class,
-            DBEPage.class
+            DBEPage.class,
+            DBEPeople.class
     });
     // TODO add all the sublasses and remove DBEObject
     private List<Class> registeredObjectTypes = Arrays.asList(new Class[]{
+            DBECompany.class,
             DBEFolder.class,
             DBELink.class,
             DBENews.class,
             DBENote.class,
             DBEObjectReal.class,
-            DBEPage.class
+            DBEPage.class,
+            DBEPeople.class
     });
 
     public boolean canRead(DBEObject obj) {
