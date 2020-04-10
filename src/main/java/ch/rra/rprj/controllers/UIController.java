@@ -33,14 +33,15 @@ public class UIController {
 
     private String currentObjId;
 
-    private List<DBEntity> fetchChildren(HttpSession httpSession, DBEFolder father, boolean withoutIndexPage) {
-        ObjectMgr objMgr = getObjectMgr(httpSession);
+    private List<DBEObject> fetchChildren(ObjectMgr objMgr, DBEObject father, boolean withoutIndexPage) {
         //DBEFolder search = new DBEFolder();
         DBEObject search = new DBEObjectReal();
         search.setFather_id(father.getId());
-        List<DBEntity> res = objMgr.search(search,false,"",true);
+        //List<DBEntity> res = objMgr.search(search,false,"",true);
+        List<DBEObject> res = objMgr.search(search,false,"",true)
+                .stream().map(x -> ((DBEObject)x)).collect(Collectors.toList());
         if(withoutIndexPage) res = res.stream().filter(x -> !((DBEObject)x).getName().equals("index")).collect(Collectors.toList());
-        return father.sortChildren(res);
+        return father instanceof DBEFolder ? ((DBEFolder)father).sortChildren(res) : res;
     }
 
     private ObjectMgr getObjectMgr(HttpSession httpSession) {
@@ -68,35 +69,39 @@ public class UIController {
         return ret;
     }
 
-    private DBEObject getCurrentObject(String objId, HttpSession httpSession) {
-        DBEObject ret; // = (DBEFolder) httpSession.getAttribute("currentObj");
-        //if(ret==null) {
-            ObjectMgr objMgr = getObjectMgr(httpSession);
-            ret = objMgr.fullObjectById(objId);
-            //logger.info(ret + "");
-            if(ret instanceof DBEFolder) {
-                DBEPage search = new DBEPage();
-                search.setFather_id(objId);
-                search.setName("index");
-                List<DBEntity> res = objMgr.search(search);
-                if(res.size()==1) {
-                    ret = (DBEObject) res.get(0);
-                    //logger.info("=> " + ret.toString());
-                }
+    private DBEObject getCurrentObject(String objId, ObjectMgr objMgr) {
+        DBEObject ret = objMgr.fullObjectById(objId);
+        if(ret instanceof DBEFolder) {
+            DBEPage search = new DBEPage();
+            search.setFather_id(objId);
+            search.setName("index");
+            List<DBEntity> res = objMgr.search(search);
+            if(res.size()==1) {
+                ret = (DBEObject) res.get(0);
             }
-
-            //httpSession.setAttribute("currentObj", ret);
-        //}
+        }
         return ret;
     }
 
-    private List<DBEntity> getTopMenu(HttpSession httpSession) {
-        List<DBEntity> ret = (List<DBEntity>) httpSession.getAttribute("topMenu");
+    private List<DBEObject> getTopMenu(HttpSession httpSession) {
+        List<DBEObject> ret = (List<DBEObject>) httpSession.getAttribute("topMenu");
         if(ret==null) {
+            ObjectMgr objMgr = getObjectMgr(httpSession);
             DBEFolder rootObj = getRootObject(httpSession);
-            ret = fetchChildren(httpSession, rootObj, true);
+            ret = fetchChildren(objMgr, rootObj, true);
             httpSession.setAttribute("topMenu", ret);
         }
+        return ret;
+    }
+
+    private Vector<DBEObject> getParentsList(String objId, ObjectMgr objMgr) {
+        Vector<DBEObject> ret = new Vector<>();
+        DBEObject myCurrentObject = objMgr.fullObjectById(objId);
+        while(myCurrentObject!=null && !myCurrentObject.getId().equals(rootObjId)) {
+            if(!myCurrentObject.getName().equals("index")) ret.add(0, myCurrentObject);
+            myCurrentObject = objMgr.fullObjectById(myCurrentObject.getFather_id());
+        }
+        if(myCurrentObject!=null) ret.add(0, myCurrentObject);
         return ret;
     }
 
@@ -118,43 +123,34 @@ public class UIController {
     @GetMapping("/ui/obj/")
     @ResponseBody
     public HashMap<String,Object> ui_currentobj_empty(HttpSession httpSession) {
+        ObjectMgr objMgr = getObjectMgr(httpSession);
         currentObjId = rootObjId;
-        //System.out.println("UIController.ui_currentobj: currentObjId="+currentObjId);
-        DBEObject ret = getCurrentObject(currentObjId, httpSession);
+        DBEObject ret = getCurrentObject(currentObjId, objMgr);
         return ret.getValues();
     }
 
     @GetMapping("/ui/obj/{objId}")
     @ResponseBody
     public HashMap<String,Object> ui_currentobj(@PathVariable String objId, HttpSession httpSession) {
-        //currentObjId = objId!=null && objId.length()>0 ? objId : rootObjId;
+        ObjectMgr objMgr = getObjectMgr(httpSession);
         String _currentObjId = objId==null || objId.equals("null") ? rootObjId : objId;
-        //System.out.println("UIController.ui_currentobj: objId="+objId);
-        //System.out.println("UIController.ui_currentobj: rootObjId="+rootObjId);
-        //System.out.println("UIController.ui_currentobj: _currentObjId="+_currentObjId);
-        DBEObject ret = getCurrentObject(_currentObjId, httpSession);
+        DBEObject ret = getCurrentObject(_currentObjId, objMgr);
         return ret==null ? new HashMap<>() : ret.getValues();
     }
 
     @GetMapping("/ui/topmenu")
     @ResponseBody
     public Vector<HashMap<String, Object>> ui_topmenu(HttpSession httpSession) {
-        List<DBEntity> res = getTopMenu(httpSession);
+        List<DBEObject> res = getTopMenu(httpSession);
         return (Vector<HashMap<String, Object>>)
                 res.stream().map(DBEntity::getValues).collect(Collectors.toCollection((Supplier<Vector>) Vector::new));
     }
 
     @GetMapping("/ui/parentlist/{objId}")
     @ResponseBody
-    public Vector<HashMap<String, Object>> ui_parentlist(@PathVariable String objId, HttpSession httpSession) {
+    public List<HashMap<String, Object>> ui_parentlist(@PathVariable String objId, HttpSession httpSession) {
         ObjectMgr objMgr = getObjectMgr(httpSession);
-        Vector<HashMap<String,Object>> ret = new Vector<>();
-        DBEObject myCurrentObject = objMgr.fullObjectById(objId);
-        while(myCurrentObject!=null && !myCurrentObject.getId().equals(rootObjId)) {
-            if(!myCurrentObject.getName().equals("index")) ret.add(0, myCurrentObject.getValues());
-            myCurrentObject = objMgr.fullObjectById(myCurrentObject.getFather_id());
-        }
-        if(myCurrentObject!=null) ret.add(0, myCurrentObject.getValues());
-        return ret;
+        return getParentsList(objId, objMgr).stream().map(x -> x.getValues()).collect(Collectors.toList());
     }
+
 }

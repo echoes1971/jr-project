@@ -75,7 +75,7 @@ public class HttpRequestTest {
         //assertThat(resp.get("id")).isEqualTo(objId);
     }
 
-    // ./mvnw -Dtest=HttpRequestTest#currentObjEmpty test
+    // ./mvnw -Dtest=HttpRequestTest#parentList test
     @Test
     public void parentList() throws Exception {
         String objId = "-20";
