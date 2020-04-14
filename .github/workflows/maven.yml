@@ -52,8 +52,9 @@ jobs:
     - uses: actions/checkout@v2
     - name: Setup Database
       run: |
-        mysql --host 127.0.0.1 -uroot -pmysecret < ./sql/db_rproject.sql
-        mysql --host 127.0.0.1 -uroot -pmysecret rproject -e "SHOW TABLES"
+        sudo /etc/init.d/mysql start
+        mysql --host java-rprj-mysql -uroot -pmysecret < ./sql/db_rproject.sql
+        mysql --host java-rprj-mysql -uroot -pmysecret rproject -e "SHOW TABLES"
     - name: Set up JDK 1.11
       uses: actions/setup-java@v1
       with:
