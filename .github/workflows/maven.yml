@@ -24,6 +24,7 @@ jobs:
         run: |
           apt-get update
           apt-get install -y mysql-client
+          mysql --host java-rprj-mysql -uroot -pmysecret < ./sql/db_rproject.sql
           mysql --host java-rprj-mysql -uroot -pmysecret -e "SHOW DATABASES"
 
   build:
