@@ -1,6 +1,8 @@
 package ch.rra.rprj.model.cms;
 
+import ch.rra.rprj.model.ObjectMgr;
 import ch.rra.rprj.model.core.DBEObject;
+import ch.rra.rprj.model.core.DBEObjectReal;
 import ch.rra.rprj.model.core.DBEntity;
 
 import javax.persistence.Column;
@@ -85,6 +87,11 @@ public class DBEFolder extends DBEObject {
             return pos1 < pos2 ? -1 : (pos1 > pos2 ? 1 : 0);
         });
         return childs;
+    }
+
+    @Override
+    public List<DBEObject> fetchChildren(ObjectMgr objMgr) {
+        return this.sortChildren(super.fetchChildren(objMgr));
     }
 
     @Override

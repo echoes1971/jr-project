@@ -3,10 +3,13 @@ package ch.rra.rprj.model.core;
 import ch.rra.rprj.model.DBException;
 import ch.rra.rprj.model.DBMgr;
 import ch.rra.rprj.model.ObjectMgr;
+import ch.rra.rprj.model.cms.DBEFolder;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
 import java.sql.Timestamp;
+import java.util.List;
+import java.util.stream.Collectors;
 
 /*
 mysql> desc rprj_objects;
@@ -239,6 +242,13 @@ public abstract class DBEObject extends DBEntity {
         User user = dbMgr.getDbeUser();
         if(user!=null) this.deleted_by = user.getId();
         this.deleted_date = new Timestamp((new java.util.Date()).getTime());
+    }
+
+    public List<DBEObject> fetchChildren(ObjectMgr objMgr) {
+        DBEObject search = new DBEObjectReal();
+        search.setFather_id(this.getId());
+        return objMgr.search(search,false,"",true).stream()
+                .map(x -> ((DBEObject)x)).collect(Collectors.toList());
     }
 
     @Override

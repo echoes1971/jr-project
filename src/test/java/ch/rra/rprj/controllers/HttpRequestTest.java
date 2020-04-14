@@ -117,14 +117,11 @@ public class HttpRequestTest {
     // ./mvnw -Dtest=HttpRequestTest#loginTest test
     @Test
     public void loginTest() throws Exception {
-        User resp = this.restTemplate.postForObject(
-                "http://localhost:" + port + "/login",
-                new HashMap<String,String>(){
-                    {
-                        put("login","adm");
-                        put("pwd","adm");
-                    }
-                },
+        User resp = this.restTemplate.postForObject("http://localhost:" + port + "/login",
+                new HashMap<String,String>(){{
+                    put("login","adm");
+                    put("pwd","adm");
+                    }},
                 User.class);
         //System.out.println("resp: " + resp);
         assertThat(resp).isNotNull();
@@ -133,14 +130,11 @@ public class HttpRequestTest {
     // ./mvnw -Dtest=HttpRequestTest#loginNegativeTest test
     @Test
     public void loginNegativeTest() throws Exception {
-        User resp = this.restTemplate.postForObject(
-                "http://localhost:" + port + "/login",
-                new HashMap<String,String>(){
-                    {
+        User resp = this.restTemplate.postForObject("http://localhost:" + port + "/login",
+                new HashMap<String,String>(){{
                         put("login","adm");
                         put("pwd","ad");
-                    }
-                },
+                    }},
                 User.class);
         //System.out.println("resp: " + resp);
         assertThat(resp).isNull();

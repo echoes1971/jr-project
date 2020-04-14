@@ -34,14 +34,9 @@ public class UIController {
     private String currentObjId;
 
     private List<DBEObject> fetchChildren(ObjectMgr objMgr, DBEObject father, boolean withoutIndexPage) {
-        //DBEFolder search = new DBEFolder();
-        DBEObject search = new DBEObjectReal();
-        search.setFather_id(father.getId());
-        //List<DBEntity> res = objMgr.search(search,false,"",true);
-        List<DBEObject> res = objMgr.search(search,false,"",true)
-                .stream().map(x -> ((DBEObject)x)).collect(Collectors.toList());
-        if(withoutIndexPage) res = res.stream().filter(x -> !((DBEObject)x).getName().equals("index")).collect(Collectors.toList());
-        return father instanceof DBEFolder ? ((DBEFolder)father).sortChildren(res) : res;
+        List<DBEObject> res = father.fetchChildren(objMgr);
+        if(withoutIndexPage) res = res.stream().filter(x -> !x.getName().equals("index")).collect(Collectors.toList());
+        return res;
     }
 
     private ObjectMgr getObjectMgr(HttpSession httpSession) {

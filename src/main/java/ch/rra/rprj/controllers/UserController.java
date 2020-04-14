@@ -26,7 +26,7 @@ public class UserController {
                 e.printStackTrace();
             }
         }
-        System.out.println(httpSession.getId() + ":" + ret);
+        //System.out.println(httpSession.getId() + ":" + ret);
         return ret;
     }
 
