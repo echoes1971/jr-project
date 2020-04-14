@@ -24,7 +24,7 @@ jobs:
         run: |
           apt-get update
           apt-get install -y mysql-client
-          mysql --host 127.0.0.1 -uroot -ppassword -e "SHOW DATABASES"
+          mysql --host java-rprj-mysql -uroot -ppassword -e "SHOW DATABASES"
 
   build:
 
