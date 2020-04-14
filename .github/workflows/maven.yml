@@ -29,16 +29,16 @@ jobs:
 #          mysql --host test-rprj-mysql -uroot -pmysecret -e "SHOW DATABASES"
 #          mysql --host test-rprj-mysql -uroot -pmysecret rproject -e "SHOW TABLES"
 
-  build:
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v2
-    - name: Set up JDK 1.11
-      uses: actions/setup-java@v1
-      with:
-        java-version: 1.11
-    - name: Build with Maven
-      run: mvn -B package -Dmaven.test.skip=true --file pom.xml
+#  build:
+#    runs-on: ubuntu-latest
+#    steps:
+#    - uses: actions/checkout@v2
+#    - name: Set up JDK 1.11
+#      uses: actions/setup-java@v1
+#      with:
+#        java-version: 1.11
+#    - name: Build with Maven
+#      run: mvn -B package -Dmaven.test.skip=true --file pom.xml
 
   test:
     runs-on: ubuntu-latest
