@@ -3,10 +3,10 @@
     <tr><th class="menu"><a [routerLink]="['/obj', rootObj.id]">{{ rootObj.name }}</a></th></tr>
   </table>
   <table class="menu">
-    <tr *ngFor="let menuItem of menuItems"><td class="menu" >{{ indent }}<span class="glyphicon {{ menuItem.icon }}">&nbsp;</span> <a [routerLink]="['/obj', menuItem.id]">{{ menuItem.name }}</a></td></tr>
+    <tr *ngFor="let menuItem of menuItems"><td class="menu" ><span [innerHTML]="menuItem[0]"></span> <span class="glyphicon {{ menuItem[1].icon }}">&nbsp;</span> <a [routerLink]="['/obj', menuItem[1].id]">{{ menuItem[1].name }}</a></td></tr>
   </table>
 </div>
-<div class="middle_content col-10">{{parentsList[0]}}
+<div class="middle_content col-10">
   <div class="r_breadcrumb">
     <ul class="r_breadcrumb">
       <li *ngFor="let breadcrumb of parentsList; first as isFirst" class="r_breadcrumb">

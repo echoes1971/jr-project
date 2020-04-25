@@ -3,17 +3,7 @@ import {CoreService} from '../core.service';
 import {ActivatedRoute} from '@angular/router';
 import {ObjLight} from '../objlight';
 import {ObjPage} from '../objpage';
-
-/*
-const myObserver = {
-  next: x => {
-    console.log('Observer got a next value: ');
-    console.log(x);
-  },
-  error: err => console.error('Observer got an error: ' + err),
-  complete: () => console.log('Observer got a complete notification'),
-};
-*/
+import {mergeMap} from 'rxjs/operators';
 
 @Component({
   selector: 'app-main',
@@ -28,88 +18,65 @@ export class MainComponent implements OnInit {
   menuItems = [];
 
   currentObjId = '';
-  parentsList: ObjLight[] = [
-    {id: '-13', name: '', icon: 'glyphicon-folder-close'},
-    {id: '-14', name: '', icon: 'glyphicon-folder-close'},
-  ];
+  parentsList: ObjLight[] = [];
 
   constructor(private coreService: CoreService, private route: ActivatedRoute) { }
-/*
-  currentObjectObserver = {
-    next: data => {
-      console.log("currentObjectObserver: start.");
-      this.currentObj = data;
-      console.log(data);
-      this.coreService.getParents(this.currentObj.id).subscribe((data2) => {
-        console.log("currentObjectObserver: parents - start.");
-        console.log(data2);
-        this.parentsList = data2;
-        console.log("currentObjectObserver: parents - end.");
+
+  _createMenuLevel(indent: string, myindex:number, items: any[], menuItems: any[]): number {
+    items.forEach((value, index2, array2) => {
+      this.menuItems[myindex] = [indent, value];
+      this.menuItems[myindex][1]['icon'] = 'glyphicon-folder-close'; // TODO do it when fetching from the back end
+      // console.log('myindex: ' + myindex + ' ' + indent + value.id + ' ' + value.name);
+      myindex++;
+      if(value.id in menuItems) {
+        // console.log('Found: ' + value.id);
+        // console.log(menuItems[value.id]);
+        myindex = this._createMenuLevel(indent + '&nbsp;', myindex, menuItems[value.id], menuItems);
+      }
+    });
+    return myindex;
+  }
+
+  paramMapObserver = {
+    next: params => {
+      this.currentObjId = params.get('objId');
+      this.coreService.currentObjId = params.get('objId');
+      console.log('Current Object ID: ' + this.currentObjId);
+      this.coreService.getRootObj().pipe(
+        mergeMap(rootObj => {
+          this.rootObj = rootObj;
+          if(this.currentObjId==null) this.currentObjId = this.rootObj.id;
+          return this.coreService.getCurrentObj(this.currentObjId);
+        }),
+        mergeMap(curObj => {
+          this.currentObj = curObj;
+          return this.coreService.getParents(this.currentObj.id);
+        }),
+        mergeMap(parents => {
+          this.parentsList = parents;
+          return this.coreService.getMenuItems(this.currentObjId);
+        }),
+        mergeMap(menuItems => {
+          this.menuItems = [];
+          this._createMenuLevel('', 0, menuItems[this.parentsList[0].id], menuItems);
+          return [];
+        })
+      ).subscribe({
+        next: () => {
+          console.log('SUCCESSO');
+        }
+        , error: err => console.error('MainComponent.paramMapObserver.pipe error: ' + err)
+        , complete: () => {
+          // console.log('MainComponent.paramMapObserver.pipe: complete notification');
+        }
       });
-      console.log("currentObjectObserver: end.");
     }
-    ,error: err => console.error('Observer got an error: ' + err)
-    ,complete: () => console.log('MainComponent.currentObjectObserver: complete.')
+    , error: err => console.error('MainComponent.paramMapObserver error: ' + err)
+    , complete: () => console.log('MainComponent.paramMapObserver: complete notification')
   };
-*/
 
   ngOnInit(): void {
-    /*
-    this.route.data.subscribe({
-      next: data => {
-        console.log("SUNCHI");
-        console.log(data);
-        console.log("SUNLI");
-      },
-      error: err => console.error('Observer got an error: ' + err),
-      complete: () => console.log('Observer got a complete notification')
-    })
-     */
-    this.route.paramMap.subscribe({
-      next: params => {
-        this.currentObjId = params.get('objId');
-        this.coreService.currentObjId = params.get('objId');
-        console.log('Current Object ID: ' + this.currentObjId);
-        this.coreService.getCurrentObj().subscribe(
-          data => {
-            console.log("currentObjectObserver: start.");
-            this.currentObj = data;
-            console.log(data);
-            this.coreService.getParents(this.currentObj.id).subscribe((data2) => {
-              console.log("currentObjectObserver: parents - start.");
-              console.log(data2);
-              this.parentsList = data2;
-              console.log("currentObjectObserver: parents - end.");
-            });
-            console.log("currentObjectObserver: end.");
-          });
-      },
-      error: err => console.error('Observer got an error: ' + err),
-      complete: () => console.log('Observer got a complete notification')
-    });
-    // this.route.paramMap.subscribe(myObserver);
-
-    this.coreService.getRootObj().subscribe(data => {
-        this.rootObj = data;
-        /*
-        this.coreService.getParents(this.rootObj.id).subscribe(data2 => {
-          this.parentsList = data2;
-        });
-         */
-    });
-    /*
-    this.coreService.getCurrentObj().subscribe(data => {
-      this.currentObj = data;
-    });
-     */
-
-    this.coreService.getMenuItems(this.currentObjId).subscribe(data => {
-      console.log("MainComponent.getMenuItems: start.");
-      this.menuItems = data;
-      console.log(data);
-      console.log("MainComponent.getMenuItems: end.");
-    });
-    // this.coreService.getMenuItems().subscribe(data => { this.menuItems = data; });
+    this.route.paramMap.subscribe(this.paramMapObserver);
   }
 
 }
