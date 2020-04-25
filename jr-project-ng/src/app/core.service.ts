@@ -32,16 +32,16 @@ export class CoreService {
 
   getRootObj() { return this.rootObj; }
 
-  getCurrentObj() {
+  getCurrentObj(objId: string) {
     // if(this.currentObj == null) {
-    this.currentObj = this.http.get<ObjPage>('/ui/obj/' + this.currentObjId);
+    this.currentObj = this.http.get<ObjPage>('/ui/obj/' + objId);
     // }
     return this.currentObj;
   }
 
   getMenuTop() { return this.menuTop; }
 
-  getMenuItems(objId: String): Observable<any[]> {
+  getMenuItems(objId: string): Observable<any[]> {
     this.menuItems = this.http.get<any[]>('/ui/menutree/' + objId);
     return this.menuItems;
     /*
@@ -52,7 +52,7 @@ export class CoreService {
      */
   }
 
-  getParents(objId: String) {
+  getParents(objId: string) {
     this.parentsList = this.http.get<ObjLight[]>('/ui/parentlist/' + objId);
     return this.parentsList;
   }
