@@ -16,6 +16,7 @@ export class CoreService {
   currentObj: Observable<ObjPage> = null;
   menuTop: Observable<ObjLight[]> = null;
   parentsList: Observable<ObjLight[]> = null;
+  menuItems: Observable<any[]> = null;
 
   constructor(private http: HttpClient) {
     console.log(environment.apiUrl + '/ui/rootobj');
@@ -40,15 +41,19 @@ export class CoreService {
 
   getMenuTop() { return this.menuTop; }
 
-  getMenuItems(): ObjLight[] {
+  getMenuItems(objId: String): Observable<any[]> {
+    this.menuItems = this.http.get<any[]>('/ui/menutree/' + objId);
+    return this.menuItems;
+    /*
     return [
       {id: '-13', name: 'Downloads', icon: 'glyphicon-folder-close'},
       {id: '-14', name: 'About us', icon: 'glyphicon-folder-close'},
     ];
+     */
   }
 
-  getParents() {
-    this.parentsList = this.http.get<ObjLight[]>('/ui/parentlist/' + this.currentObjId);
+  getParents(objId: String) {
+    this.parentsList = this.http.get<ObjLight[]>('/ui/parentlist/' + objId);
     return this.parentsList;
   }
 

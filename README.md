@@ -13,6 +13,9 @@ maybe adding some memory before: `export MAVEN_OPTS=-Xmx1024m`
 - Controllers
   - UIController
     - getMenuItems
+- main.php
+  - menu_tree
+  - mypeople: profile of the current user
 - dbschema.php
   - Core
     - DBEntity: setValues

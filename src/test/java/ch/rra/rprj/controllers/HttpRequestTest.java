@@ -15,6 +15,7 @@ import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Vector;
 import java.util.stream.Collectors;
 
@@ -102,6 +103,46 @@ public class HttpRequestTest {
             System.out.println(" " + hm.get("id") + "\t" + hm.get("father_id") + "\t" + hm.get("name"));
         });
         assertThat(resp.size()).isEqualTo(2);
+    }
+
+    // ./mvnw -Dtest=HttpRequestTest#menuTree test
+    @Test
+    public void menuTree() throws Exception {
+        HashMap<String,List<HashMap<String, Object>>> resp;
+
+        String objId = "-20";
+        resp = this.restTemplate.getForObject(
+                "http://localhost:" + port + "/ui/menutree/" + objId, HashMap.class);
+        System.out.println("resp: " + resp.size());
+        resp.forEach((k,v) -> {
+            System.out.println(k);
+            v.forEach(hm -> {
+                System.out.println(" " + hm.get("id") + "\t" + hm.get("father_id") + "\t" + hm.get("name"));
+            });
+        });
+        //assertThat(resp.size()).isEqualTo(1);
+
+        objId = "-21";
+        resp = this.restTemplate.getForObject("http://localhost:" + port + "/ui/menutree/" + objId, HashMap.class);
+        System.out.println("resp: " + resp.size());
+        resp.forEach((k,v) -> {
+            System.out.println(k);
+            v.forEach(hm -> {
+                System.out.println(" " + hm.get("id") + "\t" + hm.get("father_id") + "\t" + hm.get("name"));
+            });
+        });
+        assertThat(resp.size()).isPositive(); //.isEqualTo(2);
+
+        objId = "-31";
+        resp = this.restTemplate.getForObject("http://localhost:" + port + "/ui/menutree/" + objId, HashMap.class);
+        System.out.println("resp: " + resp.size());
+        resp.forEach((k,v) -> {
+            System.out.println(k);
+            v.forEach(hm -> {
+                System.out.println(" " + hm.get("id") + "\t" + hm.get("father_id") + "\t" + hm.get("name"));
+            });
+        });
+        assertThat(resp.size()).isPositive(); //.isEqualTo(2);
     }
 
     // ./mvnw -Dtest=HttpRequestTest#topMenu test

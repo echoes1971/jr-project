@@ -97,6 +97,10 @@ public class UIController {
             myCurrentObject = objMgr.fullObjectById(myCurrentObject.getFather_id());
         }
         if(myCurrentObject!=null) ret.add(0, myCurrentObject);
+        logger.info("ret:" + ret.size());
+        ret.forEach(o -> {
+            logger.info(" " + o.getId() + "\t" + o.getFather_id() + "\t" + o.getName());
+        });
         return ret;
     }
 
@@ -111,10 +115,10 @@ public class UIController {
     @GetMapping("/ui/rootobj")
     @ResponseBody
     public HashMap<String,Object> ui_rootobj(HttpSession httpSession) {
-        DBEFolder ret = getRootObject(httpSession);
-        return ret.getValues();
+        return getRootObject(httpSession).getValues();
     }
 
+/*
     @GetMapping("/ui/obj/")
     @ResponseBody
     public HashMap<String,Object> ui_currentobj_empty(HttpSession httpSession) {
@@ -123,7 +127,7 @@ public class UIController {
         DBEObject ret = getCurrentObject(currentObjId, objMgr);
         return ret.getValues();
     }
-
+*/
     @GetMapping("/ui/obj/{objId}")
     @ResponseBody
     public HashMap<String,Object> ui_currentobj(@PathVariable String objId, HttpSession httpSession) {
@@ -145,7 +149,18 @@ public class UIController {
     @ResponseBody
     public List<HashMap<String, Object>> ui_parentlist(@PathVariable String objId, HttpSession httpSession) {
         ObjectMgr objMgr = getObjectMgr(httpSession);
-        return getParentsList(objId, objMgr).stream().map(x -> x.getValues()).collect(Collectors.toList());
+        return getParentsList(objId, objMgr).stream().map(DBEntity::getValues).collect(Collectors.toList());
     }
 
+    @GetMapping("/ui/menutree/{objId}")
+    @ResponseBody
+    public HashMap<String,List<HashMap<String, Object>>> ui_menuTree(@PathVariable String objId, HttpSession httpSession) {
+        ObjectMgr objMgr = getObjectMgr(httpSession);
+        HashMap<String,List<HashMap<String, Object>>> ret = new HashMap<>();
+        getParentsList(objId,objMgr).forEach(o -> {
+            logger.info("Fetching children for: " + o.getId());
+            ret.put(o.getId(), fetchChildren(objMgr,o,true).stream().map(DBEntity::getValues).collect(Collectors.toList()));
+        });
+        return ret;
+    }
 }
