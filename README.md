@@ -9,7 +9,7 @@ maybe adding some memory before: `export MAVEN_OPTS=-Xmx1024m`
 
 **TODO**
 - Angular FE
-  - login
+  - main component: list childs?
   - object icons: handle properly
   - search component
 - Controllers
@@ -41,6 +41,8 @@ maybe adding some memory before: `export MAVEN_OPTS=-Xmx1024m`
 
 **DONE**
 - Angular FE
+  - login
+  - logout
   - menu items
   - manage current object
 - Controllers

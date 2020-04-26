@@ -83,5 +83,4 @@ export class MainComponent implements OnInit {
   ngOnInit(): void {
     this.route.paramMap.subscribe(this.paramMapObserver);
   }
-
 }

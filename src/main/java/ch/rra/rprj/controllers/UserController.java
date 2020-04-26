@@ -2,6 +2,8 @@ package ch.rra.rprj.controllers;
 
 import ch.rra.rprj.model.ObjectMgr;
 import ch.rra.rprj.model.core.User;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
@@ -10,9 +12,10 @@ import java.util.HashMap;
 
 @RestController
 public class UserController {
+    private Logger logger;
 
     UserController() {
-
+        this.logger = LoggerFactory.getLogger(getClass());
     }
 
     private ObjectMgr getObjectMgr(HttpSession httpSession) {
@@ -37,7 +40,7 @@ public class UserController {
 
     // Aggregate Root
 
-    @GetMapping("/ping")
+    @GetMapping("/api/user/ping")
     String ping(HttpSession httpSession) {
         ObjectMgr objMgr = getObjectMgr(httpSession);
         Integer counter = httpSession.getAttribute("counter") == null ? 0 : (Integer) httpSession.getAttribute("counter");
@@ -58,8 +61,9 @@ public class UserController {
 //    }
 
     // curl -d '{"login":"adm","pwd":"adm"}' -H "Content-Type: application/json" http://localhost:8080/login
-    @PostMapping("/login")
-    User login(HttpSession httpSession, @RequestBody HashMap<String,String> hm, HttpServletRequest httpServletRequest) {
+    @PostMapping("/api/user/login")
+    HashMap<String, Object> login(HttpSession httpSession, @RequestBody HashMap<String,String> hm, HttpServletRequest httpServletRequest) {
+        logger.info(hm.toString());
         ObjectMgr objMgr = getObjectMgr(httpSession);
         User user = objMgr.login(hm.get("login"),hm.get("pwd"));
 
@@ -68,10 +72,27 @@ public class UserController {
             user.setGroups(null);
         }
 
-        return user;
+        logger.info("user: " + user);
+        return user==null ? null : user.getValues();
     }
 
-    @GetMapping("/currentUser")
+    @PostMapping("/api/user/logout")
+    HashMap<String, Object> logout(HttpSession httpSession, @RequestBody HashMap<String,String> hm, HttpServletRequest httpServletRequest) {
+        logger.info(hm.toString());
+        ObjectMgr objMgr = getObjectMgr(httpSession);
+        objMgr.setDbeUser(null);
+        objMgr.setUserGroupsList(null);
+
+        User user = objMgr.getDbeUser();
+        if(user!=null) {
+            user.setPwd(null);
+            user.setGroups(null);
+        }
+        logger.info("user: " + user);
+        return user==null ? null : user.getValues();
+    }
+
+    @GetMapping("/api/user/current")
     String currentUser(HttpSession httpSession) {
         User user = getCurrentUser(httpSession);
 

@@ -33,22 +33,17 @@ td.login {
   margin:2px;
   padding:4px 8px;
 }
-input.login {
+input.login, button.login {
   background-color:#aaaaaa;
   border:0 solid black;
   border-radius: 4px;
   padding:2px 5px;
 }
-input.login:hover {
+input.login:hover, button.login:hover {
   background-color:#dddddd;
 }
 
 #loginForm {
-  /* position: absolute;
-   top: 15em;
-   bottom: 5em;
-   left: 17em;
-   right: 17em;*/
   padding-top:5em;
   padding-bottom:10em;
 }

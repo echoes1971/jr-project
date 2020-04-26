@@ -22,6 +22,8 @@ export class CoreService {
   parentsList$: Observable<ObjLight[]> = null;
   menuItems: Observable<any[]> = null;
 
+  myUser: any = null;
+
   constructor(private http: HttpClient) {
     console.log(environment.apiUrl + '/ui/rootobj');
 
@@ -75,4 +77,18 @@ export class CoreService {
     return this.parentsList$;
   }
 
+  login(username: string, password: string) {
+    console.log('CoreService.login: ' + login + ' ' + pwd);
+    this.http.post<any>('/api/user/login', {login: username, pwd: password} ).subscribe(data => {
+      console.log(data);
+      this.myUser = data;
+    });
+  }
+
+  logout() {
+    this.myUser = null;
+    this.http.post<any>('/api/user/logout', {} ).subscribe(data => {
+      console.log(data);
+    });
+  }
 }

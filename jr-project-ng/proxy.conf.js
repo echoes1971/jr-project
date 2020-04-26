@@ -4,7 +4,7 @@ const PROXY_CONFIG = [
   {
     context: [
       "/ui"
-      // "/api"
+      ,"/api"
     ],
     target: 'http://localhost:8080', //environment.apiUrl,
     secure: false,

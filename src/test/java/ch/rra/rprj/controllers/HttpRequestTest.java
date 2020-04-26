@@ -39,7 +39,7 @@ public class HttpRequestTest {
     // ./mvnw -Dtest=HttpRequestTest#pingTest test
     @Test
     public void pingTest() throws Exception {
-        String resp = this.restTemplate.getForObject("http://localhost:" + port + "/ping",
+        String resp = this.restTemplate.getForObject("http://localhost:" + port + "/api/user/ping",
                 String.class);
         System.out.println("resp: " + resp);
         assertThat(resp).contains("pong");
@@ -158,25 +158,44 @@ public class HttpRequestTest {
     // ./mvnw -Dtest=HttpRequestTest#loginTest test
     @Test
     public void loginTest() throws Exception {
-        User resp = this.restTemplate.postForObject("http://localhost:" + port + "/login",
+        HashMap<String, Object> resp = this.restTemplate.postForObject("http://localhost:" + port + "/api/user/login",
                 new HashMap<String,String>(){{
                     put("login","adm");
                     put("pwd","adm");
                     }},
-                User.class);
+                HashMap.class);
         //System.out.println("resp: " + resp);
         assertThat(resp).isNotNull();
+    }
+
+    // ./mvnw -Dtest=HttpRequestTest#logoutTest test
+    @Test
+    public void logoutTest() throws Exception {
+        HashMap<String, Object> resp = this.restTemplate.postForObject("http://localhost:" + port + "/api/user/login",
+                new HashMap<String,String>(){{
+                    put("login","adm");
+                    put("pwd","adm");
+                }},
+                HashMap.class);
+        //System.out.println("resp: " + resp);
+        assertThat(resp).isNotNull();
+
+        resp = this.restTemplate.postForObject("http://localhost:" + port + "/api/user/logout",
+                new HashMap<String,String>(),
+                HashMap.class);
+        //System.out.println("resp: " + resp);
+        assertThat(resp).isNull();
     }
 
     // ./mvnw -Dtest=HttpRequestTest#loginNegativeTest test
     @Test
     public void loginNegativeTest() throws Exception {
-        User resp = this.restTemplate.postForObject("http://localhost:" + port + "/login",
+        HashMap<String, Object> resp = this.restTemplate.postForObject("http://localhost:" + port + "/api/user/login",
                 new HashMap<String,String>(){{
                         put("login","adm");
                         put("pwd","ad");
                     }},
-                User.class);
+                HashMap.class);
         //System.out.println("resp: " + resp);
         assertThat(resp).isNull();
     }

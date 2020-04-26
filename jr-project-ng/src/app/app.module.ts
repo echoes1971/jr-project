@@ -10,6 +10,7 @@ import { SearchComponent } from './search/search.component';
 import { MngComponent } from './mng/mng.component';
 import { LoginComponent } from './login/login.component';
 import { EscapeHtmlPipe } from './pipes/keep-html.pipe';
+import {FormsModule} from '@angular/forms';
 
 @NgModule({
   declarations: [
@@ -31,9 +32,10 @@ import { EscapeHtmlPipe } from './pipes/keep-html.pipe';
         , {path: 'mng', component: MngComponent}
         , {path: 'obj/:objId', component: MainComponent}
         , {path: 'search', component: SearchComponent}
-    ]
+      ]
       // ,{ enableTracing: true }
-    )
+    ),
+    FormsModule
   ],
   providers: [],
   bootstrap: [AppComponent]
