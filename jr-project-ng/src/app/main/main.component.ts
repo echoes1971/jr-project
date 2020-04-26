@@ -12,6 +12,8 @@ import {mergeMap} from 'rxjs/operators';
 })
 export class MainComponent implements OnInit {
 
+  constructor(private coreService: CoreService, private route: ActivatedRoute) { }
+
   rootObj: ObjLight = {id: '', name: '', icon: ''};
   currentObj: ObjPage = {id: '', name: '', icon: '', html: '<b>Loading...</b>'};
   indent = '';
@@ -20,17 +22,14 @@ export class MainComponent implements OnInit {
   currentObjId = null;
   parentsList: ObjLight[] = [];
 
-  constructor(private coreService: CoreService, private route: ActivatedRoute) { }
-
   paramMapObserver = {
     next: params => {
-      this.currentObjId = params.get('objId');
-      this.coreService.currentObjId = params.get('objId');
+      this.setCurrentObjId(params.get('objId'));
       // console.log('MainComponent.paramMapObserver: currentObjId=' + this.currentObjId);
       this.coreService.getRootObj().pipe(
         mergeMap(rootObj => {
           this.rootObj = rootObj;
-          if (this.currentObjId == null) { this.currentObjId = this.rootObj.id; }
+          if (this.currentObjId == null) { this.setCurrentObjId(this.rootObj.id); }
           return this.coreService.getCurrentObj(this.currentObjId);
         }),
         mergeMap(curObj => {
@@ -59,6 +58,12 @@ export class MainComponent implements OnInit {
     , error: err => console.error('MainComponent.paramMapObserver error: ' + err)
     , complete: () => console.log('MainComponent.paramMapObserver: complete notification')
   };
+
+  setCurrentObjId(value: string): void {
+    if (value == null) { return; }
+    this.currentObjId = value;
+    this.coreService.currentObjId = value;
+  }
 
   _createMenuLevel(indent: string, myindex: number, items: any[], menuItems: any[]): number {
     items.forEach((value, index2, array2) => {

@@ -1,16 +1,18 @@
-<div id="loginForm">
-  <form action="login_do.php" method="POST">
-    <table class="login" align="center" valign="middle" width="200">
-      <tr><th class="login" colspan="2">Login</th></tr>
-      <tr>
-        <td class="login" align="right">Login</td><td class="login"><input class="login" type="text" name="field_login"></td>
-      </tr>
-      <tr>
-        <td class="login" align="right">Password</td><td class="login"><input class="login" type="password" name="field_pwd"></td>
-      </tr>
-      <tr>
-        <td class="login" colspan="2" align="center"><input class="login" type="submit" name="submit" value="Login"></td>
-      </tr>
-    </table>
-  </form>
+<div class="col-12">
+  <div id="loginForm">
+    <form>
+      <table class="login">
+        <tr><th class="login" colspan="2">Login</th></tr>
+        <tr>
+          <td class="login login-right"><label for="field_login">Login</label></td><td class="login"><input class="login" type="text" id="field_login" name="field_login"></td>
+        </tr>
+        <tr>
+          <td class="login login-right"><label for="field_pwd">Password</label></td><td class="login"><input class="login" type="password" id="field_pwd" name="field_pwd"></td>
+        </tr>
+        <tr>
+          <td class="login login-center" colspan="2"><input class="login" type="submit" name="submit" value="Login"></td>
+        </tr>
+      </table>
+    </form>
+  </div>
 </div>

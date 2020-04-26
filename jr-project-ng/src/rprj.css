@@ -176,41 +176,6 @@ li.obj_actions {
   font-weight: bold;
 }
 
-.login { padding: 2px; }
-table.login {
-  background-color: rgba(0,0,0,0.25);
-  /*  border: 2px; */
-  border-radius: 8px; -webkit-border-radius: 8px;
-  border-spacing:8px;
-  padding:8px;
-}
-th.login {
-  color: #111122;
-  /*  background-color: #aaaaaa; */
-  background-color: rgba(255,255,255,0.4);
-  font-size: 12px;
-  font-weight: bold;
-  border-radius: 8px 8px 0 0; -webkit-border-radius: 8px 8px 0 0;
-  margin:2px;
-  padding:4px 8px;
-}
-td.login {
-  color: #eeeeee;
-  /*  background-color: rgba(255,255,255,0.8); */
-  font-size: 12px;
-  font-weight: normal;
-  margin:2px;
-}
-input.login {
-  background-color:#aaaaaa;
-  border:0 solid black;
-  border-radius: 4px;
-  padding:2px 5px;
-}
-input.login:hover {
-  background-color:#dddddd;
-}
-
 div.middle_content {
   /*  padding:0; */
 
@@ -436,16 +401,6 @@ input.search {
   /*  border-radius: 4px; -webkit-border-radius: 4px; */
 }
 
-#loginForm {
-  /* position: absolute;
-   top: 15em;
-   bottom: 5em;
-   left: 17em;
-   right: 17em;*/
-  padding-top:5em;
-  padding-bottom:10em;
-}
-
 
 /* ********************************* Media Queries ********************************* */
 
@@ -475,14 +430,6 @@ input.search {
     height: 3em;
     border-radius:0;-webkit-border-radius:0;
   }
-  #loginForm {
-    position: absolute;
-    top: 8em;
-    bottom: 3em;
-    left: 14em;
-    right: 14em;
-  }
-
 }
 @media screen and (max-width: 768px) {
   /* Mobile devices */
@@ -568,12 +515,6 @@ input.search {
   }
   #top_menu a:link, #top_menu a:active, #top_menu a:visited, #top_menu a:hover {
     display: block;
-  }
-
-  #loginForm {
-    position:static;
-    padding-top:2em;
-    padding-bottom:2em;
   }
 
   #logo {

@@ -11,37 +11,54 @@ import {ObjPage} from './objpage';
 })
 export class CoreService {
 
-  rootObj: Observable<ObjLight> = null;
+  rootObj: ObjLight = null;
+  rootObj$: Observable<ObjLight> = null;
   currentObjId = '';
-  currentObj: Observable<ObjPage> = null;
-  menuTop: Observable<ObjLight[]> = null;
-  parentsList: Observable<ObjLight[]> = null;
+  currentObj: ObjPage = null;
+  currentObj$: Observable<ObjPage> = null;
+  menuTop: ObjLight[] = null;
+  menuTop$: Observable<ObjLight[]> = null;
+  parentsList: ObjLight[] = null;
+  parentsList$: Observable<ObjLight[]> = null;
   menuItems: Observable<any[]> = null;
 
   constructor(private http: HttpClient) {
     console.log(environment.apiUrl + '/ui/rootobj');
 
-    this.rootObj = this.http.get<ObjLight>('/ui/rootobj');
-    this.currentObj = this.http.get<ObjPage>('/ui/obj/' + this.currentObjId);
-    this.menuTop = this.http.get<ObjLight[]>('/ui/topmenu');
-    this.rootObj.subscribe(data => {
-      this.currentObjId = data.id;
-      this.parentsList = this.http.get<ObjLight[]>('/ui/parentlist/' + this.currentObjId);
+    this.rootObj$ = this.http.get<ObjLight>('/ui/rootobj');
+    this.menuTop$ = this.http.get<ObjLight[]>('/ui/topmenu');
+    // this.currentObj$ = this.http.get<ObjPage>('/ui/obj/' + this.currentObjId);
+
+    this.rootObj$.subscribe(data => {
+      this.rootObj = data;
+      if (this.currentObjId === '') { this.currentObjId = this.rootObj.id; }
     });
+    this.menuTop$.subscribe(data => { this.menuTop = data; });
+
+    /*
+    this.currentObj$.subscribe({
+      next: data => { this.currentObj = data; }
+      , error: err => console.error('CoreService.currentObjObserver.pipe error: ' + err)
+      , complete: () => {
+        // console.log('MainComponent.paramMapObserver.pipe: complete notification');
+      }
+    });
+     */
   }
 
-  getRootObj() { return this.rootObj; }
+  getRootObj() { return this.rootObj$; }
+
+  getMenuTop() { return this.menuTop$; }
 
   getCurrentObj(objId: string) {
     // if(this.currentObj == null) {
-    this.currentObj = this.http.get<ObjPage>('/ui/obj/' + objId);
+    this.currentObj$ = this.http.get<ObjPage>('/ui/obj/' + objId);
     // }
-    return this.currentObj;
+    return this.currentObj$;
   }
 
-  getMenuTop() { return this.menuTop; }
-
   getMenuItems(objId: string): Observable<any[]> {
+    // console.log('CoreService.getMenuItems: objId=' + objId);
     this.menuItems = this.http.get<any[]>('/ui/menutree/' + objId);
     return this.menuItems;
     /*
@@ -53,8 +70,9 @@ export class CoreService {
   }
 
   getParents(objId: string) {
-    this.parentsList = this.http.get<ObjLight[]>('/ui/parentlist/' + objId);
-    return this.parentsList;
+    // console.log('CoreService.getParents: objId=' + objId);
+    this.parentsList$ = this.http.get<ObjLight[]>('/ui/parentlist/' + objId);
+    return this.parentsList$;
   }
 
 }

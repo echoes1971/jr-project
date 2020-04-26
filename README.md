@@ -9,7 +9,9 @@ maybe adding some memory before: `export MAVEN_OPTS=-Xmx1024m`
 
 **TODO**
 - Angular FE
-  - menu items: display correctly
+  - login
+  - object icons: handle properly
+  - search component
 - Controllers
   - UIController
     - getMenuItems
@@ -39,6 +41,7 @@ maybe adding some memory before: `export MAVEN_OPTS=-Xmx1024m`
 
 **DONE**
 - Angular FE
+  - menu items
   - manage current object
 - Controllers
   - UIController

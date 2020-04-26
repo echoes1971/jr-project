@@ -13,12 +13,12 @@ import { EscapeHtmlPipe } from './pipes/keep-html.pipe';
 
 @NgModule({
   declarations: [
-    EscapeHtmlPipe,
     AppComponent,
     MainComponent,
     SearchComponent,
     MngComponent,
-    LoginComponent
+    LoginComponent,
+    EscapeHtmlPipe
   ],
   imports: [
     BrowserModule,
