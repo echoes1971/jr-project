@@ -8,13 +8,17 @@ import {RouterModule} from '@angular/router';
 import { MainComponent } from './main/main.component';
 import { SearchComponent } from './search/search.component';
 import { MngComponent } from './mng/mng.component';
+import { LoginComponent } from './login/login.component';
+import { EscapeHtmlPipe } from './pipes/keep-html.pipe';
 
 @NgModule({
   declarations: [
+    EscapeHtmlPipe,
     AppComponent,
     MainComponent,
     SearchComponent,
-    MngComponent
+    MngComponent,
+    LoginComponent
   ],
   imports: [
     BrowserModule,
@@ -22,6 +26,8 @@ import { MngComponent } from './mng/mng.component';
     NgbModule,
     RouterModule.forRoot([
         {path: '', component: MainComponent}
+        // , {path: 'login', component: LoginComponent}
+        , {path: 'login/:objId', component: LoginComponent}
         , {path: 'mng', component: MngComponent}
         , {path: 'obj/:objId', component: MainComponent}
         , {path: 'search', component: SearchComponent}
