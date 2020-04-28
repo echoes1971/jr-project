@@ -98,7 +98,7 @@ public class DBECountry extends DBEntity {
         this.IANA_Country_Code_TLD = IANA_Country_Code_TLD;
     }
 
-    public String getIcon() { return "glyphicon-file"; }
+    public String getIcon() { return "glyphicon-globe"; }
 
     public String getId() { return id; }
     public void setId(String id) { this.id = id; }

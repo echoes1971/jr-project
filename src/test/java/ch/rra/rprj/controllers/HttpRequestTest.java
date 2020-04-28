@@ -117,7 +117,7 @@ public class HttpRequestTest {
         resp.forEach((k,v) -> {
             System.out.println(k);
             v.forEach(hm -> {
-                System.out.println(" " + hm.get("id") + "\t" + hm.get("father_id") + "\t" + hm.get("name"));
+                System.out.println(" " + hm.get("id") + "\t" + hm.get("father_id") + "\t" + hm.get("_icon") + "\t" + hm.get("name"));
             });
         });
         //assertThat(resp.size()).isEqualTo(1);
@@ -128,7 +128,7 @@ public class HttpRequestTest {
         resp.forEach((k,v) -> {
             System.out.println(k);
             v.forEach(hm -> {
-                System.out.println(" " + hm.get("id") + "\t" + hm.get("father_id") + "\t" + hm.get("name"));
+                System.out.println(" " + hm.get("id") + "\t" + hm.get("father_id") + "\t" + hm.get("_icon") + "\t" + hm.get("name"));
             });
         });
         assertThat(resp.size()).isPositive(); //.isEqualTo(2);
@@ -139,7 +139,7 @@ public class HttpRequestTest {
         resp.forEach((k,v) -> {
             System.out.println(k);
             v.forEach(hm -> {
-                System.out.println(" " + hm.get("id") + "\t" + hm.get("father_id") + "\t" + hm.get("name"));
+                System.out.println(" " + hm.get("id") + "\t" + hm.get("father_id") + "\t" + hm.get("_icon") + "\t" + hm.get("name"));
             });
         });
         assertThat(resp.size()).isPositive(); //.isEqualTo(2);

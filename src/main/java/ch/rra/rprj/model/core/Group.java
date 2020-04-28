@@ -53,6 +53,8 @@ public class Group extends DBEntity {
         this.description = description;
     }
 
+    public String getIcon() { return "glyphicon-asterisk"; }
+
     @Override
     public String toString() {
         return "Group{" +

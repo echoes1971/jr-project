@@ -73,7 +73,7 @@ public class UserController {
         }
 
         logger.info("user: " + user);
-        return user==null ? null : user.getValues();
+        return user==null ? null : user.getValues(true);
     }
 
     @PostMapping("/api/user/logout")
@@ -89,7 +89,7 @@ public class UserController {
             user.setGroups(null);
         }
         logger.info("user: " + user);
-        return user==null ? null : user.getValues();
+        return user==null ? null : user.getValues(true);
     }
 
     @GetMapping("/api/user/current")

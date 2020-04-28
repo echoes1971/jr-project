@@ -37,9 +37,12 @@ public class DBEntity {
     public String getIcon() { return "glyphicon-cog"; }
 
     public HashMap<String, Object> getValues() {
-        return getValues(new HashMap<>());
+        return getValues(false);
     }
-    public HashMap<String, Object> getValues(HashMap<String, Object> hashMap) {
+    public HashMap<String, Object> getValues(boolean with_metadata) {
+        return getValues(new HashMap<>(),with_metadata);
+    }
+    public HashMap<String, Object> getValues(HashMap<String, Object> hashMap, boolean with_metadata) {
         List<Field> fields = new ArrayList<>();
         Field[] this_fields = getClass().getDeclaredFields();
         fields.addAll(Arrays.asList(this_fields));
@@ -74,6 +77,10 @@ public class DBEntity {
                 continue;
             hashMap.put(field_name, value);
         }
+        if(with_metadata) {
+            hashMap.put("_class", getClass().getSimpleName());
+            hashMap.put("_icon", getIcon());
+        }
         return hashMap;
     }
 
@@ -88,7 +95,7 @@ public class DBEntity {
         String column_name = field.getName();
         Annotation[] field_annotations = field.getAnnotations();
         for(Annotation an : field_annotations) {
-            //// System.out.println("  " +an.toString());
+            // System.out.println("  " +an.toString());
             if(an instanceof javax.persistence.Column) {
                 column_name = ((javax.persistence.Column)an).name();
                 break;

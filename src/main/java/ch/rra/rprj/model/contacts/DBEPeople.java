@@ -118,7 +118,7 @@ public class DBEPeople extends DBEObject {
         this.p_iva = p_iva;
     }
 
-    public String getIcon() { return "glyphicon-circle-arrow-right"; }
+    public String getIcon() { return "glyphicon-user"; }
 
     public String getStreet() { return street; }
     public void setStreet(String street) { this.street = street; }

@@ -9,18 +9,19 @@ maybe adding some memory before: `export MAVEN_OPTS=-Xmx1024m`
 
 **TODO**
 - Angular FE
-  - main component: list childs?
-  - object icons: handle properly
+  - main component: object actions
   - search component
 - Controllers
   - UIController
-    - getMenuItems
+    - ...
 - main.php
   - menu_tree
   - mypeople: profile of the current user
 - dbschema.php
   - Core
-    - DBEntity: setValues
+    - DBEntity
+      - setValues
+      - getValue / setValue ?
   - CMS
     - DBEFile
     - DBEEvent
@@ -41,12 +42,15 @@ maybe adding some memory before: `export MAVEN_OPTS=-Xmx1024m`
 
 **DONE**
 - Angular FE
+  - main component: list childs
+  - object icons: handle properly
   - login
   - logout
   - menu items
   - manage current object
 - Controllers
   - UIController
+    - getMenuItems
     - getCurrentObject
     - getParentsList
 - dbschema.php

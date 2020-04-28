@@ -39,3 +39,64 @@ li.r_breadcrumb, a.r_breadcrumb:link, a.r_breadcrumb:active, a.r_breadcrumb:visi
   font-size: 12px;
   font-weight: bold;
 }
+
+div.content_list {
+  margin: 0.4em;
+  padding: 8px; /*0.4em;*/
+  background-color: rgba(0,0,0,0.1);
+  border-radius: 8px; -webkit-border-radius: 8px;
+
+  /* position:absolute;
+   left:0em;
+   width:60em;
+   margin:0 auto;*/
+}
+div.content_item {
+  vertical-align:text-top;
+  font-size: 12px;
+}
+p.content_item {
+  font-size: 10px;
+  margin: 0.1em;
+  border: 0;
+  padding: 0.1em;
+}
+
+/* ********************************* Media Queries ********************************* */
+@media screen and (max-width: 1024px) {
+}
+@media screen and (max-width: 960px) {
+}
+@media screen and (max-width: 768px) {
+  div.r_breadcrumb {
+    /*
+     background-color: rgba(0,0,0,0.1);
+     */
+    /*  background-image: linear-gradient(to top, #f0f0f0, #f4f4f4); */
+  }
+
+  table.menu {
+    display:none;
+  }
+
+  div.content_list {
+    margin:0;
+    border-radius:0;
+  }
+
+}
+
+@media screen and (max-width: 640px) {
+  /* iPod Vertical */
+}
+@media screen and (max-width: 480px) {
+  /* Samsung GT-I8262 */
+}
+@media screen and (min-width: 320px) {
+}
+@media screen and (min-width: 480px) {
+}
+@media screen and (min-width: 600px) { /* greater than iphone mobile*/
+}
+@media screen and (min-width: 768px) {  /* Large Size and up*/
+}

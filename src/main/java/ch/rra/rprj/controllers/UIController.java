@@ -115,7 +115,7 @@ public class UIController {
     @GetMapping("/ui/rootobj")
     @ResponseBody
     public HashMap<String,Object> ui_rootobj(HttpSession httpSession) {
-        return getRootObject(httpSession).getValues();
+        return getRootObject(httpSession).getValues(true);
     }
 
 /*
@@ -134,7 +134,7 @@ public class UIController {
         ObjectMgr objMgr = getObjectMgr(httpSession);
         String _currentObjId = objId==null || objId.equals("null") ? rootObjId : objId;
         DBEObject ret = getCurrentObject(_currentObjId, objMgr);
-        return ret==null ? new HashMap<>() : ret.getValues();
+        return ret==null ? new HashMap<>() : ret.getValues(true);
     }
 
     @GetMapping("/ui/topmenu")
@@ -142,14 +142,14 @@ public class UIController {
     public Vector<HashMap<String, Object>> ui_topmenu(HttpSession httpSession) {
         List<DBEObject> res = getTopMenu(httpSession);
         return (Vector<HashMap<String, Object>>)
-                res.stream().map(DBEntity::getValues).collect(Collectors.toCollection((Supplier<Vector>) Vector::new));
+                res.stream().map(x -> x.getValues(true)).collect(Collectors.toCollection((Supplier<Vector>) Vector::new));
     }
 
     @GetMapping("/ui/parentlist/{objId}")
     @ResponseBody
     public List<HashMap<String, Object>> ui_parentlist(@PathVariable String objId, HttpSession httpSession) {
         ObjectMgr objMgr = getObjectMgr(httpSession);
-        return getParentsList(objId, objMgr).stream().map(DBEntity::getValues).collect(Collectors.toList());
+        return getParentsList(objId, objMgr).stream().map(x -> x.getValues(true)).collect(Collectors.toList());
     }
 
     @GetMapping("/ui/menutree/{objId}")
@@ -159,7 +159,7 @@ public class UIController {
         HashMap<String,List<HashMap<String, Object>>> ret = new HashMap<>();
         getParentsList(objId,objMgr).forEach(o -> {
             logger.info("Fetching children for: " + o.getId());
-            ret.put(o.getId(), fetchChildren(objMgr,o,true).stream().map(DBEntity::getValues).collect(Collectors.toList()));
+            ret.put(o.getId(), fetchChildren(objMgr,o,true).stream().map(x -> x.getValues(true)).collect(Collectors.toList()));
         });
         return ret;
     }

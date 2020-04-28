@@ -1,6 +1,6 @@
 export interface ObjPage {
   id: string;
   name: string;
-  icon: string;
+  _icon: string;
   html: string;
 }

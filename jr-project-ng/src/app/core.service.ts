@@ -78,7 +78,7 @@ export class CoreService {
   }
 
   login(username: string, password: string) {
-    console.log('CoreService.login: ' + login + ' ' + pwd);
+    console.log('CoreService.login: ' + username + ' ' + password);
     this.http.post<any>('/api/user/login', {login: username, pwd: password} ).subscribe(data => {
       console.log(data);
       this.myUser = data;

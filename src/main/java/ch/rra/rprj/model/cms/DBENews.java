@@ -57,7 +57,7 @@ public class DBENews extends DBEObject {
         this.language = language;
     }
 
-    public String getIcon() { return "glyphicon-file"; }
+    public String getIcon() { return "glyphicon-arrow-right"; }
 
     public String getHtml() { return html; }
     public void setHtml(String html) { this.html = html; }

@@ -14,10 +14,11 @@ export class MainComponent implements OnInit {
 
   constructor(private coreService: CoreService, private route: ActivatedRoute) { }
 
-  rootObj: ObjLight = {id: '', name: '', icon: ''};
-  currentObj: ObjPage = {id: '', name: '', icon: '', html: '<b>Loading...</b>'};
+  rootObj: ObjLight = {id: '', name: '', _icon: ''};
+  currentObj: ObjPage = {id: '', name: '', _icon: '', html: '<b>Loading...</b>'};
   indent = '';
   menuItems = [];
+  contentItems = [];
 
   currentObjId = null;
   parentsList: ObjLight[] = [];
@@ -42,6 +43,7 @@ export class MainComponent implements OnInit {
         }),
         mergeMap(menuItems => {
           this.menuItems = [];
+          this.contentItems = [];
           this._createMenuLevel('', 0, menuItems[this.parentsList[0].id], menuItems);
           return [];
         })
@@ -67,8 +69,22 @@ export class MainComponent implements OnInit {
 
   _createMenuLevel(indent: string, myindex: number, items: any[], menuItems: any[]): number {
     items.forEach((value, index2, array2) => {
+      if (value.father_id === this.currentObjId) {
+        if (value._class === 'DBELink' && value.href.startsWith('http')) {
+          this.contentItems.push(value);
+          return myindex;
+        } else if (value._class === 'DBENote') {
+          this.contentItems.push(value);
+          return myindex;
+        } else if (value._class === 'DBEPage') {
+          this.contentItems.push(value);
+          // return myindex;
+        } else {
+          this.contentItems.push(value);
+        }
+      }
       this.menuItems[myindex] = [indent, value];
-      this.menuItems[myindex][1].icon = 'glyphicon-folder-close'; // TODO do it when fetching from the back end
+      // console.log(this.menuItems[myindex][1]);
       // console.log('myindex: ' + myindex + ' ' + indent + value.id + ' ' + value.name);
       myindex++;
       if (value.id in menuItems) {

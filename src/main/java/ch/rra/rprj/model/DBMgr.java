@@ -334,7 +334,7 @@ public class DBMgr {
     }
 
     protected void _getClausesAndValues(DBEntity search, boolean uselike, HashMap<String, Object> hashMap, List<String> clauses) {
-        HashMap<String, Object> hmValues = search.getValues();
+        HashMap<String, Object> hmValues = search.getValues(false);
         hmValues.forEach((k,v) -> {
             if(uselike && v instanceof String) {
                 clauses.add(k + " LIKE :" + k);

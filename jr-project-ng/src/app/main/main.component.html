@@ -3,7 +3,14 @@
     <tr><th class="menu"><a [routerLink]="['/obj', rootObj.id]">{{ rootObj.name }}</a></th></tr>
   </table>
   <table class="menu">
-    <tr *ngFor="let menuItem of menuItems"><td class="menu" ><span [innerHTML]="menuItem[0]"></span> <span class="glyphicon {{ menuItem[1].icon }}">&nbsp;</span> <a [routerLink]="['/obj', menuItem[1].id]">{{ menuItem[1].name }}</a></td></tr>
+    <tr *ngFor="let menuItem of menuItems">
+      <td class="menu" >
+        <span [innerHTML]="menuItem[0]"></span>
+        <span class="glyphicon {{ menuItem[1]._icon }}">&nbsp;</span>
+        <a *ngIf="menuItem[1]._class != 'DBELink'" [routerLink]="['/obj', menuItem[1].id]">{{ menuItem[1].name }}</a>
+        <a *ngIf="menuItem[1]._class == 'DBELink'" href="{{ menuItem[1].href }}" target="{{ menuItem[1].target }}">{{ menuItem[1].name }}</a>
+      </td>
+    </tr>
   </table>
 </div>
 <div class="middle_content col-10">
@@ -16,4 +23,16 @@
   </div>
   <div class="r_breadcrumb col-sm-1"><div id="r_breadcrumb_after"></div></div>
   <div [innerHTML]="currentObj.html | keepHtml"></div>
+  <div *ngIf="contentItems.length > 0" class="content content_list">
+    <div *ngFor="let contentItem of contentItems">
+      <h3 *ngIf="contentItem._class != 'DBELink'" class="content_item">
+        <span class="glyphicon {{ contentItem._icon }}">&nbsp;</span>
+        <span *ngIf="contentItem._class == 'DBEFile'" >{{ contentItem.name }}</span>
+        <a *ngIf="contentItem._class != 'DBEFile'" [routerLink]="['/obj', contentItem.id]">{{ contentItem.name }}</a>
+      </h3>
+      <span *ngIf="contentItem._class == 'DBEFile'" >TODO: display the thumbnail (alt_link)</span>
+      <p *ngIf="contentItem._class == 'DBEPage' && contentItem.description>''" class="content_item">{{ contentItem.description }}</p>
+      <span *ngIf="contentItem._class == 'DBELink'" class="glyphicon {{ contentItem._icon }}">&nbsp;</span> <a *ngIf="contentItem._class == 'DBELink'" href="{{ contentItem.href }}" target="{{ contentItem.target }}">{{ contentItem.name }}</a>
+    </div>
+  </div>
 </div>

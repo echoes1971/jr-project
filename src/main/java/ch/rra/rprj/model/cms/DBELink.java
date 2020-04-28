@@ -57,7 +57,7 @@ public class DBELink extends DBEObject {
         this.fk_obj_id = fk_obj_id;
     }
 
-    public String getIcon() { return "glyphicon-file"; }
+    public String getIcon() { return "glyphicon-link"; }
 
     public String getHref() { return href; }
     public void setHref(String href) { this.href = href; }

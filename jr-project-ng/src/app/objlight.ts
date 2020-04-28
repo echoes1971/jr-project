@@ -1,5 +1,5 @@
 export interface ObjLight {
   id: string;
   name: string;
-  icon: string;
+  _icon: string;
 }

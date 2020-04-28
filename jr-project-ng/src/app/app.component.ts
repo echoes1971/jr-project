@@ -11,7 +11,7 @@ import {ObjLight} from './objlight';
 export class AppComponent implements OnInit {
   title = 'JR-Project';
 
-  rootObj: ObjLight = {id: '', name: '', icon: ''};
+  rootObj: ObjLight = {id: '', name: '', _icon: ''};
   menuTop = [];
 
   constructor(private coreService: CoreService) {}
