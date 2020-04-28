@@ -70,7 +70,7 @@ public class CmsTest extends TestCase {
 
             List<DBEntity> res = objMgr.search(new DBENote());
             System.out.println("res: "+res.size());
-            if(res.size()!=object_names.length) fail("Error with privileges");
+            if((res.size()-initial_objects_count)!=object_names.length) fail("Error with privileges");
             res.stream().forEach((dbe) -> System.out.println(" " + dbe));
             System.out.println();
         });
