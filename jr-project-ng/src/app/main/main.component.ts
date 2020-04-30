@@ -99,4 +99,6 @@ export class MainComponent implements OnInit {
   ngOnInit(): void {
     this.route.paramMap.subscribe(this.paramMapObserver);
   }
+
+  getCurrentUser(): any { return this.coreService.myUser; }
 }

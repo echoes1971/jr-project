@@ -37,11 +37,12 @@ maybe adding some memory before: `export MAVEN_OPTS=-Xmx1024m`
     - DBETodo
     - DBETodoTipo
   - Foreign keys?
-    
+
 - Implement a rest/json login with Spring
 
 **DONE**
 - Angular FE
+  - fetch user from backend at first load of the page
   - main component: list childs
   - object icons: handle properly
   - login

@@ -69,11 +69,17 @@ public class UserController {
 
         if(user!=null) {
             user.setPwd(null);
-            user.setGroups(null);
         }
 
-        logger.info("user: " + user);
-        return user==null ? null : user.getValues(true);
+        HashMap<String, Object> ret = user==null ? null : user.getValues(true);
+        if(user!=null) {
+            ret.put("groups",
+                    user.getGroups().stream()
+                            .map(x -> { x.setUsers(null); return x; } )
+                            .map(x -> x.getValues(true))
+            );
+        }
+        return ret;
     }
 
     @PostMapping("/api/user/logout")
@@ -93,10 +99,19 @@ public class UserController {
     }
 
     @GetMapping("/api/user/current")
-    String currentUser(HttpSession httpSession) {
+    HashMap<String, Object> currentUser(HttpSession httpSession) {
         User user = getCurrentUser(httpSession);
 
-        return user!=null ? user.toString() : "";
+        HashMap<String, Object> ret = user==null ? null : user.getValues(true);
+        if(user!=null) {
+            ret.put("groups",
+                    user.getGroups().stream()
+                            .map(x -> { x.setUsers(null); return x; } )
+                            .map(x -> x.getValues(true))
+            );
+        }
+
+        return ret;
     }
 
 //    @GetMapping("/users")

@@ -13,7 +13,7 @@
     </tr>
   </table>
 </div>
-<div class="middle_content col-10">
+<div [ngClass]="getCurrentUser()==null ? 'middle_content col-10' : 'middle_content col-8'">
   <div class="r_breadcrumb">
     <ul class="r_breadcrumb">
       <li *ngFor="let breadcrumb of parentsList; first as isFirst" class="r_breadcrumb">
@@ -35,4 +35,11 @@
       <span *ngIf="contentItem._class == 'DBELink'" class="glyphicon {{ contentItem._icon }}">&nbsp;</span> <a *ngIf="contentItem._class == 'DBELink'" href="{{ contentItem.href }}" target="{{ contentItem.target }}">{{ contentItem.name }}</a>
     </div>
   </div>
+</div>
+<div *ngIf="getCurrentUser()" class="obj_actions col-sm-2">
+  TODO: check user has WEBMASTER group, AND has write permission (U or G)<br>
+  <ul class="obj_actions">Actions
+    <li class="obj_actions"><a [routerLink]="['/obj/edit/', currentObj.id]"><img border="0" src="assets/icons/mng/Edit16.gif" alt="" /> Edit</a></li>
+    <li>TODO: cycle through all the possible childs that this object can have and create a "new" action</li>
+  </ul>
 </div>

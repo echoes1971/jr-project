@@ -17,6 +17,9 @@ export class AppComponent implements OnInit {
   constructor(private coreService: CoreService) {}
 
   ngOnInit(): void {
+    // Load the current user, if already logged in
+    this.coreService.currentUser();
+
     this.coreService.getRootObj().subscribe(data => { this.rootObj = data; });
     this.coreService.getMenuTop().subscribe((data: ObjLight[]) => { this.menuTop = data; });
   }

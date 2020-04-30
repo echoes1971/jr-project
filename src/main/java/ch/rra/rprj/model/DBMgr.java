@@ -126,9 +126,10 @@ public class DBMgr {
 
         User user = null;
 
-        if(res.size()==1)
+        if(res.size()==1) {
             user = (User) res.get(0);
-
+            logger.info("groups: " + user.getGroups());
+        }
         this.setDbeUser(user);
         this.setUserGroupsList(user==null ? null : user.getGroups());
         return user;

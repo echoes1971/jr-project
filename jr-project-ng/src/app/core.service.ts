@@ -36,16 +36,6 @@ export class CoreService {
       if (this.currentObjId === '') { this.currentObjId = this.rootObj.id; }
     });
     this.menuTop$.subscribe(data => { this.menuTop = data; });
-
-    /*
-    this.currentObj$.subscribe({
-      next: data => { this.currentObj = data; }
-      , error: err => console.error('CoreService.currentObjObserver.pipe error: ' + err)
-      , complete: () => {
-        // console.log('MainComponent.paramMapObserver.pipe: complete notification');
-      }
-    });
-     */
   }
 
   getRootObj() { return this.rootObj$; }
@@ -53,22 +43,13 @@ export class CoreService {
   getMenuTop() { return this.menuTop$; }
 
   getCurrentObj(objId: string) {
-    // if(this.currentObj == null) {
     this.currentObj$ = this.http.get<ObjPage>('/ui/obj/' + objId);
-    // }
     return this.currentObj$;
   }
 
   getMenuItems(objId: string): Observable<any[]> {
-    // console.log('CoreService.getMenuItems: objId=' + objId);
     this.menuItems = this.http.get<any[]>('/ui/menutree/' + objId);
     return this.menuItems;
-    /*
-    return [
-      {id: '-13', name: 'Downloads', icon: 'glyphicon-folder-close'},
-      {id: '-14', name: 'About us', icon: 'glyphicon-folder-close'},
-    ];
-     */
   }
 
   getParents(objId: string) {
@@ -80,7 +61,6 @@ export class CoreService {
   login(username: string, password: string) {
     console.log('CoreService.login: ' + username + ' ' + password);
     this.http.post<any>('/api/user/login', {login: username, pwd: password} ).subscribe(data => {
-      console.log(data);
       this.myUser = data;
     });
   }
@@ -89,6 +69,13 @@ export class CoreService {
     this.myUser = null;
     this.http.post<any>('/api/user/logout', {} ).subscribe(data => {
       console.log(data);
+    });
+  }
+
+  currentUser() {
+    this.http.get<any>('/api/user/current').subscribe(data => {
+      // console.log(data);
+      this.myUser = data;
     });
   }
 }

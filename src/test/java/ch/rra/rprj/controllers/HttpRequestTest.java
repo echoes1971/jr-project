@@ -164,7 +164,7 @@ public class HttpRequestTest {
                     put("pwd","adm");
                     }},
                 HashMap.class);
-        //System.out.println("resp: " + resp);
+        System.out.println("resp: " + resp);
         assertThat(resp).isNotNull();
     }
 

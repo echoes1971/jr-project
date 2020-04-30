@@ -43,6 +43,9 @@ public class DBEntity {
         return getValues(new HashMap<>(),with_metadata);
     }
     public HashMap<String, Object> getValues(HashMap<String, Object> hashMap, boolean with_metadata) {
+
+        // TODO skip fields ManyToMany like DBEGroup.users, IF data is a proxy (?)
+
         List<Field> fields = new ArrayList<>();
         Field[] this_fields = getClass().getDeclaredFields();
         fields.addAll(Arrays.asList(this_fields));
