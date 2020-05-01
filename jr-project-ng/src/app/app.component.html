@@ -17,10 +17,10 @@
         <ul class="navbar-nav mr-auto">
           <li class="nav-item"><a [routerLink]="['/obj', rootObj.id]" routerLinkActive="active">{{ rootObj.name }}</a></li>
           <li class="nav-item" *ngFor="let menuItem of menuTop"><a [routerLink]="['/obj', menuItem.id]" routerLinkActive="active">{{ menuItem.name }}</a></li>
-          <li *ngIf="getCurrentUser()" class="nav-item"><a routerLink="/mng">Manage</a></li>
+          <li *ngIf="currentUser" class="nav-item"><a routerLink="/mng">Manage</a></li>
         </ul>
       </div>
-      <div id="user_div" class="dropdown"><a *ngIf="!getCurrentUser()" [routerLink]="['/login', getCurrentId()]" routerLinkActive="active">Login</a><b *ngIf="getCurrentUser()">User:&nbsp;{{ getCurrentUser().fullname }}</b><a *ngIf="getCurrentUser()" (click)="logout()" [routerLink]="['/obj', getCurrentId()]">Logout</a></div>
+      <div id="user_div" class="dropdown"><a *ngIf="!currentUser" [routerLink]="['/login', currentId]" routerLinkActive="active">Login</a><b *ngIf="currentUser">User:&nbsp;{{ currentUser.fullname }}</b><a *ngIf="currentUser" (click)="logout()" [routerLink]="['/obj', currentId]">Logout</a></div>
       <form name="" action="/search" class="form-inline "><input aria-label="Search" id="search_object" name="search_object" type="text" /></form>
     </nav>
   </div>

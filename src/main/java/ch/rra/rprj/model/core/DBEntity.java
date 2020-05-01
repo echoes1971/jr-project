@@ -9,6 +9,7 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.lang.reflect.TypeVariable;
 import java.util.*;
 
 public class DBEntity {
@@ -85,6 +86,86 @@ public class DBEntity {
             hashMap.put("_icon", getIcon());
         }
         return hashMap;
+    }
+
+    public String toTypeScript() {
+        String prefix = "";//"Base";
+        String class_name = getClass().getSimpleName().equals("DBEObjectReal") ? "DBEObject" : getClass().getSimpleName();
+        String super_class = !getClass().getSimpleName().equals("DBEObjectReal") && getClass().getSuperclass().getSimpleName().equals("DBEObject") ?
+                                " extends DBEObject" : " extends DBEntity";
+        Vector<String> superConstructor = new Vector<>();
+        Vector<String> sbConstructor1 = new Vector<>();
+        Vector<String> sbConstructor2 = new Vector<>();
+        String ret = "";
+        ret += "export class "+prefix+class_name+super_class+" {\n";
+        ret += "  _class: string = '" + class_name + "';\n";
+        ret += "  _icon: string = '" + getIcon() + "';\n";
+        ret += "\n";
+
+        List<Field> fields = new ArrayList<>();
+        List<Field> fieldsSuperclass = new ArrayList<>();
+
+        if(getClass().getSuperclass().getSimpleName().equals("DBEObject")) {
+            Field[] super_fields = getClass().getSuperclass().getDeclaredFields();
+            if(getClass().getSimpleName().equals("DBEObjectReal"))
+                fields.addAll(Arrays.asList(super_fields));
+            else
+                fieldsSuperclass.addAll(Arrays.asList(super_fields));
+        }
+
+        // if(fieldsSuperclass.size()>0) {
+            //sbConstructor2.add("// DBEObject");
+        // }
+        for (Field field : fieldsSuperclass) {
+            String field_name = field.getName();
+            String field_type = _getTSType(field);
+            superConstructor.add(field_name);
+            sbConstructor1.add(field_name+"?: "+field_type);
+            //sbConstructor2.add("this."+field_name+" = "+field_name+";");
+        }
+        if(fieldsSuperclass.size()>0) {
+            sbConstructor2.add("// "+class_name);
+        }
+
+
+        Field[] this_fields = getClass().getDeclaredFields();
+        fields.addAll(Arrays.asList(this_fields));
+        for (Field field : fields) {
+            String field_name = field.getName();
+            String field_type = _getTSType(field);
+            ret += "  "+field_name+"?: "+field_type+" = null;\n";
+            sbConstructor1.add(field_name+"?: "+field_type);
+            sbConstructor2.add("this."+field_name+" = "+field_name+";");
+        }
+        ret += "\n";
+        ret += "  constructor("+String.join(", ",sbConstructor1)+") {\n";
+        ret += "    super("+String.join(", ",superConstructor)+");\n";
+        ret += "    " + String.join("\n    ", sbConstructor2) +"\n";
+        ret += "  }\n";
+        ret += "}\n";
+        return ret;
+    }
+
+    private String _getTSType(Field field) {
+        String field_type = "any";
+        switch (field.getType().getSimpleName()) {
+            case "Set":
+                field_type = "any[]";
+                break;
+            case "Integer":
+                field_type = "number";
+                break;
+            case "String":
+            case "Date":
+            case "Time":
+            case "Timestamp":
+                field_type = "string";
+                break;
+            default:
+                System.out.println("// " + field.getName() + "->" + field.getType().getSimpleName());
+                break;
+        }
+        return field_type;
     }
 
     public String getColumnName(String field_name) {

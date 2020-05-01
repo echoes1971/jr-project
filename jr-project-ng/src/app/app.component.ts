@@ -1,6 +1,6 @@
 import {Component, OnInit} from '@angular/core';
 import {CoreService} from './core.service';
-import {ObjLight} from './objlight';
+import {ObjLight} from './iobjects';
 
 
 @Component({
@@ -24,8 +24,8 @@ export class AppComponent implements OnInit {
     this.coreService.getMenuTop().subscribe((data: ObjLight[]) => { this.menuTop = data; });
   }
 
-  getCurrentId(): string { return this.coreService.currentObjId; }
-  getCurrentUser(): any { return this.coreService.myUser; }
+  get currentId(): string { return this.coreService.currentObjId; }
+  get currentUser(): any { return this.coreService.myUser; }
 
   logout() { this.coreService.logout(); }
 }

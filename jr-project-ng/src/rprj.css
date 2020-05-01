@@ -142,31 +142,6 @@ hr.amiga {
   /*     background: linear-gradient(to right, red,orange,yellow,green,blue,indigo,violet); */
 }
 
-ul.obj_actions {
-  display:inline;
-  list-style-position: inside;
-  text-align: left;
-  margin: 0.1em;
-}
-li.obj_actions {
-  display:block;
-  font-size: 12px;
-  font-weight: bold;
-}
-
-div.middle_content {
-  /*  padding:0; */
-
-  /* overflow:auto;
-   border:0 solid red;
-   position:absolute;
-   top:2em;
-   left:0.1em;
-   right:0.1em;
-   bottom:4px;*/
-  /*  background-color: rgba(0,0,0,0.1); */
-}
-
 form.search {}
 label.search {
   color: #444444;
@@ -418,18 +393,6 @@ input.search {
   }
   h3 {
     font-size:1.5em;
-  }
-
-  div.middle_content {
-    position:static;
-    padding:4px;
-  }
-  div.obj_actions {
-  }
-  ul.obj_actions {
-  }
-  li.obj_actions {
-    /*  text-align:center; */
   }
 
   #header {
