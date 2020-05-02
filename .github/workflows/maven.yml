@@ -67,7 +67,7 @@ jobs:
     runs-on: ubuntu-latest
     services:
       java-rprj-maria:
-        image: mariadb:10.4
+        image: mariadb:latest
         ports:
           - 3306:3306
         env:
