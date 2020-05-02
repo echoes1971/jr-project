@@ -20,7 +20,17 @@
           <li *ngIf="currentUser" class="nav-item"><a routerLink="/mng">Manage</a></li>
         </ul>
       </div>
-      <div id="user_div" class="dropdown"><a *ngIf="!currentUser" [routerLink]="['/login', currentId]" routerLinkActive="active">Login</a><b *ngIf="currentUser">User:&nbsp;{{ currentUser.fullname }}</b><a *ngIf="currentUser" (click)="logout()" [routerLink]="['/obj', currentId]">Logout</a></div>
+      <div id="user_div" class="dropdown">
+        <a *ngIf="!currentUser" [routerLink]="['/login', currentId]" routerLinkActive="active">Login</a>
+        <a *ngIf="currentUser" class="nav-link dropdown-toggle" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+          <b>User:&nbsp;{{ currentUser.fullname }}</b>
+        </a>
+        <div *ngIf="currentUser" class="dropdown-menu" aria-labelledby="navbarDropdown">
+          <a class="dropdown-item" (click)="logout()" [routerLink]="['/profile']">Profile</a>
+          <div class="dropdown-divider"></div>
+          <a class="dropdown-item" (click)="logout()" [routerLink]="['/obj', currentId]">Logout</a>
+        </div>
+      </div>
       <form name="" action="/search" class="form-inline "><input aria-label="Search" id="search_object" name="search_object" type="text" /></form>
     </nav>
   </div>

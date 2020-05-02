@@ -9,7 +9,9 @@ maybe adding some memory before: `export MAVEN_OPTS=-Xmx1024m`
 
 **TODO**
 - Angular FE
-  - main component: object actions
+  - main component:
+    - edit current object
+    - new object action
   - search component
 - Controllers
   - UIController
@@ -42,6 +44,7 @@ maybe adding some memory before: `export MAVEN_OPTS=-Xmx1024m`
 
 **DONE**
 - Angular FE
+  - main component: object actions
   - fetch user from backend at first load of the page
   - main component: list childs
   - object icons: handle properly

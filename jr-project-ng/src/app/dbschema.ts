@@ -19,6 +19,8 @@ export class DBEntity {
   }
 
   /* View stuff: start. */
+  getDetailName(): string { return 'DBEntity'; }
+  childrenTypes(): DBEntity[] { return []; }
   renderView(): string { return 'nope'; }
   /* View stuff: end. */
 }
@@ -72,6 +74,9 @@ export class DBEObject extends DBEntity {
     }
   }
   canWrite(x: string = ''): boolean {
+    if (this.permissions === undefined) {
+      return false;
+    }
     switch (x) {
       case 'U':
         return this.permissions[1] === 'w';
@@ -91,6 +96,11 @@ export class DBEObject extends DBEntity {
         return this.permissions[8] === 'x';
     }
   }
+
+  /* View stuff: start. */
+  getDetailName(): string { return 'Object'; }
+  // renderView(): string { return this.html; }
+  /* View stuff: end. */
 }
 
 /* **** Core **** */
@@ -121,16 +131,23 @@ export class User extends DBEntity {
 
   hasGroup(group_id: string): boolean {
     let ret = false;
-    for (const i in this.groups) {
-      const g = this.groups[i];
-      // console.log('Group: ' + g.id + '=>' + (g.id === group_id));
-      if (g.id === group_id) {
+    for (const group of this.groups) {
+      // console.log('Group: ' + group.id + '=>' + (group.id === group_id));
+      if (group.id === group_id) {
         ret = true;
         break;
       }
     }
     return ret;
   }
+
+  /* View stuff: start. */
+  getDetailName(): string { return 'User'; }
+  childrenTypes(): DBEntity[] {
+    return [new DBEPeople()];
+  }
+  // renderView(): string { return this.html; }
+  /* View stuff: end. */
 }
 
 export class Group extends DBEntity {
@@ -149,6 +166,11 @@ export class Group extends DBEntity {
     this.description = description;
     this.users = users;
   }
+
+  /* View stuff: start. */
+  getDetailName(): string { return 'Group'; }
+  // renderView(): string { return this.html; }
+  /* View stuff: end. */
 }
 
 export class DBELog extends DBEntity {
@@ -174,6 +196,10 @@ export class DBELog extends DBEntity {
     this.note = note;
     this.note2 = note2;
   }
+
+  /* View stuff: start. */
+  getDetailName(): string { return 'Log'; }
+  /* View stuff: end. */
 }
 
 export class DBEDBVersion extends DBEntity {
@@ -226,6 +252,16 @@ export class DBECompany extends DBEObject {
     this.url = url;
     this.p_iva = p_iva;
   }
+
+  /* View stuff: start. */
+  getDetailName(): string { return 'Company'; }
+  childrenTypes(): DBEntity[] {
+    return [
+      new DBEFolder(), new DBEPeople(), new DBEPage(), new DBELink(), new DBENote()
+    ];
+  }
+  // renderView(): string { return this.html; }
+  /* View stuff: end. */
 }
 
 export class DBECountry extends DBEntity {
@@ -316,6 +352,16 @@ export class DBEPeople extends DBEObject {
     this.codice_fiscale = codice_fiscale;
     this.p_iva = p_iva;
   }
+
+  /* View stuff: start. */
+  getDetailName(): string { return 'People'; }
+  childrenTypes(): DBEntity[] {
+    return [
+      new DBEFolder(), new DBEPage(), new DBELink(), new DBENote()
+    ];
+  }
+  // renderView(): string { return this.html; }
+  /* View stuff: end. */
 }
 
 /* **** CMS **** */
@@ -335,6 +381,17 @@ export class DBEFolder extends DBEObject {
     // DBEFolder
     this.fk_obj_id = fk_obj_id;
     this.childs_sort_order = childs_sort_order;
+  }
+
+  /* View stuff: start. */
+  getDetailName(): string { return 'Folder'; }
+  childrenTypes(): DBEntity[] {
+    return [
+      new DBEFolder(), new DBEPage(), new DBENews(),
+      new DBELink(), new DBENote(),
+      // new DBEFile(), new DBEEvent(),
+      // new DBETodo(), new DBETimetrack(),
+    ];
   }
 }
 
@@ -357,6 +414,10 @@ export class DBELink extends DBEObject {
     this.target = target;
     this.fk_obj_id = fk_obj_id;
   }
+
+  /* View stuff: start. */
+  getDetailName(): string { return 'Link'; }
+  /* View stuff: end. */
 }
 
 export class DBENews extends DBEObject {
@@ -379,6 +440,14 @@ export class DBENews extends DBEObject {
     this.language = language;
   }
 
+  /* View stuff: start. */
+  getDetailName(): string { return 'News'; }
+  childrenTypes(): DBEntity[] {
+    return [
+      new DBENews(), new DBELink()
+      // , new DBEFile(), new DBEEvent()
+    ];
+  }
   renderView(): string { return this.html; }
 }
 
@@ -398,6 +467,9 @@ export class DBENote extends DBEObject {
     this.fk_obj_id = fk_obj_id;
   }
 
+  /* View stuff: start. */
+  getDetailName(): string { return 'Note'; }
+  childrenTypes(): DBEntity[] { return [ new DBENote() ]; }
   renderView(): string {
     console.log('DBENote.renderView');
     let ret = '<div class="form_note">';
@@ -428,5 +500,18 @@ export class DBEPage extends DBEObject {
     this.language = language;
   }
 
+
+  /* View stuff: start. */
+  getDetailName(): string { return 'Page'; }
+  childrenTypes(): DBEntity[] {
+    if (this.name === 'index') {
+      return (new DBEFolder()).childrenTypes();
+    }
+    return [
+      new DBEPage(), new DBELink()
+      // , new DBEFile(), new DBEEvent()
+    ];
+  }
   renderView(): string { return this.html; }
+  /* View stuff: end. */
 }

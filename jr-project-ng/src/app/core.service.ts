@@ -1,7 +1,6 @@
 import {Injectable} from '@angular/core';
 import {HttpClient} from '@angular/common/http';
 
-import { environment } from '../environments/environment';
 import {Observable} from 'rxjs';
 import {IDBEObject} from './iobjects';
 import {DBEObject, User} from './dbschema';
@@ -25,11 +24,8 @@ export class CoreService {
   myUser: User = null;
 
   constructor(private http: HttpClient) {
-    console.log(environment.apiUrl + '/ui/rootobj');
-
     this.rootObj$ = this.http.get<IDBEObject>('/ui/rootobj');
     this.menuTop$ = this.http.get<IDBEObject[]>('/ui/topmenu');
-    // this.currentObj$ = this.http.get<ObjPage>('/ui/obj/' + this.currentObjId);
 
     this.rootObj$.subscribe(data => {
       this.rootObj = data;

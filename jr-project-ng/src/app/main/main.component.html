@@ -1,4 +1,4 @@
-<div class="col-2">
+<div class="col-2 col-sm-2 hidden-sm">
   <table class="menu">
     <tr><th class="menu"><a [routerLink]="['/obj', rootObj.id]">{{ rootObj.name }}</a></th></tr>
   </table>
@@ -38,7 +38,10 @@
 </div>
 <div *ngIf="currentUser" class="obj_actions col-sm-2">
   <ul *ngIf="currentUser.hasGroup('-6') && (currentObj.canWrite('U') || currentObj.canWrite('G'))" class="obj_actions">Actions
-    <li class="obj_actions"><a [routerLink]="['/obj/edit/', currentObj.id]"><img src="assets/icons/mng/Edit16.gif" alt="" /> Edit</a></li>
-    <li>TODO: cycle through all the possible childs that this object can have and create a "new" action</li>
+    <li class="obj_actions"><a [routerLink]="['/obj/edit/', currentObj.id]"><img src="./assets/icons/mng/Edit16.gif" alt="" /> Edit</a></li>
+    <li class="obj_actions">&nbsp;</li>
+    <li *ngFor="let childType of currentObj.childrenTypes()" class="obj_actions">
+      <a [routerLink]="['/obj/'+childType._class+'/new/', currentObj._class=='DBEPage' && currentObj.name=='index' ? currentObj.father_id : currentObj.id]"><img title="New {{childType.getDetailName()}}" alt="New {{childType.getDetailName()}}" src="./assets/icons/mng/New16.gif" /> {{childType.getDetailName()}}</a>
+    </li>
   </ul>
 </div>

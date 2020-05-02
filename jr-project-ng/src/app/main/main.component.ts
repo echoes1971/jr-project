@@ -49,7 +49,7 @@ export class MainComponent implements OnInit {
         }),
         mergeMap(curObj => {
           // console.log('paramMapObserver:');
-          console.log(curObj._class);
+          // console.log(curObj._class);
           let dbeObject: DBEObject;
           switch (curObj._class) {
             case 'DBECompany':

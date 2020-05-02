@@ -1,3 +1,252 @@
 router-outlet {
   width: 100%;
 }
+
+/* ********************************* Classi ********************************* */
+
+h1.logo {
+  background-color: rgba(255,255,255,0.8);
+  margin: 0.2em;
+  margin-bottom: 0;
+  border: 1px solid #9FA3A6;
+  padding: 0.4em;
+  width: 20em;
+  font-weight: bold;
+  border-radius: 8px; -webkit-border-radius: 8px;
+}
+h2.logo {
+  color: #111122;
+  background-color: rgba(255,255,255,0.8);
+  margin: 0.1em;
+  margin-top: -1em;
+  border: 1px solid #9FA3A6;
+  padding: 0.2em;
+  font-size: 10px;
+  width: 40em;
+  border-radius: 8px; -webkit-border-radius: 8px;
+}
+
+
+/* ********************************* Elementi ********************************* */
+
+#header {
+  text-align: center;
+}
+
+#logo {
+  width:28em;
+  height:4em;
+  margin: 0.3em auto 0.3em 0;
+  border: 0 solid red;
+}
+#logo h1 {
+  color:#0099da;
+}
+#logo h3 {
+  font-size: 1.1em;
+  font-weight: bold;
+  color: #444444;
+}
+
+#top_menu {
+  text-align:center;
+  height:2em;
+  color:black;
+
+  background-color: rgba(0,0,0,0.4);
+}
+#top_menu {
+  margin:0;
+  padding:0;
+}
+#top_menu a:link, #top_menu a:active, #top_menu a:visited, #top_menu a:hover {
+  margin:auto 4px;
+  border-radius:4px;
+  padding:2px 4px;
+  color:black;
+  background-color:rgba(255,255,255,0.45);
+}
+#top_menu a:active, #top_menu a:hover {
+  background-color:rgba(255,255,255,0.85);
+}
+#top_menu ul {
+  list-style-type: none;
+  display: block;
+  margin: 0.1em;
+  padding: 4px 16px;
+}
+#top_menu li {
+  display: inline;
+}
+
+/*
+#search_div {
+ float:right;
+ text-align: left;
+ margin: 2px;
+ padding: 2px;
+ background-color: rgba(255,255,255,1.0);
+ color: transparent;
+
+ background-image:url('icons/glass.png');
+ background-repeat:no-repeat;
+ background-attachment:scroll;
+ background-position:right center;
+
+ border-radius: 8px; -webkit-border-radius: 8px;
+
+ overflow: hidden;
+
+ width: 20px;
+ transition:width 1s;-webkit-transition:width 1s;-moz-transition:width 1s;-o-transition:width 1s;
+}
+#search_div:hover { width: 100px; color: inherit; }
+*/
+#search_object {
+  margin: 0;
+  margin-right: 20px;
+  border: 0 solid rgba(255,255,255,0.8);
+  color: inherit;
+  background-color: rgba(255,255,255,0.8);
+  width: 80px;
+
+  border-radius: 8px; -webkit-border-radius: 8px;
+  padding: 0 8px;
+  /*  transition:color 1s;-webkit-transition:color 1s;-moz-transition:color 1s;-o-transition:color 1s; */
+}
+/* #search_object:hover { width: 100px; } */
+
+#user_div {
+  /*padding: 0.2em;*/
+  text-align: right;
+  color: white;
+}
+#user_div a {
+  margin:auto 4px;
+  border-radius:4px;
+  padding:2px 4px;
+}
+#user_div a:hover {
+  /*padding: 0 0.2em;*/
+  /*color: white;*/
+  /*background-color: transparent;*/
+}
+
+#footer {
+  color:#ccc;
+  background-color:#333;
+  /* background-color: rgba(0,0,0,0.4); */
+  height: 3em;
+  text-align: center;
+  padding:0;
+}
+#footer .copyright {
+  margin: .4em auto;
+  width: 50em;
+  font-size: x-small;
+  border-radius:4px;
+  padding:4px 8px;
+  /*  background-color:rgba(255,255,255,0.45); */
+}
+#footer a:link, #footer a:active, #footer a:visited, #footer a:hover {
+  color:#0099da;
+}
+
+/* ********************************* Fix bootstrap ********************************* */
+
+#top_menu a.dropdown-item {
+  margin: 0;
+  /*padding: 0;*/
+}
+
+
+
+
+@media screen and (max-width: 1024px) {
+}
+@media screen and (max-width: 960px) {
+  #header {
+    border-radius:0; -webkit-border-radius:0;
+  }
+  #footer {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 3em;
+    border-radius:0;-webkit-border-radius:0;
+  }
+}
+@media screen and (max-width: 768px) {
+  #header {
+    position: static;
+    float:none;
+  }
+  #logo {
+    margin: 0 auto;
+    /* border: 2px solid #adb5fa; */
+    /* border-radius: 8px; */
+    /* background: #ea098d; */
+    /* padding: 5px 3px; */
+    /* width:15em; */
+    /* margin: 0.3em auto 0.3em 0; */
+  }
+  #logo h1 {
+    font-size: 1.5em;
+  }
+  #top_menu {
+    height:auto;
+  }
+  #top_menu ul {
+    padding:0;
+  }
+  #top_menu li {
+    display: block;
+    padding:2px;
+  }
+  #top_menu a:link, #top_menu a:active, #top_menu a:visited, #top_menu a:hover {
+    display: block;
+  }
+  #user_div, #search_div {
+    /*  height:auto; */
+    text-align:center;
+    padding:0;
+    display:inline;
+
+    float:none;
+  }
+  #user_div a:link, #user_div a:active, #user_div a:visited, #user_div a:hover {
+    display: inline;
+  }
+
+  #search_div {
+    width:auto;
+    margin:2px 8px;
+  }
+  #search_div:hover { width: auto; color: inherit; }
+  #search_object {
+    /* width:100%; */
+  }
+  #footer {
+    position: static;
+    float:none;
+  }
+  #footer div.copyright {
+    width: auto;
+  }
+
+}
+@media screen and (max-width: 640px) {
+  /* iPod Vertical */
+}
+@media screen and (max-width: 480px) {
+  /* Samsung GT-I8262 */
+}
+@media screen and (min-width: 320px) {
+}
+@media screen and (min-width: 480px) {
+}
+@media screen and (min-width: 600px) { /* greater than iphone mobile*/
+}
+@media screen and (min-width: 768px) {  /* Large Size and up*/
+}

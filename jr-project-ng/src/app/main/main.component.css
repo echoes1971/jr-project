@@ -94,6 +94,8 @@ li.obj_actions {
 @media screen and (max-width: 960px) {
 }
 @media screen and (max-width: 768px) {
+  .hidden-sm { display: none; }
+
   div.r_breadcrumb {
     /*
      background-color: rgba(0,0,0,0.1);
@@ -101,9 +103,11 @@ li.obj_actions {
     /*  background-image: linear-gradient(to top, #f0f0f0, #f4f4f4); */
   }
 
+  /*
   table.menu {
     display:none;
   }
+  */
 
   div.middle_content {
     position:static;
