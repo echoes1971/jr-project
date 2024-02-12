@@ -6,7 +6,7 @@ import ch.rra.rprj.model.ObjectMgr;
 import ch.rra.rprj.model.cms.DBEFolder;
 import org.hibernate.annotations.GenericGenerator;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 import java.sql.Timestamp;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -47,7 +47,7 @@ public abstract class DBEObject extends DBEntity {
     @Column(name = "id", updatable = false, nullable = false, columnDefinition = "VARCHAR(16)")
     protected String id;
 
-    @Column(name = "owner", columnDefinition = "VARCHAR(16)")
+    @Column(name = "`owner`", columnDefinition = "VARCHAR(16)")
     protected String owner;
     @Column(name = "group_id", columnDefinition = "VARCHAR(16)")
     protected String group_id;
@@ -72,9 +72,9 @@ public abstract class DBEObject extends DBEntity {
     @Column(name = "father_id", columnDefinition = "VARCHAR(16)")
     protected String father_id;
 
-    @Column(name = "name", columnDefinition = "VARCHAR(255)")
+    @Column(name = "`name`", columnDefinition = "VARCHAR(255)")
     protected String name;
-    @Column(name="description", columnDefinition="TEXT")
+    @Column(name = "`description`", columnDefinition="TEXT")
     protected String description;
 
     public DBEObject() { }

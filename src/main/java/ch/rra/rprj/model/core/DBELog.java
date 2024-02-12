@@ -1,6 +1,6 @@
 package ch.rra.rprj.model.core;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 import java.sql.Date;
 import java.sql.Time;
 
@@ -30,18 +30,18 @@ public class DBELog extends DBEntity {
     private String ip;
 
     @Id
-    @Column(name = "data", columnDefinition="DATE")
+    @Column(name = "`data`", columnDefinition="DATE")
     private Date data;
 
-    @Column(name="ora", columnDefinition="TIME")
+    @Column(name = "ora", columnDefinition="TIME")
     private Time ora;
-    @Column(name="count", columnDefinition="INT(11)")
+    @Column(name = "`count`", columnDefinition="INT(11)")
     private Integer count;
-    @Column(name="url", columnDefinition="VARCHAR(255)")
+    @Column(name = "`url`", columnDefinition="VARCHAR(255)")
     private String url;
-    @Column(name="note", nullable=false, columnDefinition="VARCHAR(255)")
+    @Column(name = "note", nullable=false, columnDefinition="VARCHAR(255)")
     private String note;
-    @Column(name="note2", columnDefinition="TEXT")
+    @Column(name = "note2", columnDefinition="TEXT")
     private String note2;
 
     public DBELog() { }

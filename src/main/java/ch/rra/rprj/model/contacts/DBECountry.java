@@ -4,7 +4,7 @@ package ch.rra.rprj.model.contacts;
 import ch.rra.rprj.model.core.DBEntity;
 import org.hibernate.annotations.GenericGenerator;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 
 /*
 mysql> desc rprj_countrylist;
@@ -46,7 +46,7 @@ public class DBECountry extends DBEntity {
     @Column(name = "Formal_Name", columnDefinition = "VARCHAR(255)")
     protected String Formal_Name;
 
-    @Column(name = "Type", columnDefinition = "VARCHAR(255)")
+    @Column(name = "`Type`", columnDefinition = "VARCHAR(255)")
     protected String Type;
 
     @Column(name = "Sub_Type", columnDefinition = "VARCHAR(255)")

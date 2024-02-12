@@ -14,26 +14,38 @@
     <session-factory>
 
         <!-- SQL dialect -->
-        <property name="dialect">org.hibernate.dialect.MySQL57Dialect</property>
+        <property name="dialect">org.hibernate.dialect.MariaDBDialect</property>
 
-        <property name="connection.driver_class">com.mysql.jdbc.Driver</property>
-        <property name="connection.url">jdbc:mysql://127.0.0.1:3306/rproject?zeroDateTimeBehavior=convertToNull</property>
+        <property name="connection.driver_class">org.mariadb.jdbc.Driver</property>
+        <property name="connection.url">jdbc:mariadb://127.0.0.1:3306/rproject?zeroDateTimeBehavior=convertToNull</property>
+<!--        <property name="connection.url">jdbc:mysql://127.0.0.1:3306/rproject?zeroDateTimeBehavior=convertToNull</property>-->
         <!-- property name="connection.url">jdbc:mysql://172.17.0.1:3306/rproject</property -->
         <property name="connection.username">root</property>
         <property name="connection.password">mysecret</property>
 
 
         <!-- JDBC connection pool (use the built-in) -->
-        <!-- property name="connection.pool_size">1</property -->
+        <property name="connection.pool_size">1</property>
 
         <!-- Disable the second-level cache  -->
         <property name="cache.provider_class">org.hibernate.cache.internal.NoCacheProvider</property>
 
         <!-- Echo all executed SQL to stdout -->
-        <property name="show_sql">false</property>
+        <property name="show_sql">true</property>
+
+        <!-- Set the current session context -->
+        <property name="current_session_context_class">thread</property>
 
         <!-- Drop and re-create the database schema on startup -->
         <property name="hbm2ddl.auto">validate</property>
+<!--        <property name="hbm2ddl.auto">create-drop</property>-->
+
+        <!-- dbcp connection pool configuration -->
+        <property name="hibernate.dbcp.initialSize">5</property>
+        <property name="hibernate.dbcp.maxTotal">20</property>
+        <property name="hibernate.dbcp.maxIdle">10</property>
+        <property name="hibernate.dbcp.minIdle">5</property>
+        <property name="hibernate.dbcp.maxWaitMillis">-1</property>
 
         <!-- Names the annotated entity class -->
         <mapping class="ch.rra.rprj.model.core.DBEDBVersion"/>

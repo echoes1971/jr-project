@@ -85,3 +85,11 @@ maybe adding some memory before: `export MAVEN_OPTS=-Xmx1024m`
 **TECH INFO**
 
 Reduce log: see https://github.com/eugenp/tutorials/blob/master/persistence-modules/hibernate5-2/src/test/resources/logback.xml
+
+## DB
+
+### Log queries
+
+SET GLOBAL log_output = 'TABLE';
+SET GLOBAL general_log = 'ON';
+select * from mysql.general_log;

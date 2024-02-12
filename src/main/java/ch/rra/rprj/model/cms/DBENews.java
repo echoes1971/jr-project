@@ -2,9 +2,9 @@ package ch.rra.rprj.model.cms;
 
 import ch.rra.rprj.model.core.DBEObject;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Table;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Table;
 import java.sql.Timestamp;
 
 /*
@@ -40,7 +40,7 @@ public class DBENews extends DBEObject {
     @Column(name = "fk_obj_id", columnDefinition = "VARCHAR(16)")
     private String fk_obj_id;
 
-    @Column(name = "language", columnDefinition = "VARCHAR(5)")
+    @Column(name = "`language`", columnDefinition = "VARCHAR(5)")
     private String language;
 
     public DBENews() {

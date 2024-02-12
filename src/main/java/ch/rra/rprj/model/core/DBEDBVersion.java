@@ -1,9 +1,9 @@
 package ch.rra.rprj.model.core;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 
 /*
 mysql> desc rprj_dbversion;
@@ -24,7 +24,7 @@ public class DBEDBVersion extends DBEntity {
     @Column(name = "model_name", updatable = false, nullable = false, columnDefinition = "VARCHAR(100)")
     private String model_name;
 
-    @Column(name="version", columnDefinition="INT(11)")
+    @Column(name = "`version`", columnDefinition="INT(11)")
     private Integer version;
 
     public DBEDBVersion() {}

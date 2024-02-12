@@ -19,7 +19,7 @@ import org.hibernate.Transaction;
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.query.Query;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -36,10 +36,10 @@ public class Group extends DBEntity {
     @Column(name = "id", updatable = false, nullable = false, columnDefinition = "VARCHAR(16)")
     private String id;
 
-    @Column(name="name", unique=true, updatable=false)
+    @Column(name = "`name`", unique=true, updatable=false)
     private String name;
 
-    @Column(name="description", columnDefinition="TEXT")
+    @Column(name = "`description`", columnDefinition="TEXT")
     private String description;
 
     //@ManyToMany(mappedBy = "groups", cascade = {CascadeType.ALL})

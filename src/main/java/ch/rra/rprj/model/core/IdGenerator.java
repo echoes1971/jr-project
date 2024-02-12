@@ -27,8 +27,8 @@ public class IdGenerator implements IdentifierGenerator {
         return generateMyId();
     }
 
-    @Override
-    public boolean supportsJdbcBatchInserts() {
-        return false;
-    }
+//    @Override
+//    public boolean supportsJdbcBatchInserts() {
+//        return false;
+//    }
 }

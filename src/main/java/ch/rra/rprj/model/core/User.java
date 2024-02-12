@@ -24,7 +24,7 @@ import org.hibernate.Transaction;
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.query.Query;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -41,15 +41,15 @@ public class User extends DBEntity {
     @Column(name = "id", updatable = false, nullable = false, columnDefinition = "VARCHAR(16)")
     private String id;
 
-    @Column(name="login", unique=true, updatable=false)
+    @Column(name = "login", unique=true, updatable=false)
     private String login;
     private String pwd;
     private String pwd_salt;
 
-    @Column(name="fullname", columnDefinition="TEXT")
+    @Column(name = "fullname", columnDefinition="TEXT")
     private String fullname;
 
-    @Column(name="group_id", columnDefinition="VARCHAR(16)")
+    @Column(name = "group_id", columnDefinition="VARCHAR(16)")
     private String group_id;
 
 

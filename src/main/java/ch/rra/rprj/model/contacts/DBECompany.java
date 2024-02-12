@@ -2,9 +2,9 @@ package ch.rra.rprj.model.contacts;
 
 import ch.rra.rprj.model.core.DBEObject;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Table;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Table;
 import java.sql.Timestamp;
 
 /*
@@ -67,7 +67,7 @@ public class DBECompany extends DBEObject {
     @Column(name = "email", columnDefinition = "VARCHAR(255)")
     private String email;
 
-    @Column(name = "url", columnDefinition = "VARCHAR(255)")
+    @Column(name = "`url`", columnDefinition = "VARCHAR(255)")
     private String url;
 
     @Column(name = "p_iva", columnDefinition = "VARCHAR(16)")

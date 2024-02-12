@@ -2,22 +2,25 @@ package ch.rra.rprj.model;
 
 import ch.rra.rprj.model.core.*;
 import org.hibernate.*;
+import org.hibernate.boot.Metadata;
 import org.hibernate.boot.MetadataSources;
 import org.hibernate.boot.registry.StandardServiceRegistry;
 import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
 import org.hibernate.query.NativeQuery;
 import org.hibernate.query.Query;
 import org.hibernate.Transaction;
+import org.hibernate.query.SelectionQuery;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.persistence.EntityNotFoundException;
+import jakarta.persistence.EntityNotFoundException;
 import java.sql.Date;
 import java.sql.Time;
 import java.util.*;
 
 public class DBMgr {
     protected SessionFactory sessionFactory;
+    protected StandardServiceRegistry registry;
 
     private Logger logger;
 
@@ -27,11 +30,22 @@ public class DBMgr {
     public DBMgr() { logger = LoggerFactory.getLogger(getClass()); }
 
     public boolean setUp() throws Exception {
-        final StandardServiceRegistry registry = new StandardServiceRegistryBuilder()
+        registry = new StandardServiceRegistryBuilder()
                 .configure()
                 .build();
         try {
-            sessionFactory = new MetadataSources(registry).buildMetadata().buildSessionFactory();
+//            sessionFactory = new MetadataSources(registry).buildMetadata().buildSessionFactory();
+
+            // Create MetadataSources
+            MetadataSources sources = new MetadataSources(registry);
+
+            // Create Metadata
+            Metadata metadata = sources.getMetadataBuilder().build();
+
+            // Create SessionFactory
+            sessionFactory = metadata.getSessionFactoryBuilder().build();
+
+
             return true;
         } catch(Exception e) {
             System.out.println("**************************");
@@ -47,13 +61,16 @@ public class DBMgr {
         if(sessionFactory!=null) {
             sessionFactory.close();
         }
+        if (registry != null) {
+            StandardServiceRegistryBuilder.destroy(registry);
+        }
     }
 
     public SessionFactory getSessionFactory() { return sessionFactory; }
 
     public int listUsers() {
         Session session = sessionFactory.openSession();
-        Query query = session.createQuery("FROM User");
+        SelectionQuery query = session.createSelectionQuery("FROM User");
         List<User> users = (List<User>) query.list();
         for(User u : users) {
             System.out.println(u.toString());
@@ -65,7 +82,7 @@ public class DBMgr {
     }
     public int listGroups() {
         Session session = sessionFactory.openSession();
-        Query query = session.createQuery("FROM Group");
+        SelectionQuery query = session.createSelectionQuery("FROM Group");
         List<Group> dbes = (List<Group>) query.list();
         for(Group dbe : dbes) {
             System.out.println(dbe.toString());
@@ -147,7 +164,7 @@ public class DBMgr {
         Session session = sessionFactory.openSession();
         Transaction tx = session.beginTransaction();
         try {
-            int res = session.createSQLQuery(sql).executeUpdate();
+            int res = session.createNativeQuery(sql).executeUpdate();
             logger.debug("DBMgr.db_execute: res="+res);
             tx.commit();
         } catch (HibernateException he) {
@@ -205,7 +222,7 @@ public class DBMgr {
         Session session = sessionFactory.openSession();
         Transaction tx = session.beginTransaction();
         try {
-            session.save(dbe);
+            session.persist(dbe); // .save(dbe)
             tx.commit();
         } catch (HibernateException he) {
             if(tx!=null) tx.rollback();
@@ -222,7 +239,7 @@ public class DBMgr {
         Session session = sessionFactory.openSession();
         Transaction tx = session.beginTransaction();
         try {
-            session.update(dbe);
+            session.merge(dbe); //.update(dbe);
             tx.commit();
         } catch (HibernateException he) {
             if(tx!=null) tx.rollback();
@@ -239,7 +256,7 @@ public class DBMgr {
         Session session = sessionFactory.openSession();
         Transaction tx = session.beginTransaction();
         try {
-            session.delete(dbe);
+            session.remove(dbe); //.delete(dbe);
             tx.commit();
         } catch (HibernateException he) {
             if(tx!=null) tx.rollback();

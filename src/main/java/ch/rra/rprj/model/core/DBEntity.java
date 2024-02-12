@@ -3,8 +3,8 @@ package ch.rra.rprj.model.core;
 import ch.rra.rprj.model.DBException;
 import ch.rra.rprj.model.DBMgr;
 
-import javax.persistence.JoinTable;
-import javax.persistence.Table;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.Table;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
@@ -180,8 +180,8 @@ public class DBEntity {
         Annotation[] field_annotations = field.getAnnotations();
         for(Annotation an : field_annotations) {
             // System.out.println("  " +an.toString());
-            if(an instanceof javax.persistence.Column) {
-                column_name = ((javax.persistence.Column)an).name();
+            if(an instanceof jakarta.persistence.Column) {
+                column_name = ((jakarta.persistence.Column)an).name();
                 break;
             } else if(an instanceof JoinTable) {
                 column_name = "";

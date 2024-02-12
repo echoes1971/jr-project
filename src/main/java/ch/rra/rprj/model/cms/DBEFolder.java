@@ -5,9 +5,9 @@ import ch.rra.rprj.model.core.DBEObject;
 import ch.rra.rprj.model.core.DBEObjectReal;
 import ch.rra.rprj.model.core.DBEntity;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Table;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Table;
 import java.sql.Timestamp;
 import java.util.*;
 import java.util.function.Function;
