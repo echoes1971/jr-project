@@ -30,8 +30,19 @@ public class DBMgr {
     public DBMgr() { logger = LoggerFactory.getLogger(getClass()); }
 
     public boolean setUp() throws Exception {
+
+        // Customize here.
+        // See: https://www.digitalocean.com/community/tutorials/hibernate-tutorial-for-beginners
+        Properties props = new Properties();
+        //props.put("hibernate.connection.driver_class", "org.mariadb.jdbc.Driver");
+        props.put("hibernate.connection.url", "jdbc:mariadb://127.0.0.1:3306/rproject?zeroDateTimeBehavior=convertToNull");
+        props.put("hibernate.connection.username", "root");
+        //props.put("hibernate.connection.password", "pankaj123");
+        //props.put("hibernate.current_session_context_class", "thread");
+
         registry = new StandardServiceRegistryBuilder()
                 .configure()
+                .applySettings(props)
                 .build();
         try {
 //            sessionFactory = new MetadataSources(registry).buildMetadata().buildSessionFactory();
@@ -44,7 +55,6 @@ public class DBMgr {
 
             // Create SessionFactory
             sessionFactory = metadata.getSessionFactoryBuilder().build();
-
 
             return true;
         } catch(Exception e) {
