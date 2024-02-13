@@ -1,6 +1,8 @@
 package ch.rra.rprj.model;
 
 import ch.rra.rprj.model.core.*;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.EntityTransaction;
 import org.hibernate.*;
 import org.hibernate.boot.Metadata;
 import org.hibernate.boot.MetadataSources;
@@ -9,6 +11,7 @@ import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
 import org.hibernate.query.NativeQuery;
 import org.hibernate.query.Query;
 import org.hibernate.Transaction;
+import org.hibernate.query.QueryProducer;
 import org.hibernate.query.SelectionQuery;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,8 +38,8 @@ public class DBMgr {
         // See: https://www.digitalocean.com/community/tutorials/hibernate-tutorial-for-beginners
         Properties props = new Properties();
         //props.put("hibernate.connection.driver_class", "org.mariadb.jdbc.Driver");
-        props.put("hibernate.connection.url", "jdbc:mariadb://127.0.0.1:3306/rproject?zeroDateTimeBehavior=convertToNull");
-        props.put("hibernate.connection.username", "root");
+//        props.put("hibernate.connection.url", "jdbc:mariadb://127.0.0.1:3306/rproject?zeroDateTimeBehavior=convertToNull");
+//        props.put("hibernate.connection.username", "root");
         //props.put("hibernate.connection.password", "pankaj123");
         //props.put("hibernate.current_session_context_class", "thread");
 
@@ -173,11 +176,20 @@ public class DBMgr {
     public boolean db_execute(String sql) {
         Session session = sessionFactory.openSession();
         Transaction tx = session.beginTransaction();
+        EntityManager em =null;
+        EntityTransaction etx = null;
         try {
-            int res = session.createNativeQuery(sql).executeUpdate();
+//            int res = session.createMutationQuery(sql).executeUpdate();
+            em = session.getEntityManagerFactory().createEntityManager();
+            etx = em.getTransaction();
+            etx.begin();
+            int res = em.createNativeQuery(sql).executeUpdate();
+//            int res = session.createNativeQuery(sql).executeUpdate();
+            etx.commit();
             logger.debug("DBMgr.db_execute: res="+res);
             tx.commit();
         } catch (HibernateException he) {
+            if(etx!=null) etx.rollback();
             if(tx!=null) tx.rollback();
             he.printStackTrace();
             return false;
