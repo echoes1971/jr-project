@@ -19,6 +19,8 @@ public class DBMgr {
     public void setConn(DBConnectionProvider conn) {
         this.conn = conn;
     }
+    public boolean connect() { return this.conn.connect(); }
+    public boolean disconnect() { return this.conn.disconnect(); }
 
     private Logger log;
 
@@ -31,9 +33,9 @@ public class DBMgr {
 
         // Customize here.
         // See: https://www.digitalocean.com/community/tutorials/hibernate-tutorial-for-beginners
-        Properties props = new Properties();
+//        Properties props = new Properties();
 //        try {
-            props.load(getClass().getResourceAsStream("/application.properties"));
+//            props.load(getClass().getResourceAsStream("/application.properties"));
 //            log.debug("Project.getPropertiesFromFile: properties=${properties.size()}")
 //            return properties
 //        } catch(e) {
@@ -101,9 +103,24 @@ public class DBMgr {
     }
 
     public DBEntity refresh(DBEntity dbe) throws DBException { return conn.refresh(dbe); }
-    public DBEntity insert(DBEntity dbe) throws DBException { return conn.insert(dbe, this); }
-    public DBEntity update(DBEntity dbe) throws DBException { return conn.update(dbe, this); }
-    public DBEntity delete(DBEntity dbe) throws DBException { return conn.delete(dbe, this); }
+    public DBEntity insert(DBEntity dbe) throws DBException {
+        dbe.beforeInsert(this);
+        DBEntity ret = conn.insert(dbe, this);
+        dbe.afterInsert(this);
+        return ret;
+    }
+    public DBEntity update(DBEntity dbe) throws DBException {
+        dbe.beforeUpdate(this);
+        DBEntity ret = conn.update(dbe, this);
+        dbe.afterUpdate(this);
+        return ret;
+    }
+    public DBEntity delete(DBEntity dbe) throws DBException {
+        dbe.beforeDelete(this);
+        DBEntity ret = conn.delete(dbe, this);
+        dbe.afterDelete(this);
+        return ret;
+    }
 
     public List<DBEntity> search(DBEntity search) { return search(search, true, null); }
     public List<DBEntity> search(DBEntity search, boolean uselike, String orderby) {
@@ -172,11 +189,15 @@ public class DBMgr {
                 ret = null;
             }
         } else {
-            DBELog oldEntry = (DBELog) res.get(0);
-            ret.setCount(oldEntry.getCount() + 1);
-            ret.setNote(oldEntry.getNote());
+//            DBELog oldEntry = (DBELog) res.get(0);
+//            ret.setCount(oldEntry.getCount() + 1);
+//            ret.setNote(oldEntry.getNote());
+            ret = (DBELog) res.get(0);
+            ret.setCount(ret.getCount() + 1);
+            ret.setNote(ret.getNote());
             if(note2!=null && note2.length()>0)
-                ret.setNote2(oldEntry.getNote2()+"\n"+hour+"-"+note2);
+                ret.setNote2(ret.getNote2()+"\n"+hour+"-"+note2);
+//                ret.setNote2(oldEntry.getNote2()+"\n"+hour+"-"+note2);
             try {
                 ret = (DBELog) this.update(ret);
             } catch (DBException e) {

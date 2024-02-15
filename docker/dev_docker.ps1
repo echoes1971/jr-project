@@ -144,7 +144,7 @@ Write-Output "Access mysql with: docker exec -it $MYSQL_APP mariadb -p$MYSQL_PAS
 Write-Output "Interact with the containers with:"
 Write-Output " docker exec -it $MYSQL_APP bash"
 #Write-Output " docker exec -it $PHP_APP bash"
-Write-Output "Point your browser to: http://localhost:8080/"
+#Write-Output "Point your browser to: http://localhost:8080/"
 Read-Host  "Press any key to continue... "
 Write-Output ""
 

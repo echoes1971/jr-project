@@ -25,6 +25,8 @@ import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.query.Query;
 
 import jakarta.persistence.*;
+
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -244,7 +246,7 @@ public class User extends DBEntity {
         String hql = "Select user_id, group_id FROM rprj_users_groups"
                     + " where user_id = '" + this.id + "'"
                     + "   and group_id = '" + this.group_id + "'";
-        List<DBEntity> results = dbMgr.db_query(hql);
+        List<DBEntity> results = dbMgr.db_query(hql, new HashMap<String,Object>(), Object.class,false);
         if(results.size()==0) {
             //System.out.println("insert into rprj_users_groups values ('" + this.id + "','" + this.group_id + "')");
             dbMgr.db_execute(

@@ -536,12 +536,12 @@ public class CoreTest extends TestCase {
         if(log2==null)
             fail("Unable to create log entry");
 
-        try {
-            objMgr.delete(log);
-            objMgr.delete(log2);
-        } catch (DBException e) {
-            e.printStackTrace();
-        }
+//        try {
+//            objMgr.delete(log);
+//            objMgr.delete(log2);
+//        } catch (DBException e) {
+//            e.printStackTrace();
+//        }
     }
 
     // ./mvnw -Dtest=CoreTest#testObject test
@@ -586,6 +586,8 @@ public class CoreTest extends TestCase {
             objMgr.setUserGroupsList(testUser.getGroups());
 
             List<DBEntity> res = objMgr.search(new DBENote());
+            System.out.println("initial_objects_count: "+initial_objects_count);
+            System.out.println("object_names.length: "+object_names.length);
             System.out.println("res: "+res.size());
             if((res.size()-initial_objects_count)!=object_names.length) fail("Error with privileges");
             res.stream().forEach((dbe) -> System.out.println(" " + dbe));
