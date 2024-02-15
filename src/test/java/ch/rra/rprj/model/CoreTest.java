@@ -17,9 +17,16 @@ public class CoreTest extends TestCase {
     protected void setUp() throws Exception {
         Properties props = new Properties();
         props.load(getClass().getResourceAsStream("/application.properties"));
-//        for(String k : props.stringPropertyNames()) {
-//            log.info(k + ": " + props.getProperty(k));
-//        }
+        try {
+            props.load(getClass().getResourceAsStream("/local.properties"));
+        } catch(java.io.IOException ioe) {
+            ioe.printStackTrace();
+        } catch(NullPointerException npe) {
+            npe.printStackTrace();
+        }
+        for(String k : props.stringPropertyNames()) {
+            log.info(k + ": " + props.getProperty(k));
+        }
 
         DBConnectionProvider conn = null;
         switch (props.getProperty("db.conn.provider")) {
