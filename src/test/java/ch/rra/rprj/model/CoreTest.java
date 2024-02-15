@@ -7,10 +7,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Properties;
-import java.util.Vector;
+import java.util.*;
 
 public class CoreTest extends TestCase {
     private static final Logger log = LogManager.getLogger(CoreTest.class);
@@ -20,9 +17,9 @@ public class CoreTest extends TestCase {
     protected void setUp() throws Exception {
         Properties props = new Properties();
         props.load(getClass().getResourceAsStream("/application.properties"));
-        for(String k : props.stringPropertyNames()) {
-            log.info(k + ": " + props.getProperty(k));
-        }
+//        for(String k : props.stringPropertyNames()) {
+//            log.info(k + ": " + props.getProperty(k));
+//        }
 
         DBConnectionProvider conn = null;
         switch (props.getProperty("db.conn.provider")) {
@@ -42,6 +39,7 @@ public class CoreTest extends TestCase {
         objMgr.tearDown();
     }
 
+    // ./mvnw -Dtest=CoreTest#testGenerator test
     public void testGenerator() {
         IdGenerator gen = new IdGenerator();
         String myid = gen.generateMyId();
@@ -68,7 +66,7 @@ public class CoreTest extends TestCase {
             user = (User) objMgr.insert(user);
             System.out.println("User: " + user.toString());
             ((HDBConnection) objMgr.getConn()).listGroups();
-            users_groups = objMgr.db_query("SELECT user_id, group_id FROM rprj_users_groups where user_id='" + user.getId() + "'");
+            users_groups = objMgr.db_query("SELECT user_id, group_id FROM rprj_users_groups where user_id='" + user.getId() + "'",new HashMap<String,Object>(), DBEntity.class,false);
             ((HDBConnection) objMgr.getConn()).printObjectList(users_groups);
             if (users_groups.size() != 2) fail("Not all associations created");
 
