@@ -95,18 +95,7 @@ public class ObjectMgr extends DBMgr {
 
         // Mark object as deleted
         dbe.beforeDelete(this);
-        Session session = sessionFactory.openSession();
-        Transaction tx = session.beginTransaction();
-        try {
-            session.update(dbe);
-            tx.commit();
-        } catch (HibernateException he) {
-            if(tx!=null) tx.rollback();
-            he.printStackTrace();
-            return null;
-        } finally {
-            session.close();
-        }
+        this.update(dbe);
         dbe.afterDelete(this);
         return dbe;
     }

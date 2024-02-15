@@ -83,28 +83,22 @@ public class Group extends DBEntity {
 
     @Override
     public void beforeInsert(DBMgr dbMgr) throws DBException {
-        SessionFactory sessionFactory = dbMgr.getSessionFactory();
-        Session session = sessionFactory.openSession();
-        Transaction tx = session.beginTransaction();
-
         // Check that name is unique
-        boolean uniqueName = this.checkUniqueName(session);
+        Group search = new Group();
+        search.setName(this.getName());
+        List<DBEntity> res = dbMgr.search(search,false,null);
+        boolean uniqueName = res.size()==0;
         //System.out.println("Check uniqueName:\t" + uniqueName);
 
         if (!uniqueName) {
             //throw new DBException("Name '" + this.name + "' not unique!");
             // Delete duplicates
             /**/
-            Query query = session.createQuery("FROM Group where name = :name");
-            query.setParameter("name", this.name);
-            List<Group> results2 = (List<Group>) query.list();
-            for (Group u1 : results2) {
-                session.delete(u1);
+            for (DBEntity u1 : res) {
+                dbMgr.delete(u1);
             }
              /**/
         }
-        tx.commit();
-        session.close();
     }
 
     @Override
@@ -119,11 +113,4 @@ public class Group extends DBEntity {
         //System.out.println("Group.afterDelete: end.");
     }
 
-    private boolean checkUniqueName(Session session) {
-        Query query = session.createQuery(
-                "Select COUNT(*), U.name FROM Group U where name = :name " +
-                "GROUP BY U.name");
-        query.setParameter("name", this.name);
-        return query.list().size() == 0;
-    }
 }

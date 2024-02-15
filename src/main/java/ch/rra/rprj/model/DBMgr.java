@@ -1,142 +1,61 @@
 package ch.rra.rprj.model;
 
 import ch.rra.rprj.model.core.*;
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.EntityTransaction;
-import org.hibernate.*;
-import org.hibernate.boot.Metadata;
-import org.hibernate.boot.MetadataSources;
-import org.hibernate.boot.registry.StandardServiceRegistry;
-import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
-import org.hibernate.query.NativeQuery;
-import org.hibernate.query.Query;
-import org.hibernate.Transaction;
-import org.hibernate.query.QueryProducer;
-import org.hibernate.query.SelectionQuery;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import jakarta.persistence.EntityNotFoundException;
 import java.sql.Date;
 import java.sql.Time;
 import java.util.*;
 
 public class DBMgr {
-    protected SessionFactory sessionFactory;
-    protected StandardServiceRegistry registry;
 
-    private Logger logger;
+    protected DBConnectionProvider conn;
+
+    public DBConnectionProvider getConn() {
+        return conn;
+    }
+
+    public void setConn(DBConnectionProvider conn) {
+        this.conn = conn;
+    }
+
+    private Logger log;
 
     private User dbeUser;
     private Set<Group> user_groups_list;
 
-    public DBMgr() { logger = LoggerFactory.getLogger(getClass()); }
+    public DBMgr() { log = LoggerFactory.getLogger(getClass()); }
 
     public boolean setUp() throws Exception {
 
         // Customize here.
         // See: https://www.digitalocean.com/community/tutorials/hibernate-tutorial-for-beginners
         Properties props = new Properties();
+//        try {
+            props.load(getClass().getResourceAsStream("/application.properties"));
+//            log.debug("Project.getPropertiesFromFile: properties=${properties.size()}")
+//            return properties
+//        } catch(e) {
+//            log.error("Project.getPropertiesFromFile: Error to read project properties file '${fileurl}'!");
+//            log.error("Project.getPropertiesFromFile: $e");
+////            return null
+//        }
         //props.put("hibernate.connection.driver_class", "org.mariadb.jdbc.Driver");
 //        props.put("hibernate.connection.url", "jdbc:mariadb://127.0.0.1:3306/rproject?zeroDateTimeBehavior=convertToNull");
 //        props.put("hibernate.connection.username", "root");
         //props.put("hibernate.connection.password", "pankaj123");
         //props.put("hibernate.current_session_context_class", "thread");
 
-        registry = new StandardServiceRegistryBuilder()
-                .configure()
-                .applySettings(props)
-                .build();
-        try {
-//            sessionFactory = new MetadataSources(registry).buildMetadata().buildSessionFactory();
-
-            // Create MetadataSources
-            MetadataSources sources = new MetadataSources(registry);
-
-            // Create Metadata
-            Metadata metadata = sources.getMetadataBuilder().build();
-
-            // Create SessionFactory
-            sessionFactory = metadata.getSessionFactoryBuilder().build();
-
-            return true;
-        } catch(Exception e) {
-            System.out.println("**************************");
-            System.out.println(e.getMessage());
-            e.printStackTrace();
-            StandardServiceRegistryBuilder.destroy(registry);
-            return false;
-        }
-
+        conn.connect();
+        return true;
     }
 
     public void tearDown() throws Exception {
-        if(sessionFactory!=null) {
-            sessionFactory.close();
-        }
-        if (registry != null) {
-            StandardServiceRegistryBuilder.destroy(registry);
-        }
+        conn.disconnect();
     }
 
-    public SessionFactory getSessionFactory() { return sessionFactory; }
 
-    public int listUsers() {
-        Session session = sessionFactory.openSession();
-        SelectionQuery query = session.createSelectionQuery("FROM User");
-        List<User> users = (List<User>) query.list();
-        for(User u : users) {
-            System.out.println(u.toString());
-        }
-        System.out.println("Users: " + users.size());
-        System.out.println();
-        session.close();
-        return users.size();
-    }
-    public int listGroups() {
-        Session session = sessionFactory.openSession();
-        SelectionQuery query = session.createSelectionQuery("FROM Group");
-        List<Group> dbes = (List<Group>) query.list();
-        for(Group dbe : dbes) {
-            System.out.println(dbe.toString());
-        }
-        System.out.println("Groups: " + dbes.size());
-        System.out.println();
-        session.close();
-        return dbes.size();
-    }
-    public int listUsersGroups() {
-        List objs = this.db_query("SELECT user_id, group_id FROM rprj_users_groups");
-        printObjectList(objs);
-        System.out.println("Objects: " + objs.size());
-        System.out.println();
-        return objs.size();
-    }
-    public void printObjectList(List objects) {
-        try {
-            for(Object[] obj : (List<Object[]>) objects) {
-                System.out.print("Object:");
-                for (Object o : obj) {
-                    System.out.print(" " + o);
-                }
-                System.out.println();
-            }
-        } catch (ClassCastException cce) {
-            try {
-                for (HashMap hm : (List<HashMap>) objects) {
-                    System.out.print("hm>");
-                    for(Object k : hm.keySet()) {
-                        System.out.print(" " + k + ": " + hm.get(k));
-                    }
-                    System.out.println();
-                }
-            } catch(ClassCastException cce2) {
-                for (Object obj : objects) {
-                    System.out.println("obj> " + obj);
-                }
-            }
-        }
-    }
 
 
     public User getDbeUser() { return dbeUser; }
@@ -158,7 +77,7 @@ public class DBMgr {
 
         if(res.size()==1) {
             user = (User) res.get(0);
-            logger.info("groups: " + user.getGroups());
+            log.info("groups: " + user.getGroups());
         }
         this.setDbeUser(user);
         this.setUserGroupsList(user==null ? null : user.getGroups());
@@ -173,131 +92,26 @@ public class DBMgr {
         return ret;
     }
 
-    public boolean db_execute(String sql) {
-        Session session = sessionFactory.openSession();
-        Transaction tx = session.beginTransaction();
-        EntityManager em =null;
-        EntityTransaction etx = null;
-        try {
-//            int res = session.createMutationQuery(sql).executeUpdate();
-            em = session.getEntityManagerFactory().createEntityManager();
-            etx = em.getTransaction();
-            etx.begin();
-            int res = em.createNativeQuery(sql).executeUpdate();
-//            int res = session.createNativeQuery(sql).executeUpdate();
-            etx.commit();
-            logger.debug("DBMgr.db_execute: res="+res);
-            tx.commit();
-        } catch (HibernateException he) {
-            if(etx!=null) etx.rollback();
-            if(tx!=null) tx.rollback();
-            he.printStackTrace();
-            return false;
-        } finally {
-            session.close();
-        }
-        return true;
-    }
+    public boolean db_execute(String sql) { return conn.db_execute(sql); }
     public List<DBEntity> db_query(String sql) {
-        return db_query(sql, new HashMap<>(), null, false);
+        return conn.db_query(sql, new HashMap<>(), null, false);
     }
     public List<DBEntity> db_query(String sql, HashMap<String,Object> hm, Class klass, boolean initializeLazyObjects) {
-        logger.debug("db_query: sql="+sql);
-        logger.debug("db_query: hm="+hm);
-        logger.debug("db_query: klass="+klass);
-        Session session = sessionFactory.openSession();
-        NativeQuery q = session.createNativeQuery(sql);
-        if(klass!=null) q.addEntity(klass);
-        if(hm!=null) {
-            for (String k : hm.keySet()) {
-                //logger.debug(k + ": " + hm.get(k) + " " + (hm.get(k)).getClass().getName());
-                q.setParameter(k, hm.get(k));
-            }
-        }
-        List<DBEntity> dbes = q.getResultList();
-        // This to force the load of lazy objects :-(
-        if(initializeLazyObjects)
-            dbes.stream().forEach(Object::toString);
-        session.close();
-        return dbes;
+        return conn.db_query(sql, hm, klass, initializeLazyObjects);
     }
 
-    public DBEntity refresh(DBEntity dbe) throws DBException {
-        Session session = sessionFactory.openSession();
-        try {
-            session.refresh(dbe);
-        } catch (HibernateException he) {
-            //he.printStackTrace();
-            return null;
-        } catch(EntityNotFoundException enfex) {
-            // RRA: maybe because has already been refreshed in memory by the previous passage?
-            // RRA: so i'll ignore it
-            //enfex.printStackTrace();
-            //return null;
-        } finally {
-            session.close();
-        }
-        return dbe;
-    }
-    public DBEntity insert(DBEntity dbe) throws DBException {
-        dbe.beforeInsert(this);
-        Session session = sessionFactory.openSession();
-        Transaction tx = session.beginTransaction();
-        try {
-            session.persist(dbe); // .save(dbe)
-            tx.commit();
-        } catch (HibernateException he) {
-            if(tx!=null) tx.rollback();
-            he.printStackTrace();
-            return null;
-        } finally {
-            session.close();
-        }
-        dbe.afterInsert(this);
-        return dbe;
-    }
-    public DBEntity update(DBEntity dbe) throws DBException {
-        dbe.beforeUpdate(this);
-        Session session = sessionFactory.openSession();
-        Transaction tx = session.beginTransaction();
-        try {
-            session.merge(dbe); //.update(dbe);
-            tx.commit();
-        } catch (HibernateException he) {
-            if(tx!=null) tx.rollback();
-            he.printStackTrace();
-            return null;
-        } finally {
-            session.close();
-        }
-        dbe.afterUpdate(this);
-        return dbe;
-    }
-    public DBEntity delete(DBEntity dbe) throws DBException {
-        dbe.beforeDelete(this);
-        Session session = sessionFactory.openSession();
-        Transaction tx = session.beginTransaction();
-        try {
-            session.remove(dbe); //.delete(dbe);
-            tx.commit();
-        } catch (HibernateException he) {
-            if(tx!=null) tx.rollback();
-            he.printStackTrace();
-            return null;
-        } finally {
-            session.close();
-        }
-        dbe.afterDelete(this);
-        return dbe;
-    }
+    public DBEntity refresh(DBEntity dbe) throws DBException { return conn.refresh(dbe); }
+    public DBEntity insert(DBEntity dbe) throws DBException { return conn.insert(dbe, this); }
+    public DBEntity update(DBEntity dbe) throws DBException { return conn.update(dbe, this); }
+    public DBEntity delete(DBEntity dbe) throws DBException { return conn.delete(dbe, this); }
 
     public List<DBEntity> search(DBEntity search) { return search(search, true, null); }
     public List<DBEntity> search(DBEntity search, boolean uselike, String orderby) {
         // tablename
         String entityname = search.getClass().getSimpleName();
         String tablename = search.getTableName();
-        logger.debug("entityname: " + entityname);
-        logger.debug("tablename: " + tablename);
+        log.debug("entityname: " + entityname);
+        log.debug("tablename: " + tablename);
 
         // Columns
         HashMap<String,Object> hashMap = new HashMap<>();

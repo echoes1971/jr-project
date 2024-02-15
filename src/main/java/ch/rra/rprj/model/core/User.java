@@ -143,28 +143,20 @@ public class User extends DBEntity {
 
     @Override
     public void beforeInsert(DBMgr dbMgr) throws DBException {
-        SessionFactory sessionFactory = dbMgr.getSessionFactory();
-        Session session = sessionFactory.openSession();
-        Transaction tx = session.beginTransaction();
-
         // Check that login name is unique
-        boolean uniqueLogin = this._checkUniqueLogin(session);
+        User search = new User();
+        search.setLogin(this.getLogin());
+        List<DBEntity> results = dbMgr.search(search, false, null);
+        boolean uniqueLogin = results.size()==0;
 
         // TODO NO! Throw an exception here!!!
         if(!uniqueLogin) {
             //throw new DBException("Login '" + this.login + "' not unique!");
             // Delete duplicates
-            /**/
-            Query query = session.createQuery("FROM User U where login = :login");
-            query.setParameter("login", this.login);
-            List<User> results2 = (List<User>) query.list();
-            for(User u1 : results2) {
-                session.delete(u1);
+            for(DBEntity u1 : results) {
+                dbMgr.delete(u1);
             }
-             /**/
         }
-        tx.commit();
-        session.close();
     }
 
     @Override
@@ -259,14 +251,4 @@ public class User extends DBEntity {
                     "insert into rprj_users_groups values ('" + this.id + "','" + this.group_id + "')");
         }
     }
-    private boolean _checkUniqueLogin(Session session) {
-        String hql = "Select COUNT(*), U.login FROM User U where login = :login " +
-                "GROUP BY U.login";
-        Query query = session.createQuery(hql);
-        query.setParameter("login", this.login);
-        List results = query.list();
-
-        return results.size() == 0;
-    }
-
 }
