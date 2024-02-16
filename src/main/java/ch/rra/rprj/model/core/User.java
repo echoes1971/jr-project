@@ -196,13 +196,13 @@ public class User extends DBEntity {
         // TODO move this in the beforeDelete?
         // Delete the private group of the user
         boolean foundPvtGrp = false;
-        for(Group g : this.getGroups()) {
-            if(g.getName().equals(this.getLogin())) { // && g.getUsers().size()==1)
-                dbMgr.delete(g);
-                foundPvtGrp = true;
-                break;
-            }
-        }
+//        for(Group g : this.getGroups()) {
+//            if(g.getName().equals(this.getLogin())) { // && g.getUsers().size()==1)
+//                dbMgr.delete(g);
+//                foundPvtGrp = true;
+//                break;
+//            }
+//        }
         if(!foundPvtGrp) {
             // TODO this is way too dangerous
             dbMgr.db_execute(

@@ -157,6 +157,8 @@ public class DBMgr {
     }
 
     public DBELog log(String ip, String note, String note2) {
+//        connect();
+
         Date date = new Date(new java.util.Date().getTime());
         Time hour = new Time(new java.util.Date().getTime());
         //System.out.println("Date: " + date);
@@ -168,15 +170,17 @@ public class DBMgr {
         search.setData(date);
         List<DBEntity> res = this.search(search, false, null);
 
+
         DBELog ret = new DBELog();
         ret.setIp(ip);
         ret.setData(date);
         ret.setOra(hour);
-        if(res.size()==0) {
+        if(res.isEmpty()) {
             DBELog search2 = new DBELog();
             search2.setIp(ip);
             List<DBEntity> res2 = this.search(search2, false, "url desc");
-            if(res2.size()>0) {
+            if(!res2.isEmpty()) {
+                log.info("res2[0]="+res2.get(0).toString());
                 ret.setUrl(((DBELog)res2.get(0)).getUrl());
             }
             ret.setCount(1);
@@ -185,6 +189,7 @@ public class DBMgr {
             try {
                 ret = (DBELog) this.insert(ret);
             } catch (DBException e) {
+                log.error(dbeUser.toString());
                 e.printStackTrace();
                 ret = null;
             }
@@ -205,6 +210,7 @@ public class DBMgr {
                 ret = null;
             }
         }
+//        disconnect();
         return ret;
     }
 

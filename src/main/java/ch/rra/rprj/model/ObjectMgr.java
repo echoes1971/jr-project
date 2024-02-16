@@ -200,7 +200,7 @@ public class ObjectMgr extends DBMgr {
 
         HashMap<String,Object> hm = new HashMap<>();
         hm.put("id", id);
-        List res = this.db_query(sql,hm,null,false);
+        List res = this.db_query(sql,hm,Object.class,false);
         Object[] values = (Object[]) res.get(0);
 
         Class myclass = typesWithId.stream().filter(k -> k.getSimpleName().equals(values[0])).collect(Collectors.toList()).get(0);

@@ -54,9 +54,9 @@ public class CoreTest extends TestCase {
     }
 
     public void testUsers() {
-        int initial_users = ((HDBConnection) objMgr.getConn()).listUsers();
-        int initial_groups = ((HDBConnection) objMgr.getConn()).listGroups();
-        int initial_usersgroups = ((HDBConnection) objMgr.getConn()).listUsersGroups();
+        int initial_users = _listUsers();
+        int initial_groups = _listGroups();
+        int initial_usersgroups = _listUsersGroups();
 
         int current_users = initial_users;
         int current_groups = initial_groups;
@@ -72,22 +72,24 @@ public class CoreTest extends TestCase {
         try {
             user = (User) objMgr.insert(user);
             System.out.println("User: " + user.toString());
-            ((HDBConnection) objMgr.getConn()).listGroups();
-            users_groups = objMgr.db_query("SELECT user_id, group_id FROM rprj_users_groups where user_id='" + user.getId() + "'",new HashMap<String,Object>(), DBEntity.class,false);
-            ((HDBConnection) objMgr.getConn()).printObjectList(users_groups);
+            _listGroups();
+
+            users_groups = objMgr.db_query("SELECT user_id, group_id FROM rprj_users_groups where user_id='" + user.getId() + "'",new HashMap<String,Object>(), Object.class,false);
+            _printObjectList(users_groups);
+
             if (users_groups.size() != 2) fail("Not all associations created");
 
             System.out.println("**** Test Read");
-            ((HDBConnection) objMgr.getConn()).listUsers();
-            ((HDBConnection) objMgr.getConn()).listGroups();
-            ((HDBConnection) objMgr.getConn()).listUsersGroups();
+            _listUsers();
+            _listGroups();
+            _listUsersGroups();
 
             if (false) {
                 System.out.println("**** Test Update");
                 user.setFullname("Mr.Echoes");
                 user = (User) objMgr.update(user);
                 System.out.println("User: " + user.toString());
-                ((HDBConnection) objMgr.getConn()).listUsers();
+                _listUsers();
             }
 
             user = (User) objMgr.refresh(user);
@@ -97,16 +99,16 @@ public class CoreTest extends TestCase {
             user = (User) objMgr.delete(user);
             System.out.println("Deleted user: " + user.toString());
             System.out.println();
-            ((HDBConnection) objMgr.getConn()).listUsers();
-            ((HDBConnection) objMgr.getConn()).listGroups();
-            users_groups = objMgr.db_query("SELECT user_id, group_id FROM rprj_users_groups where user_id='" + user.getId() + "'");
-            ((HDBConnection) objMgr.getConn()).printObjectList(users_groups);
+            _listUsers();
+            _listGroups();
+            users_groups = objMgr.db_query("SELECT user_id, group_id FROM rprj_users_groups where user_id='" + user.getId() + "'",new HashMap<String,Object>(), Object.class,false);
+            _printObjectList(users_groups);
             if (users_groups.size() != 0) {
                 objMgr.db_execute("delete FROM rprj_users_groups where user_id='" + user.getId() + "'");
                 fail("Not all associations were deleted");
             }
-            groups = objMgr.db_query("SELECT id, name, description FROM rprj_groups where name='" + user.getLogin() + "'");
-            ((HDBConnection) objMgr.getConn()).printObjectList(groups);
+            groups = objMgr.db_query("SELECT id, name, description FROM rprj_groups where name='" + user.getLogin() + "'",new HashMap<String,Object>(), Object.class,false);
+            _printObjectList(groups);
             if (groups.size() != 0) {
                 objMgr.db_execute("delete FROM rprj_groups where name='" + user.getLogin() + "'");
                 fail("Not all groups were deleted");
@@ -115,9 +117,9 @@ public class CoreTest extends TestCase {
             dbex.printStackTrace();
         }
 
-        current_users = ((HDBConnection) objMgr.getConn()).listUsers();
-        current_groups = ((HDBConnection) objMgr.getConn()).listGroups();
-        current_usersgroups = ((HDBConnection) objMgr.getConn()).listUsersGroups();
+        current_users = _listUsers();
+        current_groups = _listGroups();
+        current_usersgroups = _listUsersGroups();
         System.out.println("Users:\t\t" + initial_users + " => " + current_users);
         System.out.println("Groups:\t\t" + initial_groups + " => " + current_groups);
         System.out.println("UsersGroups:\t" + initial_usersgroups + " => " + current_usersgroups);
@@ -128,9 +130,9 @@ public class CoreTest extends TestCase {
     }
 
     public void testManyToMany2() {
-        int initial_users = ((HDBConnection) objMgr.getConn()).listUsers();
-        int initial_groups = ((HDBConnection) objMgr.getConn()).listGroups();
-        int initial_usersgroups = ((HDBConnection) objMgr.getConn()).listUsersGroups();
+        int initial_users = _listUsers();
+        int initial_groups = _listGroups();
+        int initial_usersgroups = _listUsersGroups();
 
         int current_users = initial_users;
         int current_groups = initial_groups;
@@ -166,9 +168,9 @@ public class CoreTest extends TestCase {
         }
 
         System.out.println("**** Test Read");
-        ((HDBConnection) objMgr.getConn()).listUsers();
-        ((HDBConnection) objMgr.getConn()).listGroups();
-        ((HDBConnection) objMgr.getConn()).listUsersGroups();
+        _listUsers();
+        _listGroups();
+        _listUsersGroups();
 
         try {
             user = (User) objMgr.refresh(user);
@@ -184,7 +186,7 @@ public class CoreTest extends TestCase {
             dbex.printStackTrace();
         }
         users_groups = objMgr.db_query("SELECT user_id, group_id FROM rprj_users_groups");
-        ((HDBConnection) objMgr.getConn()).printObjectList(users_groups);
+        _printObjectList(users_groups);
         System.out.println("===============================");
         /**/
         try {
@@ -194,11 +196,11 @@ public class CoreTest extends TestCase {
         }
         /**/
         users_groups = objMgr.db_query("SELECT user_id, group_id FROM rprj_users_groups");
-        ((HDBConnection) objMgr.getConn()).printObjectList(users_groups);
+        _printObjectList(users_groups);
 
-        current_users = ((HDBConnection) objMgr.getConn()).listUsers();
-        current_groups = ((HDBConnection) objMgr.getConn()).listGroups();
-        current_usersgroups = ((HDBConnection) objMgr.getConn()).listUsersGroups();
+        current_users = _listUsers();
+        current_groups = _listGroups();
+        current_usersgroups = _listUsersGroups();
         System.out.println("Users:\t\t" + initial_users + " => " + current_users);
         System.out.println("Groups:\t\t" + initial_groups + " => " + current_groups);
         System.out.println("UsersGroups:\t" + initial_usersgroups + " => " + current_usersgroups);
@@ -209,9 +211,9 @@ public class CoreTest extends TestCase {
     }
 
     public void testGroups() {
-        int initial_users = ((HDBConnection) objMgr.getConn()).listUsers();
-        int initial_groups = ((HDBConnection) objMgr.getConn()).listGroups();
-        int initial_usersgroups = ((HDBConnection) objMgr.getConn()).listUsersGroups();
+        int initial_users = _listUsers();
+        int initial_groups = _listGroups();
+        int initial_usersgroups = _listUsersGroups();
 
         int current_users = initial_users;
         int current_groups = initial_groups;
@@ -227,25 +229,25 @@ public class CoreTest extends TestCase {
             System.out.println("Group: " + group.toString());
 
             System.out.println("**** Test Read");
-            ((HDBConnection) objMgr.getConn()).listGroups();
+            _listGroups();
 
             System.out.println("**** Test Update");
             group.setDescription("Mr.Echoes");
             group = (Group) objMgr.update(group);
             System.out.println("Group: " + group.toString());
-            ((HDBConnection) objMgr.getConn()).listGroups();
+            _listGroups();
 
             System.out.println("**** Test Delete");
             group = (Group) objMgr.delete(group);
             System.out.println("Group: " + group.toString());
-            ((HDBConnection) objMgr.getConn()).listGroups();
+            _listGroups();
         } catch (DBException dbex) {
             dbex.printStackTrace();
         }
 
-        current_users = ((HDBConnection) objMgr.getConn()).listUsers();
-        current_groups = ((HDBConnection) objMgr.getConn()).listGroups();
-        current_usersgroups = ((HDBConnection) objMgr.getConn()).listUsersGroups();
+        current_users = _listUsers();
+        current_groups = _listGroups();
+        current_usersgroups = _listUsersGroups();
         System.out.println("Users:\t\t" + initial_users + " => " + current_users);
         System.out.println("Groups:\t\t" + initial_groups + " => " + current_groups);
         System.out.println("UsersGroups:\t" + initial_usersgroups + " => " + current_usersgroups);
@@ -257,9 +259,9 @@ public class CoreTest extends TestCase {
 
     // ./mvnw -Dtest=CoreTest#testUserGroup test
     public void testUserGroup() {
-        int initial_users = ((HDBConnection) objMgr.getConn()).listUsers();
-        int initial_groups = ((HDBConnection) objMgr.getConn()).listGroups();
-        int initial_usersgroups = ((HDBConnection) objMgr.getConn()).listUsersGroups();
+        int initial_users = _listUsers();
+        int initial_groups = _listGroups();
+        int initial_usersgroups = _listUsersGroups();
 
         int current_users = initial_users;
         int current_groups = initial_groups;
@@ -278,9 +280,9 @@ public class CoreTest extends TestCase {
         Vector<User> testUsers = _createTestUsers(user_names);
         Vector<Group> testGroups = _createTestGroups(group_names);
 
-        current_users = ((HDBConnection) objMgr.getConn()).listUsers();
-        current_groups = ((HDBConnection) objMgr.getConn()).listGroups();
-        current_usersgroups = ((HDBConnection) objMgr.getConn()).listUsersGroups();
+        current_users = _listUsers();
+        current_groups = _listGroups();
+        current_usersgroups = _listUsersGroups();
         System.out.println("Users:\t\t" + initial_users + " => " + current_users);
         System.out.println("Groups:\t\t" + initial_groups + " => " + current_groups);
         System.out.println("UsersGroups:\t" + initial_usersgroups + " => " + current_usersgroups);
@@ -320,9 +322,9 @@ public class CoreTest extends TestCase {
                     users2.add(u);
                 skip++;
             }
-            current_users = ((HDBConnection) objMgr.getConn()).listUsers();
-            current_groups = ((HDBConnection) objMgr.getConn()).listGroups();
-            current_usersgroups = ((HDBConnection) objMgr.getConn()).listUsersGroups();
+            current_users = _listUsers();
+            current_groups = _listGroups();
+            current_usersgroups = _listUsersGroups();
             System.out.println("Users:\t\t" + initial_users + " => " + current_users);
             System.out.println("Groups:\t\t" + initial_groups + " => " + current_groups);
             System.out.println("UsersGroups:\t" + initial_usersgroups + " => " + current_usersgroups);
@@ -334,18 +336,18 @@ public class CoreTest extends TestCase {
 
         // Delete users and groups
         _deleteTestUsers(users2);
-        current_users = ((HDBConnection) objMgr.getConn()).listUsers();
-        current_groups = ((HDBConnection) objMgr.getConn()).listGroups();
-        current_usersgroups = ((HDBConnection) objMgr.getConn()).listUsersGroups();
+        current_users = _listUsers();
+        current_groups = _listGroups();
+        current_usersgroups = _listUsersGroups();
         System.out.println("Users:\t\t" + initial_users + " => " + current_users);
         System.out.println("Groups:\t\t" + initial_groups + " => " + current_groups);
         System.out.println("UsersGroups:\t" + initial_usersgroups + " => " + current_usersgroups);
         System.out.println("==============================================================");
 
         _deleteTestGroups(testGroups);
-        current_users = ((HDBConnection) objMgr.getConn()).listUsers();
-        current_groups = ((HDBConnection) objMgr.getConn()).listGroups();
-        current_usersgroups = ((HDBConnection) objMgr.getConn()).listUsersGroups();
+        current_users = _listUsers();
+        current_groups = _listGroups();
+        current_usersgroups = _listUsersGroups();
         System.out.println("Users:\t\t" + initial_users + " => " + current_users);
         System.out.println("Groups:\t\t" + initial_groups + " => " + current_groups);
         System.out.println("UsersGroups:\t" + initial_usersgroups + " => " + current_usersgroups);
@@ -411,9 +413,9 @@ public class CoreTest extends TestCase {
 
     // ./mvnw -Dtest=CoreTest#testLogin test
     public void testLogin() {
-        int initial_users = ((HDBConnection) objMgr.getConn()).listUsers();
-        int initial_groups = ((HDBConnection) objMgr.getConn()).listGroups();
-        int initial_usersgroups = ((HDBConnection) objMgr.getConn()).listUsersGroups();
+        int initial_users = _listUsers();
+        int initial_groups = _listGroups();
+        int initial_usersgroups = _listUsersGroups();
 
         int current_users = initial_users;
         int current_groups = initial_groups;
@@ -424,6 +426,11 @@ public class CoreTest extends TestCase {
         // Create test users
         String[] user_names = {"user01", "user02"};
         Vector<User> testUsers = _createTestUsers(user_names);
+        System.out.println("");
+        System.out.println("** Current:");
+        _listUsers();
+        _listGroups();
+        _listUsersGroups();
 
         User myuser;
         System.out.println("* Loggin existing user...");
@@ -441,9 +448,9 @@ public class CoreTest extends TestCase {
 
         // Delete test users
         _deleteTestUsers(testUsers);
-        current_users = ((HDBConnection) objMgr.getConn()).listUsers();
-        current_groups = ((HDBConnection) objMgr.getConn()).listGroups();
-        current_usersgroups = ((HDBConnection) objMgr.getConn()).listUsersGroups();
+        current_users = _listUsers();
+        current_groups = _listGroups();
+        current_usersgroups = _listUsersGroups();
         System.out.println("Users:\t\t" + initial_users + " => " + current_users);
         System.out.println("Groups:\t\t" + initial_groups + " => " + current_groups);
         System.out.println("UsersGroups:\t" + initial_usersgroups + " => " + current_usersgroups);
@@ -453,6 +460,66 @@ public class CoreTest extends TestCase {
             fail("Not all rows deleted!!!!");
         }
 
+    }
+
+    public void testListUsers() {
+        int ret = _listUsers();
+        log.info("ret: "+ret);
+        ret = _listGroups();
+        log.info("ret: "+ret);
+        ret = _listUsersGroups();
+        log.info("ret: "+ret);
+    }
+
+    private int _listUsers() {
+        List<DBEntity> users = objMgr.search(new User());
+        for(DBEntity u : users) {
+            System.out.println(u.toString());
+        }
+        System.out.println("Users: " + users.size());
+        System.out.println();
+        return users.size();
+    }
+    private int _listGroups() {
+        List<DBEntity> users = objMgr.search(new Group());
+        for(DBEntity u : users) {
+            System.out.println(u.toString());
+        }
+        System.out.println("Groups: " + users.size());
+        System.out.println();
+        return users.size();
+    }
+    private int _listUsersGroups() {
+        List objs = objMgr.db_query("SELECT user_id, group_id FROM rprj_users_groups", new HashMap<String,Object>(), Object.class,false);
+        _printObjectList(objs);
+        System.out.println("Objects: " + objs.size());
+        System.out.println();
+        return objs.size();
+    }
+    private void _printObjectList(List objects) {
+        try {
+            for(Object[] obj : (List<Object[]>) objects) {
+                System.out.print("Object:");
+                for (Object o : obj) {
+                    System.out.print(" " + o);
+                }
+                System.out.println();
+            }
+        } catch (ClassCastException cce) {
+            try {
+                for (HashMap hm : (List<HashMap>) objects) {
+                    System.out.print("hm>");
+                    for(Object k : hm.keySet()) {
+                        System.out.print(" " + k + ": " + hm.get(k));
+                    }
+                    System.out.println();
+                }
+            } catch(ClassCastException cce2) {
+                for (Object obj : objects) {
+                    System.out.println("obj> " + obj);
+                }
+            }
+        }
     }
 
     private Vector<Group> _createTestGroups(String[] group_names) {
@@ -541,12 +608,12 @@ public class CoreTest extends TestCase {
         if(log2==null)
             fail("Unable to create log entry");
 
-//        try {
-//            objMgr.delete(log);
-//            objMgr.delete(log2);
-//        } catch (DBException e) {
-//            e.printStackTrace();
-//        }
+        try {
+            objMgr.delete(log);
+            objMgr.delete(log2);
+        } catch (DBException e) {
+            e.printStackTrace();
+        }
     }
 
     // ./mvnw -Dtest=CoreTest#testObject test

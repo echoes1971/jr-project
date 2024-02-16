@@ -3,11 +3,7 @@ package ch.rra.rprj.model;
 import ch.rra.rprj.model.core.DBEntity;
 import ch.rra.rprj.model.core.Group;
 import ch.rra.rprj.model.core.User;
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.EntityNotFoundException;
-import jakarta.persistence.EntityTransaction;
-import jakarta.persistence.PersistenceException;
-import jakarta.persistence.Query;
+import jakarta.persistence.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.hibernate.HibernateException;
@@ -20,6 +16,7 @@ import org.hibernate.boot.registry.StandardServiceRegistry;
 import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
 import org.hibernate.query.NativeQuery;
 import org.hibernate.query.SelectionQuery;
+import org.hibernate.resource.transaction.spi.TransactionStatus;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -28,6 +25,10 @@ import java.util.Properties;
 
 /**
  * Hibernate DB Connection
+ *
+ * See:
+ *  https://thorben-janssen.com/flushmode-in-jpa-and-hibernate/
+ *
  */
 public class HDBConnection extends DBConnectionProvider {
     private static final Logger log = LogManager.getLogger(HDBConnection.class);
@@ -36,10 +37,9 @@ public class HDBConnection extends DBConnectionProvider {
     protected StandardServiceRegistry registry;
 
     private Session session;
-//    private Transaction tx;
 
-    EntityManager em;
-    EntityTransaction etx;
+    private EntityManager em;
+    private EntityTransaction etx;
 
     public SessionFactory getSessionFactory() { return sessionFactory; }
 
@@ -80,8 +80,10 @@ public class HDBConnection extends DBConnectionProvider {
             return false;
         }
 
-        if(session==null) session = sessionFactory.openSession();
-//        if(tx==null) tx = session.beginTransaction();
+        if(session==null) {
+            session = sessionFactory.openSession();
+//            session.setFlushMode(FlushModeType.COMMIT);
+        }
 
         return true;
     }
@@ -106,13 +108,13 @@ public class HDBConnection extends DBConnectionProvider {
 
 
     public boolean db_execute(String sql) {
+        if(em==null) {
+            em = session.getEntityManagerFactory().createEntityManager();
+            etx = em.getTransaction(); etx.begin();
+        }
+        if(etx==null || !etx.isActive()) { etx = em.getTransaction(); etx.begin(); }
         try {
-//            int res = session.createMutationQuery(sql).executeUpdate();
-            if(em==null) em = session.getEntityManagerFactory().createEntityManager();
-            if(etx==null) etx = em.getTransaction();
-            etx.begin();
             int res = em.createNativeQuery(sql).executeUpdate();
-//            int res = session.createNativeQuery(sql).executeUpdate();
             etx.commit();
             log.debug("DBMgr.db_execute: res="+res);
         } catch (HibernateException he) {
@@ -121,7 +123,8 @@ public class HDBConnection extends DBConnectionProvider {
             he.printStackTrace();
             return false;
         } finally {
-//            session.close();
+            em.close();
+            em = null;
         }
         return true;
     }
@@ -129,6 +132,10 @@ public class HDBConnection extends DBConnectionProvider {
         log.debug("db_query: sql="+sql);
         log.debug("db_query: hm="+hm);
         log.debug("db_query: klass="+klass);
+        if(em==null) {
+            em = session.getEntityManagerFactory().createEntityManager();
+            etx = em.getTransaction(); etx.begin();
+        }
         if(em==null) em = session.getEntityManagerFactory().createEntityManager();
         Query q = em.createNativeQuery(sql, klass==null ? DBEntity.class : klass);
 //        if(klass!=null) q.addEntity(klass);
@@ -142,6 +149,8 @@ public class HDBConnection extends DBConnectionProvider {
         // This to force the load of lazy objects :-(
         if(initializeLazyObjects)
             dbes.stream().forEach(Object::toString);
+        em.close();
+        em = null;
         return dbes;
     }
 
@@ -163,114 +172,70 @@ public class HDBConnection extends DBConnectionProvider {
         return dbe;
     }
     public DBEntity insert(DBEntity dbe, DBMgr dbMgr) throws DBException {
+        if(em==null) {
+            em = session.getEntityManagerFactory().createEntityManager();
+            etx = em.getTransaction(); etx.begin();
+        }
+//        log.info(session.getTransaction().getStatus());
+//        if(session.getTransaction().getStatus()!=TransactionStatus.NOT_ACTIVE) {
+//            session.flush();
+//        }
         if(etx==null || !etx.isActive()) { etx = em.getTransaction(); etx.begin(); }
-//        if(tx==null || !tx.isActive()) tx = session.beginTransaction();
         try {
 //            dbe.beforeInsert(dbMgr);
-            session.persist(dbe);
+            em.persist(dbe);
 //            dbe.afterInsert(dbMgr);
             etx.commit();
-        } catch(PersistenceException pe) {
-            pe.printStackTrace();
-//            try {
-//                session.merge(dbe);
-//                tx.commit();
-//            } catch (HibernateException he) {
-                if (etx != null) etx.rollback();
-//                he.printStackTrace();
-//                return null;
-//            }
+        } catch (HibernateException he) {
+            if (etx != null) etx.rollback();
+            he.printStackTrace();
             return null;
         } finally {
-//            session.close();
+            em.close();
+            em = null;
         }
         return dbe;
     }
     public DBEntity update(DBEntity dbe, DBMgr dbMgr) throws DBException {
-        if(em==null) em = session.getEntityManagerFactory().createEntityManager();
+        if(em==null) {
+            em = session.getEntityManagerFactory().createEntityManager();
+            etx = em.getTransaction(); etx.begin();
+        }
         if(etx==null || !etx.isActive()) { etx = em.getTransaction(); etx.begin(); }
-//        if(tx==null || !tx.isActive()) tx = session.beginTransaction();
         try {
 //            dbe.beforeUpdate(dbMgr);
-            session.merge(dbe); //.update(dbe);
+            em.merge(dbe);
 //            dbe.afterUpdate(dbMgr);
             etx.commit();
         } catch (HibernateException he) {
             if(etx!=null) etx.rollback();
             he.printStackTrace();
             return null;
+        } finally {
+            em.close();
+            em = null;
         }
         return dbe;
     }
     public DBEntity delete(DBEntity dbe, DBMgr dbMgr) throws DBException {
+        if(em==null) {
+            em = session.getEntityManagerFactory().createEntityManager();
+            etx = em.getTransaction(); etx.begin();
+        }
         if(etx==null || !etx.isActive()) { etx = em.getTransaction(); etx.begin(); }
-//        if(tx==null || !tx.isActive()) tx = session.beginTransaction();
         try {
 //            dbe.beforeDelete(dbMgr);
-            session.remove(dbe);
+            em.remove(dbe);
 //            dbe.afterDelete(dbMgr);
             etx.commit();
         } catch (HibernateException he) {
             if(etx!=null) etx.rollback();
             he.printStackTrace();
             return null;
+        } finally {
+            em.close();
+            em = null;
         }
         return dbe;
-    }
-
-
-    // **** FOR TESTING PURPOSES
-    public int listUsers() {
-        SelectionQuery query = session.createSelectionQuery("FROM User");
-        List<User> users = (List<User>) query.list();
-//        session.flush();
-        for(User u : users) {
-            System.out.println(u.toString());
-        }
-        System.out.println("Users: " + users.size());
-        System.out.println();
-        return users.size();
-    }
-    public int listGroups() {
-        SelectionQuery query = session.createSelectionQuery("FROM Group");
-        List<Group> dbes = (List<Group>) query.list();
-        for(Group dbe : dbes) {
-            System.out.println(dbe.toString());
-        }
-        System.out.println("Groups: " + dbes.size());
-        System.out.println();
-        return dbes.size();
-    }
-    public int listUsersGroups() {
-        List objs = this.db_query("SELECT user_id, group_id FROM rprj_users_groups", new HashMap<String,Object>(), Object.class,false);
-        printObjectList(objs);
-        System.out.println("Objects: " + objs.size());
-        System.out.println();
-        return objs.size();
-    }
-    public void printObjectList(List objects) {
-        try {
-            for(Object[] obj : (List<Object[]>) objects) {
-                System.out.print("Object:");
-                for (Object o : obj) {
-                    System.out.print(" " + o);
-                }
-                System.out.println();
-            }
-        } catch (ClassCastException cce) {
-            try {
-                for (HashMap hm : (List<HashMap>) objects) {
-                    System.out.print("hm>");
-                    for(Object k : hm.keySet()) {
-                        System.out.print(" " + k + ": " + hm.get(k));
-                    }
-                    System.out.println();
-                }
-            } catch(ClassCastException cce2) {
-                for (Object obj : objects) {
-                    System.out.println("obj> " + obj);
-                }
-            }
-        }
     }
 }
