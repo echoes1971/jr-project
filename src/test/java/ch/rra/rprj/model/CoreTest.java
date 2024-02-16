@@ -172,8 +172,11 @@ public class CoreTest extends TestCase {
         _listGroups();
         _listUsersGroups();
 
+        // Why?
         try {
+            log.info("user: "+user.toString());
             user = (User) objMgr.refresh(user);
+            log.info("  --> "+user.toString());
         } catch (DBException dbex) {
             dbex.printStackTrace();
         }
@@ -735,7 +738,7 @@ public class CoreTest extends TestCase {
 
         System.out.println("* Insert");
         String[] object_names = {"object one", "object two", "object three", "object four", "object five"};
-        testUsers.stream().forEach(testUser -> {
+        for(User testUser : testUsers) {
             objMgr.setDbeUser(testUser);
             objMgr.setUserGroupsList(testUser.getGroups());
 
@@ -750,7 +753,7 @@ public class CoreTest extends TestCase {
                     e.printStackTrace();
                 }
             }
-        });
+        }
         System.out.println();
 
         System.out.println("* Search");

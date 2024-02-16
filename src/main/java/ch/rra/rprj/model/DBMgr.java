@@ -96,7 +96,8 @@ public class DBMgr {
 
     public boolean db_execute(String sql) { return conn.db_execute(sql); }
     public List<DBEntity> db_query(String sql) {
-        return conn.db_query(sql, new HashMap<>(), null, false);
+        return conn.db_query(sql,new HashMap<String,Object>(), Object.class,false);
+//        return conn.db_query(sql, new HashMap<>(), null, false);
     }
     public List<DBEntity> db_query(String sql, HashMap<String,Object> hm, Class klass, boolean initializeLazyObjects) {
         return conn.db_query(sql, hm, klass, initializeLazyObjects);

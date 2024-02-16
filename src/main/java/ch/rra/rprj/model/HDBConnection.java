@@ -155,11 +155,17 @@ public class HDBConnection extends DBConnectionProvider {
     }
 
     public DBEntity refresh(DBEntity dbe) throws DBException {
+        if(em==null) {
+            em = session.getEntityManagerFactory().createEntityManager();
+            etx = em.getTransaction(); etx.begin();
+        }
+        if(etx==null || !etx.isActive()) { etx = em.getTransaction(); etx.begin(); }
         try {
-            session.refresh(dbe);
+            em.refresh(dbe);
 //            session.flush();
         } catch (HibernateException he) {
-            //he.printStackTrace();
+            log.error("dbe: "+dbe.toString());
+            he.printStackTrace();
             return null;
         } catch(EntityNotFoundException enfex) {
             // RRA: maybe because has already been refreshed in memory by the previous passage?
@@ -167,7 +173,8 @@ public class HDBConnection extends DBConnectionProvider {
             //enfex.printStackTrace();
             //return null;
         } finally {
-//            session.close();
+            em.close();
+            em = null;
         }
         return dbe;
     }
@@ -209,6 +216,7 @@ public class HDBConnection extends DBConnectionProvider {
             etx.commit();
         } catch (HibernateException he) {
             if(etx!=null) etx.rollback();
+            log.error("dbe: "+dbe.toString());
             he.printStackTrace();
             return null;
         } finally {
