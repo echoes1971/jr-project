@@ -824,22 +824,27 @@ public class CoreTest extends TestCase {
 
         System.out.println("* Insert");
         String[] object_names = {"object one", "object two", "object three", "object four", "object five"};
-        testUsers.stream().forEach(testUser -> {
+        try {
+            objMgr.insert(new DBENote("kezzo", "funziona kazzo!"));
+        } catch(DBException e) {
+            e.printStackTrace();
+        }
+        for(User testUser: testUsers) {
             objMgr.setDbeUser(testUser);
             objMgr.setUserGroupsList(testUser.getGroups());
 
             for (String name: object_names) {
-                DBEObject obj = new DBENote(name, "description of object '" + name + "'");
+                DBENote obj = new DBENote(name, "description of object '" + name + "'");
                 //System.out.println("obj: " + obj);
                 try {
-                    obj = (DBEObject) objMgr.insert(obj);
+                    obj = (DBENote) objMgr.insert(obj);
                     System.out.println("-> " + obj);
-                    objects.add(obj);
+                    if(obj!=null) objects.add(obj);
                 } catch (DBException e) {
                     e.printStackTrace();
                 }
             }
-        });
+        }
         System.out.println();
 
         System.out.println("* Search");
@@ -892,8 +897,10 @@ public class CoreTest extends TestCase {
         _deleteTestUsers(testUsers);
 
 
+        System.out.println("Objects created: "+objects.size()+" / "+object_names.length);
+        if(objects.size()!=object_names.length) fail("Not all objects were created!");
         final_objects_count   = objMgr.search(new DBENote()).size();
         System.out.println("Objects count: " + initial_objects_count + " -> " + final_objects_count);
-        if(initial_objects_count!=final_objects_count) fail("Not all objects were deleted");
+        if(initial_objects_count!=final_objects_count) fail("Not all objects were deleted!");
     }
 }

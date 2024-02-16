@@ -195,6 +195,7 @@ public class HDBConnection extends DBConnectionProvider {
             etx.commit();
         } catch (HibernateException he) {
             if (etx != null) etx.rollback();
+            log.error("dbe: "+dbe.toString());
             he.printStackTrace();
             return null;
         } finally {
