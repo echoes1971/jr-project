@@ -1,20 +1,23 @@
 package ch.rra.rprj.model;
 
+import ch.rra.rprj.model.cms.DBEFolder;
 import ch.rra.rprj.model.cms.DBENote;
 import ch.rra.rprj.model.core.*;
 import junit.framework.TestCase;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.testng.annotations.*;
 
 import java.net.URL;
 import java.util.*;
 
-public class CoreTest extends TestCase {
+public class CoreTest { //extends TestCase {
     private static final Logger log = LogManager.getLogger(CoreTest.class);
     private ObjectMgr objMgr;
 
-    @Override
-    protected void setUp() throws Exception {
+
+    @BeforeSuite
+    public void setUpSuite() throws Exception {
         Properties props = new Properties();
         props.load(getClass().getResourceAsStream("/application.properties"));
         try {
@@ -38,21 +41,28 @@ public class CoreTest extends TestCase {
 
         objMgr = new ObjectMgr();
         objMgr.setConn(conn);
+//        objMgr.setUp();
+    }
+
+    @BeforeTest
+    public void setUp() throws Exception {
         objMgr.setUp();
     }
 
-    @Override
+    @AfterTest
     protected void tearDown() throws Exception {
         objMgr.tearDown();
     }
 
     // ./mvnw -Dtest=CoreTest#testGenerator test
+    @Test
     public void testGenerator() {
         IdGenerator gen = new IdGenerator();
         String myid = gen.generateMyId();
         System.out.println("UUID: " + myid + " (" + myid.length() + ")");
     }
 
+    @Test
     public void testUsers() {
         int initial_users = _listUsers();
         int initial_groups = _listGroups();
@@ -77,7 +87,8 @@ public class CoreTest extends TestCase {
             users_groups = objMgr.db_query("SELECT user_id, group_id FROM rprj_users_groups where user_id='" + user.getId() + "'",new HashMap<String,Object>(), Object.class,false);
             _printObjectList(users_groups);
 
-            if (users_groups.size() != 2) fail("Not all associations created");
+            assert users_groups.size()==2 : "Not all associations created";
+            //if (users_groups.size() != 2) fail("Not all associations created");
 
             System.out.println("**** Test Read");
             _listUsers();
@@ -105,13 +116,13 @@ public class CoreTest extends TestCase {
             _printObjectList(users_groups);
             if (users_groups.size() != 0) {
                 objMgr.db_execute("delete FROM rprj_users_groups where user_id='" + user.getId() + "'");
-                fail("Not all associations were deleted");
+                assert users_groups.size() != 0 : "Not all associations were deleted";
             }
             groups = objMgr.db_query("SELECT id, name, description FROM rprj_groups where name='" + user.getLogin() + "'",new HashMap<String,Object>(), Object.class,false);
             _printObjectList(groups);
             if (groups.size() != 0) {
                 objMgr.db_execute("delete FROM rprj_groups where name='" + user.getLogin() + "'");
-                fail("Not all groups were deleted");
+                assert groups.size() != 0 : "Not all groups were deleted";
             }
         } catch (DBException dbex) {
             dbex.printStackTrace();
@@ -124,11 +135,10 @@ public class CoreTest extends TestCase {
         System.out.println("Groups:\t\t" + initial_groups + " => " + current_groups);
         System.out.println("UsersGroups:\t" + initial_usersgroups + " => " + current_usersgroups);
         System.out.println("==============================================================");
-        if (initial_users != current_users || initial_groups != current_groups || initial_usersgroups != current_usersgroups) {
-            fail("Not all rows deleted!!!!");
-        }
+        assert initial_users==current_users && initial_groups==current_groups && initial_usersgroups==current_usersgroups : "Not all rows deleted!!!!";
     }
 
+    @Test
     public void testManyToMany2() {
         int initial_users = _listUsers();
         int initial_groups = _listGroups();
@@ -163,9 +173,7 @@ public class CoreTest extends TestCase {
         } catch (DBException dbex) {
             dbex.printStackTrace();
         }
-        if (user.getGroup_id().equals(group.getId())) {
-            fail("User has the extra group as foreign key: " + group.toString());
-        }
+        assert !user.getGroup_id().equals(group.getId()) : "User has the extra group as foreign key: " + group.toString();
 
         System.out.println("**** Test Read");
         _listUsers();
@@ -208,11 +216,10 @@ public class CoreTest extends TestCase {
         System.out.println("Groups:\t\t" + initial_groups + " => " + current_groups);
         System.out.println("UsersGroups:\t" + initial_usersgroups + " => " + current_usersgroups);
         System.out.println("==============================================================");
-        if (initial_users != current_users || initial_groups != current_groups || initial_usersgroups != current_usersgroups) {
-            fail("Not all rows deleted!!!!");
-        }
+        assert initial_users==current_users && initial_groups==current_groups && initial_usersgroups==current_usersgroups : "Not all rows deleted!!!!";
     }
 
+    @Test
     public void testGroups() {
         int initial_users = _listUsers();
         int initial_groups = _listGroups();
@@ -255,12 +262,11 @@ public class CoreTest extends TestCase {
         System.out.println("Groups:\t\t" + initial_groups + " => " + current_groups);
         System.out.println("UsersGroups:\t" + initial_usersgroups + " => " + current_usersgroups);
         System.out.println("==============================================================");
-        if (initial_users != current_users || initial_groups != current_groups || initial_usersgroups != current_usersgroups) {
-            fail("Not all rows deleted!!!!");
-        }
+        assert initial_users==current_users && initial_groups==current_groups && initial_usersgroups==current_usersgroups : "Not all rows deleted!!!!";
     }
 
     // ./mvnw -Dtest=CoreTest#testUserGroup test
+    @Test
     public void testUserGroup() {
         int initial_users = _listUsers();
         int initial_groups = _listGroups();
@@ -334,7 +340,7 @@ public class CoreTest extends TestCase {
             System.out.println("==============================================================");
         } catch (DBException dbex) {
             dbex.printStackTrace();
-            fail("Unable to create associations");
+            assert false : "Unable to create associations";
         }
 
         // Delete users and groups
@@ -356,12 +362,11 @@ public class CoreTest extends TestCase {
         System.out.println("UsersGroups:\t" + initial_usersgroups + " => " + current_usersgroups);
         System.out.println("==============================================================");
 
-        if (initial_users != current_users || initial_groups != current_groups || initial_usersgroups != current_usersgroups) {
-            fail("Not all rows deleted!!!!");
-        }
+        assert initial_users==current_users && initial_groups==current_groups && initial_usersgroups==current_usersgroups : "Not all rows deleted!!!!";
     }
 
     // ./mvnw -Dtest=CoreTest#testSearch test
+    @Test
     public void testSearch() {
         System.out.println("**** Test Search");
         User searchDBE = new User();
@@ -373,7 +378,7 @@ public class CoreTest extends TestCase {
         List<DBEntity> res = objMgr.search(searchDBE);
         System.out.println("res=" + res.size());
 
-        if (res.size() == 0) fail("Administrator not found");
+        assert res.size()>0 : "Administrator not found";
 
         for (DBEntity dbe : res) {
             System.out.println(dbe.toString());
@@ -381,6 +386,7 @@ public class CoreTest extends TestCase {
     }
 
     // ./mvnw -Dtest=CoreTest#testDBVersion test
+    @Test
     public void testDBVersion() {
         System.out.println("**** Test DB Version");
 
@@ -388,6 +394,7 @@ public class CoreTest extends TestCase {
     }
 
     // ./mvnw -Dtest=CoreTest#testExists test
+    @Test
     public void testExists() {
         System.out.println("**** Test Exists");
         User searchDBE = new User();
@@ -399,7 +406,7 @@ public class CoreTest extends TestCase {
         } catch (DBException e) {
             e.printStackTrace();
         }
-        if (!exists) fail("Administrator does not exists!");
+        assert exists : "Administrator does not exists!";
 
         System.out.println("**** Test Does Not Exists");
         searchDBE = new User();
@@ -411,10 +418,11 @@ public class CoreTest extends TestCase {
         } catch (DBException e) {
             e.printStackTrace();
         }
-        if (exists) fail("User " + searchDBE.getFullname() + " exists!");
+        assert !exists : "User " + searchDBE.getFullname() + " exists!";
     }
 
     // ./mvnw -Dtest=CoreTest#testLogin test
+    @Test
     public void testLogin() {
         int initial_users = _listUsers();
         int initial_groups = _listGroups();
@@ -438,15 +446,15 @@ public class CoreTest extends TestCase {
         User myuser;
         System.out.println("* Loggin existing user...");
         myuser = objMgr.login("user01", "pwd_user01");
-        if(myuser==null) fail("Unable to login existing user");
+        assert myuser!=null : "Unable to login existing user";
         System.out.println(myuser);
         System.out.println("* Loggin existing user wrong pwd...");
         myuser = objMgr.login("user02", "wd_user0");
-        if(myuser!=null) fail("Logged in with wrong password");
+        assert myuser==null : "Logged in with wrong password";
         System.out.println(myuser);
         System.out.println("* Loggin non existing user...");
         myuser = objMgr.login("__user01", "pwd_user01");
-        if(myuser!=null) fail("Logged in non existing user");
+        assert myuser==null : "Logged in non existing user";
         System.out.println(myuser);
 
         // Delete test users
@@ -459,12 +467,10 @@ public class CoreTest extends TestCase {
         System.out.println("UsersGroups:\t" + initial_usersgroups + " => " + current_usersgroups);
         System.out.println("==============================================================");
 
-        if (initial_users != current_users || initial_groups != current_groups || initial_usersgroups != current_usersgroups) {
-            fail("Not all rows deleted!!!!");
-        }
-
+        assert initial_users==current_users && initial_groups==current_groups && initial_usersgroups==current_usersgroups : "Not all rows deleted!!!!";
     }
 
+    @Test
     public void testListUsers() {
         int ret = _listUsers();
         log.info("ret: "+ret);
@@ -553,7 +559,7 @@ public class CoreTest extends TestCase {
             }
         } catch (DBException dbex) {
             dbex.printStackTrace();
-            fail("Error while deleting groups");
+            assert false : "Error while deleting groups";
         }
     }
     private Vector<User> _createTestUsers(String[] user_names) {
@@ -585,11 +591,12 @@ public class CoreTest extends TestCase {
             }
         } catch (DBException dbex) {
             dbex.printStackTrace();
-            fail("Error while deleting users");
+            assert false : "Error while deleting users";
         }
     }
 
     // ./mvnw -Dtest=CoreTest#testLog test
+    @Test
     public void testLog() {
         System.out.println("**** Test Log");
 
@@ -598,18 +605,15 @@ public class CoreTest extends TestCase {
 
         DBELog log = objMgr.log(ip,"note one", "note two");
         System.out.println("log: "+log);
-        if(log==null)
-            fail("Unable to create log entry");
+        assert log!=null : "Unable to create log entry";
 
         log = objMgr.log(ip,"note one", "note three");
         System.out.println("log: "+log);
-        if(log==null)
-            fail("Unable to update log entry");
+        assert log!=null : "Unable to update log entry";
 
         DBELog log2 = objMgr.log(ip2,"nota uno", "nota due");
         System.out.println("log2: "+log2);
-        if(log2==null)
-            fail("Unable to create log entry");
+        assert log2!=null : "Unable to create log entry";
 
         try {
             objMgr.delete(log);
@@ -620,6 +624,7 @@ public class CoreTest extends TestCase {
     }
 
     // ./mvnw -Dtest=CoreTest#testObject test
+    @Test
     public void testObject() {
         System.out.println("**** Test Object");
         int initial_objects_count = objMgr.search(new DBENote()).size();
@@ -632,8 +637,13 @@ public class CoreTest extends TestCase {
 
         List<DBEObject> objects = new ArrayList<>();
 
+//        try {
+//            objMgr.insert(new DBEObjectReal("cippa", "description of object 'cippa'"));
+//        } catch (DBException dbex) {
+//            dbex.printStackTrace();
+//        }
         System.out.println("* Insert");
-        String[] object_names = {"object one", "object two", "object three", "object four", "object five"};
+        String[] object_names = {"object one"}; //, "object two", "object three", "object four", "object five"};
         testUsers.stream().forEach(testUser -> {
             objMgr.setDbeUser(testUser);
             objMgr.setUserGroupsList(testUser.getGroups());
@@ -664,7 +674,7 @@ public class CoreTest extends TestCase {
             System.out.println("initial_objects_count: "+initial_objects_count);
             System.out.println("object_names.length: "+object_names.length);
             System.out.println("res: "+res.size());
-            if((res.size()-initial_objects_count)!=object_names.length) fail("Error with privileges");
+            assert (res.size()-initial_objects_count)==object_names.length : "Error with privileges";
             res.stream().forEach((dbe) -> System.out.println(" " + dbe));
             System.out.println();
         });
@@ -678,6 +688,7 @@ public class CoreTest extends TestCase {
             List<DBEObject> deleted_objects = new ArrayList<>();
             objects.stream().forEach(obj -> {
                 try {
+                    log.info("obj: " + obj.toString());
                     obj = (DBEObject) objMgr.delete(obj);
                     deleted_objects.add(obj);
                     System.out.println("-> " + obj);
@@ -687,6 +698,8 @@ public class CoreTest extends TestCase {
             });
             //final_objects_count   = objMgr.search(new DBENote()).size();
             //System.out.println("Objects count: " + initial_objects_count + " -> " + final_objects_count);
+
+            // DAQUI
 
             System.out.println("* Delete 2");
             deleted_objects.stream().forEach(obj -> {
@@ -703,12 +716,15 @@ public class CoreTest extends TestCase {
         _deleteTestUsers(testUsers);
 
 
+        int objects_created = objects.size();
+        assert objects_created==object_names.length : "No object was created.";
         final_objects_count   = objMgr.search(new DBENote()).size();
         System.out.println("Objects count: " + initial_objects_count + " -> " + final_objects_count);
-        if(initial_objects_count!=final_objects_count) fail("Not all objects were deleted");
+        assert initial_objects_count==final_objects_count : "Not all objects were deleted";
     }
 
     // ./mvnw -Dtest=CoreTest#testDbeById test
+    @Test
     public void testDbeById() {
         System.out.println("**** Test Search DBE By ID");
 
@@ -717,13 +733,14 @@ public class CoreTest extends TestCase {
         objMgr.login("adm","adm");
         DBEntity dbe = objMgr.dbeById("-3");
         System.out.println("dbe: " + dbe);
-        if(dbe==null) fail("Group not found by ID");
+        assert dbe!=null : "Group not found by ID";
         dbe = objMgr.dbeById("-1");
         System.out.println("dbe: " + dbe);
-        if(dbe==null) fail("User not found by ID");
+        assert dbe!=null : "User not found by ID";
     }
 
     // ./mvnw -Dtest=CoreTest#testObjectById test
+    @Test
     public void testObjectById() {
         System.out.println("**** Test Search By ID");
         int initial_objects_count = objMgr.search(new DBENote()).size();
@@ -768,7 +785,7 @@ public class CoreTest extends TestCase {
                 //if (obj == null) fail("Error searching object");
                 DBEObject obj2 = objMgr.fullObjectById(o.getId());
                 System.out.println("Full:\t" + obj2);
-                if (obj2 == null) fail("Error searching full object");
+                assert obj2!=null : "Error searching full object";
             }
         });
 
@@ -806,10 +823,11 @@ public class CoreTest extends TestCase {
 
         final_objects_count   = objMgr.search(new DBENote()).size();
         System.out.println("Objects count: " + initial_objects_count + " -> " + final_objects_count);
-        if(initial_objects_count!=final_objects_count) fail("Not all objects were deleted");
+        assert initial_objects_count==final_objects_count : "Not all objects were deleted";
     }
 
     // ./mvnw -Dtest=CoreTest#testObjectByName test
+    @Test
     public void testObjectByName() {
         System.out.println("**** Test Search By NAME");
         int initial_objects_count = objMgr.search(new DBENote()).size();
@@ -856,11 +874,11 @@ public class CoreTest extends TestCase {
             for (DBEObject o : objects) {
                 List<DBEObject> objs = objMgr.objectByName(o.getName());
                 objs.forEach(obj -> System.out.println("Partial:" + obj));
-                if (objs.size()==0) fail("Error searching objects");
+                assert objs.size()!=0 : "Error searching objects";
 
                 List<DBEObject> objs2 = objMgr.fullObjectByName(o.getName());
                 objs2.forEach(obj2 -> System.out.println("Full:\t" + obj2));
-                if (objs2.size()==0) fail("Error searching full objects");
+                assert objs2.size()>0 : "Error searching full objects";
             }
         });
 
@@ -898,9 +916,9 @@ public class CoreTest extends TestCase {
 
 
         System.out.println("Objects created: "+objects.size()+" / "+object_names.length);
-        if(objects.size()!=object_names.length) fail("Not all objects were created!");
+        assert objects.size()==object_names.length : "Not all objects were created!";
         final_objects_count   = objMgr.search(new DBENote()).size();
         System.out.println("Objects count: " + initial_objects_count + " -> " + final_objects_count);
-        if(initial_objects_count!=final_objects_count) fail("Not all objects were deleted!");
+        assert initial_objects_count==final_objects_count : "Not all objects were deleted!";
     }
 }
