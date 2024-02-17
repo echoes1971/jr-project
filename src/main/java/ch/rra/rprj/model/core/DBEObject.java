@@ -35,16 +35,18 @@ mysql> desc rprj_objects;
 // See: https://en.wikibooks.org/wiki/Java_Persistence/Inheritance
 // See: https://www.baeldung.com/hibernate-inheritance
 
+//@MappedSuperclass
 @Entity
 @Inheritance(strategy=InheritanceType.TABLE_PER_CLASS)
 public abstract class DBEObject extends DBEntity {
+//public abstract class DBEObject extends DBEntity {
     @Id
     @GeneratedValue(generator="UUID")
     @GenericGenerator(
             name="UUID",
             strategy="ch.rra.rprj.model.core.IdGenerator"
     )
-    @Column(name = "id", updatable = false, nullable = false, columnDefinition = "VARCHAR(16)")
+    @Column(name = "id", updatable = false, nullable = false, columnDefinition = "varchar(16)")
     protected String id;
 
     @Column(name = "`owner`", columnDefinition = "VARCHAR(16)")

@@ -1,5 +1,6 @@
 package ch.rra.rprj.model;
 
+import ch.rra.rprj.model.core.DBEObject;
 import ch.rra.rprj.model.core.DBEntity;
 import ch.rra.rprj.model.core.Group;
 import ch.rra.rprj.model.core.User;
@@ -28,11 +29,14 @@ import java.util.Properties;
  *
  * See:
  *  https://thorben-janssen.com/flushmode-in-jpa-and-hibernate/
+ *  https://vladmihalcea.com/hibernate-hbm2ddl-auto-schema/
+ *  https://stackoverflow.com/questions/27899443/detached-entity-passed-to-persist-jpa-inheritance
  *
  */
 public class HDBConnection extends DBConnectionProvider {
     private static final Logger log = LogManager.getLogger(HDBConnection.class);
 
+    protected Properties props;
     protected SessionFactory sessionFactory;
     protected StandardServiceRegistry registry;
 
@@ -44,6 +48,7 @@ public class HDBConnection extends DBConnectionProvider {
     public SessionFactory getSessionFactory() { return sessionFactory; }
 
     public HDBConnection(Properties props) {
+        this.props = props;
         session = null;
 //        tx = null;
         em = null;
@@ -54,16 +59,17 @@ public class HDBConnection extends DBConnectionProvider {
     }
 
     public boolean connect() {
-        Properties props = new Properties();
-        try {
-            props.load(getClass().getResourceAsStream("/application.properties"));
-
-            props.setProperty("hibernate.connection.username", props.getProperty("db.conn.user"));
-            props.setProperty("hibernate.connection.password", props.getProperty("db.conn.pwd"));
-        } catch(IOException ioe) {
-            ioe.printStackTrace();
-            return false;
-        }
+//        Properties props = new Properties();
+//        try {
+//            props.load(getClass().getResourceAsStream("/application.properties"));
+//
+//            props.setProperty("hibernate.connection.username", props.getProperty("db.conn.user"));
+//            props.setProperty("hibernate.connection.password", props.getProperty("db.conn.pwd"));
+//        } catch(IOException ioe) {
+//            ioe.printStackTrace();
+//            return false;
+//        }
+        Properties props = this.props;
         registry = new StandardServiceRegistryBuilder()
                 .configure()
                 .applySettings(props)
@@ -190,7 +196,13 @@ public class HDBConnection extends DBConnectionProvider {
         if(etx==null || !etx.isActive()) { etx = em.getTransaction(); etx.begin(); }
         try {
 //            dbe.beforeInsert(dbMgr);
-            em.persist(dbe);
+            if(dbe instanceof DBEObject) {
+                // See: https://stackoverflow.com/questions/27899443/detached-entity-passed-to-persist-jpa-inheritance
+                // very weird reason
+                em.merge(dbe);
+            } else {
+                em.persist(dbe);
+            }
 //            dbe.afterInsert(dbMgr);
             etx.commit();
         } catch (HibernateException he) {

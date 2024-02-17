@@ -52,7 +52,7 @@
         <mapping class="ch.rra.rprj.model.core.Group"/>
         <mapping class="ch.rra.rprj.model.core.User"/>
         <mapping class="ch.rra.rprj.model.core.DBELog"/>
-        <mapping class="ch.rra.rprj.model.core.DBEObject"/>
+<!--        <mapping class="ch.rra.rprj.model.core.DBEObject"/>-->
         <mapping class="ch.rra.rprj.model.core.DBEObjectReal"/>
         <mapping class="ch.rra.rprj.model.cms.DBEFolder"/>
         <mapping class="ch.rra.rprj.model.cms.DBELink"/>
