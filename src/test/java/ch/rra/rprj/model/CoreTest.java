@@ -631,8 +631,8 @@ public class CoreTest { //extends TestCase {
         int final_objects_count   = initial_objects_count;
 
         // Create Test Users
-        String[] usernames = {"user01"};
-        //String[] usernames = {"user01","user02","user03","user04","user05"};
+        //String[] usernames = {"user01"};
+        String[] usernames = {"user01","user02","user03","user04","user05"};
         Vector<User> testUsers = _createTestUsers(usernames);
 
         List<DBEObject> objects = new ArrayList<>();
@@ -643,19 +643,21 @@ public class CoreTest { //extends TestCase {
 //            dbex.printStackTrace();
 //        }
         System.out.println("* Insert");
-        String[] object_names = {"object one"}; //, "object two", "object three", "object four", "object five"};
+//        String[] object_names = {"object one"};
+        String[] object_names = {"object one", "object two", "object three", "object four", "object five"};
         testUsers.stream().forEach(testUser -> {
             objMgr.setDbeUser(testUser);
             objMgr.setUserGroupsList(testUser.getGroups());
 
             for (String name: object_names) {
-                DBEObject obj = new DBENote(name, "description of object '" + name + "'");
+                DBEObject obj = new DBENote(name, testUser.getLogin() + "'s object '" + name + "'");
                 //obj.setDefaultValues(objMgr);
                 //obj.setPermissions("rwxrwxrwx");
                 System.out.println("obj: " + obj);
                 try {
                     obj = (DBEObject) objMgr.insert(obj);
                     System.out.println("-> " + obj);
+                    assert obj.getId()!=null : "ID not created";
                     objects.add(obj);
                 } catch (DBException e) {
                     e.printStackTrace();
@@ -690,6 +692,7 @@ public class CoreTest { //extends TestCase {
                 try {
                     log.info("obj: " + obj.toString());
                     obj = (DBEObject) objMgr.delete(obj);
+                    assert obj.getDeleted_by()!=null && !obj.getDeleted_by().isEmpty() : "Deleted_by not populated!";
                     deleted_objects.add(obj);
                     System.out.println("-> " + obj);
                 } catch (DBException e) {
@@ -717,7 +720,8 @@ public class CoreTest { //extends TestCase {
 
 
         int objects_created = objects.size();
-        assert objects_created==object_names.length : "No object was created.";
+        System.out.println("Objects created: " + objects_created);
+        assert objects_created==(object_names.length*usernames.length) : "No object was created.";
         final_objects_count   = objMgr.search(new DBENote()).size();
         System.out.println("Objects count: " + initial_objects_count + " -> " + final_objects_count);
         assert initial_objects_count==final_objects_count : "Not all objects were deleted";

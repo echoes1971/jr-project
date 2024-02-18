@@ -199,7 +199,7 @@ public class HDBConnection extends DBConnectionProvider {
             if(dbe instanceof DBEObject) {
                 // See: https://stackoverflow.com/questions/27899443/detached-entity-passed-to-persist-jpa-inheritance
                 // very weird reason
-                em.merge(dbe);
+                dbe = em.merge(dbe);
             } else {
                 em.persist(dbe);
             }
