@@ -236,7 +236,7 @@ public class ObjectMgr extends DBMgr {
         logger.debug("fullObjectById: sql="+sql);
         HashMap<String,Object> hm = new HashMap<>();
         hm.put("id", id);
-        List res = this.db_query(sql,hm,null,false);
+        List res = this.db_query(sql,hm,Object.class,false);
         logger.debug("fullObjectById: res="+res.size());
         if(res.size()==0) return null;
         Object[] values = (Object[]) res.get(0);
@@ -302,7 +302,7 @@ public class ObjectMgr extends DBMgr {
         logger.debug("fullObjectByName: sql="+sql);
         HashMap<String,Object> hm = new HashMap<>();
         hm.put("name", name);
-        List res = this.db_query(sql,hm,null,false);
+        List res = this.db_query(sql,hm,Object.class,false);
         logger.debug("fullObjectByName: res="+res.size());
         //printObjectList(res);
         res.forEach(values -> {
