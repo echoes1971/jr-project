@@ -191,6 +191,11 @@ public class CoreTest { //extends TestCase {
 
         /**/
         try {
+            /* TODO fix this
+            [(conn=8) Cannot delete or update a parent row: a foreign key constraint fails
+                    (`rproject`.`rprj_users_groups`, CONSTRAINT `FKrthf9phmby8n9bnk0x23at7el` FOREIGN KEY (`group_id`) REFERENCES `rprj_groups` (`id`))]
+            [delete from rprj_groups where id=?]
+             */
             objMgr.delete(group);
             user.getGroups().remove(group);
         } catch (DBException dbex) {
