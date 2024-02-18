@@ -19,4 +19,9 @@ public class DBELogPK  implements Serializable {
         DBELogPK dbelogpk = (DBELogPK) o;
         return this.ip.equals(dbelogpk.ip) && this.data.equals(dbelogpk.data);
     }
+
+    @Override
+    public int hashCode() {
+        return ip.hashCode() * data.hashCode();
+    }
 }
