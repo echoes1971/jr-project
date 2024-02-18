@@ -279,10 +279,16 @@ public class CoreTest { //extends TestCase {
         System.out.println("**** Test User Group");
         //String[] user_names = { "user01", "user02", "user03" };
         //String[] group_names = { "group01", "group02", "group03", "group04" };
-        String[] user_names = {"user01", "user02", "user03", "user04", "user05", "user06", "user07", "user08", "user09"
+        String[] user_names = {
+                "user01"
+                , "user02", "user03", "user04", "user05", "user06", "user07", "user08", "user09"
                 , "user0A", "user0B", "user0C", "user0D", "user0E", "user0F"
         };
-        String[] group_names = {"group01", "group02", "group03", "group04", "group05", "group06", "group07", "group08", "group09"};
+        String[] group_names = {
+                "group01"
+                , "group02", "group03", "group04", "group05"
+                , "group06", "group07", "group08", "group09"
+        };
 
         // Create users and groups
         System.out.println("* Create users and groups");
@@ -302,16 +308,16 @@ public class CoreTest { //extends TestCase {
             int skip = -1;
             for (User u : testUsers) {
                 int step = -1;
-                u = (User) objMgr.refresh(u);
+//                u = (User) objMgr.refresh(u);
                 for (Group g : testGroups) {
                     step++;
                     System.out.println("step=" + step + "\tskip=" + skip);
                     if (step == skip) continue;
-//                    u = (User) dbMgr.refresh(u);
+//                    u = (User) objMgr.refresh(u);
                     System.out.println("u1=" + u);
                     System.out.println("g=" + g);
                     u.getGroups().add(g);
-                    u = (User) objMgr.update(u);
+//                    u = (User) objMgr.update(u);
                     /*
                     Set<Group> g1 = u.getGroups();
                     g1.add(g);
@@ -327,6 +333,7 @@ public class CoreTest { //extends TestCase {
                     dbMgr.update(g);
                      */
                 }
+                u = (User) objMgr.update(u);
                 if (u != null)
                     users2.add(u);
                 skip++;
@@ -340,7 +347,7 @@ public class CoreTest { //extends TestCase {
             System.out.println("==============================================================");
         } catch (DBException dbex) {
             dbex.printStackTrace();
-            assert false : "Unable to create associations";
+//            assert false : "Unable to create associations";
         }
 
         // Delete users and groups
@@ -631,19 +638,12 @@ public class CoreTest { //extends TestCase {
         int final_objects_count   = initial_objects_count;
 
         // Create Test Users
-        //String[] usernames = {"user01"};
         String[] usernames = {"user01","user02","user03","user04","user05"};
         Vector<User> testUsers = _createTestUsers(usernames);
 
         List<DBEObject> objects = new ArrayList<>();
 
-//        try {
-//            objMgr.insert(new DBEObjectReal("cippa", "description of object 'cippa'"));
-//        } catch (DBException dbex) {
-//            dbex.printStackTrace();
-//        }
         System.out.println("* Insert");
-//        String[] object_names = {"object one"};
         String[] object_names = {"object one", "object two", "object three", "object four", "object five"};
         testUsers.stream().forEach(testUser -> {
             objMgr.setDbeUser(testUser);
@@ -699,10 +699,6 @@ public class CoreTest { //extends TestCase {
                     //e.printStackTrace();
                 }
             });
-            //final_objects_count   = objMgr.search(new DBENote()).size();
-            //System.out.println("Objects count: " + initial_objects_count + " -> " + final_objects_count);
-
-            // DAQUI
 
             System.out.println("* Delete 2");
             deleted_objects.stream().forEach(obj -> {

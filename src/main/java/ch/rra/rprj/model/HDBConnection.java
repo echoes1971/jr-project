@@ -161,6 +161,7 @@ public class HDBConnection extends DBConnectionProvider {
     }
 
     public DBEntity refresh(DBEntity dbe) throws DBException {
+        // NOTE be careful, introduces duplicates in the same hibernate session
         if(em==null) {
             em = session.getEntityManagerFactory().createEntityManager();
             etx = em.getTransaction(); etx.begin();
