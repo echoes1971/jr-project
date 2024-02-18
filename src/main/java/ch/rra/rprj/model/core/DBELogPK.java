@@ -13,4 +13,10 @@ public class DBELogPK  implements Serializable {
         this.ip = ip;
         this.data = data;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        DBELogPK dbelogpk = (DBELogPK) o;
+        return this.ip.equals(dbelogpk.ip) && this.data.equals(dbelogpk.data);
+    }
 }
