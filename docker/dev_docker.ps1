@@ -64,7 +64,8 @@ if($MYSQL_EXISTS) {
         -v $PRJ_HOME/config/mysql:/etc/mysql/conf.d `
         -v $PRJ_HOME/sql:/tmp/sql `
         -e MYSQL_ROOT_PASSWORD=$MYSQL_PASSWORD `
-        -d mariadb:11.2
+        -d mariadb:latest
+#        -d mariadb:11.2
     } else {
         docker run -p 3306:3306 --name $MYSQL_APP `
         -v $PRJ_HOME/mysqldb:/var/lib/mysql `
@@ -72,7 +73,6 @@ if($MYSQL_EXISTS) {
         -v $PRJ_HOME/sql:/tmp/sql `
         -e MYSQL_ROOT_PASSWORD=$MYSQL_PASSWORD `
         -d mysql:8.3
-        # -d mariadb:10.3
     }
     Write-Output "Initialize DB with: docker exec -it $MYSQL_APP mysql -p${MYSQL_PASSWORD} -e `"create database $MYSQL_DB;`""
 
