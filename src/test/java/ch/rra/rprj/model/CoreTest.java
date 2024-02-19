@@ -27,6 +27,13 @@ public class CoreTest { //extends TestCase {
         } catch(NullPointerException npe) {
             npe.printStackTrace();
         }
+        try {
+            props.load(getClass().getResourceAsStream("/dev.properties"));
+        } catch(java.io.IOException ioe) {
+            ioe.printStackTrace();
+        } catch(NullPointerException npe) {
+            npe.printStackTrace();
+        }
         for(String k : props.stringPropertyNames()) {
             log.info(k + ": " + props.getProperty(k));
         }
@@ -73,7 +80,7 @@ public class CoreTest { //extends TestCase {
         int current_usersgroups = initial_usersgroups;
 
         System.out.println("**** Test Create");
-        User user = new User("roberto", "echoestrade", "Roberto R.A.", "-3");
+        User user = new User("ramonserrano", "cippalippa", "Roberto R.A.", "-3");
         System.out.println("Saving: " + user.toString());
 
         List users_groups;
@@ -150,7 +157,7 @@ public class CoreTest { //extends TestCase {
 
         System.out.println("**** Test ManyToMany");
         Group group = new Group("a_group", "test many to many");
-        User user = new User("roberto", "echoestrade", "Roberto R.A.", "-3");
+        User user = new User("ramonserrano", "cippalippa", "Roberto R.A.", "-3");
         System.out.println("Saving: " + user.toString());
 
         List users_groups;
@@ -190,6 +197,16 @@ public class CoreTest { //extends TestCase {
         }
 
         /**/
+        /**/
+        try {
+            objMgr.delete(user);
+        } catch (DBException dbex) {
+            dbex.printStackTrace();
+        }
+        /**/
+        users_groups = objMgr.db_query("SELECT user_id, group_id FROM rprj_users_groups");
+        _printObjectList(users_groups);
+        System.out.println("===============================");
         try {
             /* TODO fix this
             [(conn=8) Cannot delete or update a parent row: a foreign key constraint fails
@@ -201,16 +218,6 @@ public class CoreTest { //extends TestCase {
         } catch (DBException dbex) {
             dbex.printStackTrace();
         }
-        users_groups = objMgr.db_query("SELECT user_id, group_id FROM rprj_users_groups");
-        _printObjectList(users_groups);
-        System.out.println("===============================");
-        /**/
-        try {
-            objMgr.delete(user);
-        } catch (DBException dbex) {
-            dbex.printStackTrace();
-        }
-        /**/
         users_groups = objMgr.db_query("SELECT user_id, group_id FROM rprj_users_groups");
         _printObjectList(users_groups);
 
@@ -235,7 +242,7 @@ public class CoreTest { //extends TestCase {
         int current_usersgroups = initial_usersgroups;
 
         System.out.println("**** Test Create");
-        Group group = new Group("roberto", "Roberto's Group");
+        Group group = new Group("ramonserrano", "Roberto's Group");
         System.out.println("Saving: " + group.toString());
 
         // Save
