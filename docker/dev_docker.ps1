@@ -1,6 +1,10 @@
 # IF the sript execution is blocked, do:
 #  Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope LocalMachine
 
+# Example:
+# Remove-Item -Recurse ..\mariadb\* ; .\dev_docker.ps1 clean
+
+
 # Write-Output ""  | Out-File -Encoding "ASCII" .\dev_docker.log
 Write-Output "" > .\dev_docker.log
 
