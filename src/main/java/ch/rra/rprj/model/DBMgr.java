@@ -61,7 +61,12 @@ public class DBMgr {
 
 
     public User getDbeUser() { return dbeUser; }
-    public void setDbeUser(User dbeUser) { this.dbeUser = dbeUser; }
+    public void setDbeUser(User dbeUser) {
+        this.dbeUser = dbeUser;
+        if(dbeUser!=null && !dbeUser.getGroups().isEmpty()) {
+            this.setUserGroupsList(dbeUser.getGroups());
+        }
+    }
 
     public Set<Group> getUserGroupsList() { return this.user_groups_list; }
     public void setUserGroupsList(Set<Group> user_groups_list) { this.user_groups_list = user_groups_list; }

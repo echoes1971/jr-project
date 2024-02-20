@@ -56,7 +56,8 @@ public class User extends DBEntity {
 
 
     //@ManyToMany(cascade = {CascadeType.ALL})
-    @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH})
+//    @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH})
+    @ManyToMany(cascade = {CascadeType.MERGE, CascadeType.REFRESH})
     @JoinTable(
             name = "rprj_users_groups",
             joinColumns = {
@@ -137,6 +138,8 @@ public class User extends DBEntity {
     public void setGroups(Set<Group> groups) {
         this.groups = groups;
     }
+
+    public void addGroup(Group g) { this.groups.add(g); }
 
     @Override
     public String toString() {

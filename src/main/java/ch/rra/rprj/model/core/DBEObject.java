@@ -41,11 +41,11 @@ mysql> desc rprj_objects;
 public abstract class DBEObject extends DBEntity {
 //public abstract class DBEObject extends DBEntity {
     @Id
-    @GeneratedValue(generator="UUID")
-    @GenericGenerator(
-            name="UUID",
-            strategy="ch.rra.rprj.model.core.IdGenerator"
-    )
+//    @GeneratedValue(generator="UUID")
+//    @GenericGenerator(
+//            name="UUID",
+//            strategy="ch.rra.rprj.model.core.IdGenerator"
+//    )
     @Column(name = "id", updatable = false, nullable = false, columnDefinition = "varchar(16)")
     protected String id;
 
@@ -224,7 +224,7 @@ public abstract class DBEObject extends DBEntity {
     @Override
     public void beforeInsert(DBMgr dbMgr) throws DBException {
         super.beforeInsert(dbMgr);
-        this.setId(this.getNextUuid());
+        if(id==null || id.isEmpty()) this.setId(this.getNextUuid());
         this.setDefaultValues((ObjectMgr)dbMgr);
         this.setDeleted_date(new Timestamp(0));
     }

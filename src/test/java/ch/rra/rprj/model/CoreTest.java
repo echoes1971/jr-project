@@ -2,6 +2,7 @@ package ch.rra.rprj.model;
 
 import ch.rra.rprj.model.cms.DBEFolder;
 import ch.rra.rprj.model.cms.DBENote;
+import ch.rra.rprj.model.cms.DBEPage;
 import ch.rra.rprj.model.contacts.DBECountry;
 import ch.rra.rprj.model.core.*;
 import com.google.gson.JsonArray;
@@ -67,6 +68,10 @@ public class CoreTest { //extends TestCase {
         objMgr = new ObjectMgr();
         objMgr.setConn(conn);
 //        objMgr.setUp();
+
+        objMgr.setUp();
+        testInitDB();
+        objMgr.tearDown();
     }
 
     @BeforeTest
@@ -545,19 +550,9 @@ public class CoreTest { //extends TestCase {
         log.info("ret: "+ret);
     }
 
-    @Test
+    // .\mvnw.cmd -Dtest=CoreTest#testInitDB test
+    //@Test
     public void testInitDB() {
-//        User{id='-1', login='adm', pwd='adm', pwd_salt='', fullname='Administrator', group_id='-2',
-//            groups=[Group{id='-5', name='Project', description='R-Project user'}, Group{id='-6', name='Webmaster', description='Web content creators'}, Group{id='-2', name='Admin', description='System admins'}]
-//        }
-//        Group{id='-2', name='Admin', description='System admins'}
-//        Group{id='-3', name='Users', description='System users'}
-//        Group{id='-4', name='Guests', description='System guests (read only)'}
-//        Group{id='-5', name='Project', description='R-Project user'}
-//        Group{id='-6', name='Webmaster', description='Web content creators'}
-//        users_groups(-1 -2)
-//        users_groups(-1 -5)
-//        users_groups(-1 -6)
 
         Integer db_version = objMgr.db_version();
         System.out.println("DB Version: " + db_version);
@@ -589,30 +584,50 @@ public class CoreTest { //extends TestCase {
 //            break;
         }
 
+        HashMap<String, Group> groups = new HashMap();
         for(JsonElement jsonArray : initialDB.getAsJsonObject().get("groups").getAsJsonArray()) {
             int i = 0;
             JsonArray ja = (JsonArray) jsonArray;
             Group newDBE = new Group(ja.get(0).getAsString(),ja.get(1).getAsString(),ja.get(2).getAsString());
-            System.out.println(newDBE.toString());
             try {
-                objMgr.insert(newDBE);
+                newDBE = (Group) objMgr.insert(newDBE);
+                groups.put(newDBE.getId(), newDBE);
             } catch(DBException dbex) {
                 dbex.printStackTrace();
                 break;
             }
+            System.out.println(newDBE.toString());
 //            break;
         }
 
+        JsonArray users_groups = initialDB.getAsJsonObject().get("users_groups").getAsJsonArray();
         for(JsonElement jsonArray : initialDB.getAsJsonObject().get("users").getAsJsonArray()) {
             int i = 0;
             JsonArray ja = (JsonArray) jsonArray;
+//            System.out.println(" ja: " + ja);
             User newDBE = new User(
-                    ja.get(i++).getAsString(),ja.get(i++).getAsString(),ja.get(i++).getAsString(),
-                    ja.get(i++).getAsString(),ja.get(i++).getAsString()
+                ja.get(0).getAsString(),ja.get(1).getAsString(),ja.get(2).getAsString(),
+                ja.get(4).getAsString(),ja.get(5).getAsString()
             );
+            for(JsonElement je : users_groups) {
+                JsonArray ug = (JsonArray) je;
+                /*
+                System.out.println(" newDBE.getId(): " + newDBE.getId());
+                System.out.println(" user_group: " + ug.toString());
+                System.out.println(" user_group[0]: " + ug.get(0).getAsString());
+                System.out.println(" user_group[1]: " + groups.get(ug.get(1).getAsString()));
+                 */
+                if(!ug.get(0).getAsString().equals(newDBE.getId())) continue;
+
+                Group g = groups.get(ug.get(1).getAsString());
+//                System.out.println(" group: " + g);
+                newDBE.addGroup(g);
+            }
             System.out.println(newDBE.toString());
             try {
                 objMgr.insert(newDBE);
+                objMgr.setDbeUser(newDBE);
+                //objMgr.setUserGroupsList(newDBE.getGroups());
             } catch(DBException dbex) {
                 dbex.printStackTrace();
                 break;
@@ -623,14 +638,27 @@ public class CoreTest { //extends TestCase {
         for(JsonElement jsonArray : initialDB.getAsJsonObject().get("folders").getAsJsonArray()) {
             int i = 0;
             JsonArray ja = (JsonArray) jsonArray;
+            //System.out.println(" ja: " + ja);
             DBEFolder newDBE = new DBEFolder(
-                    ja.get(i++).getAsString(), ja.get(i++).getAsString(),ja.get(i++).getAsString(),ja.get(i++).getAsString(),ja.get(i++).getAsString(),
-                    Timestamp.valueOf(ja.get(i++).getAsString()), ja.get(i++).getAsString(),
-                    ja.get(i).getAsString()==null ? null : Timestamp.valueOf(ja.get(i++).getAsString()),
-                    ja.get(i).getAsString()==null ? null : ja.get(i++).getAsString(),
-                    Timestamp.valueOf(ja.get(i++).getAsString()),
-                    ja.get(i++).getAsString(), ja.get(i++).getAsString(),ja.get(i++).getAsString(),ja.get(i++).getAsString(),
-                    ja.get(i++).getAsString()
+                    ja.get(i++).getAsString(), // id
+                    ja.get(i++).getAsString(), // owner
+                    ja.get(i++).getAsString(), // group_id
+                    ja.get(i++).getAsString(), // permissions
+                    // Creator
+                    ja.get(i++).getAsString(),
+                    ja.get(i++).isJsonNull() ? null : Timestamp.valueOf(ja.get(i-1).getAsString()),
+                    // Last modify
+                    ja.get(i++).isJsonNull() ? null : ja.get(i-1).getAsString(),
+                    ja.get(i++).isJsonNull() ? null : Timestamp.valueOf(ja.get(i-1).getAsString()),
+                    // Deleted by
+                    ja.get(i++).isJsonNull() ? null : ja.get(i-1).getAsString(),
+                    ja.get(i++).isJsonNull() || ja.get(i-1).getAsString().equals("0000-00-00 00:00:00") ? null : Timestamp.valueOf(ja.get(i-1).getAsString()),
+
+                    ja.get(i++).isJsonNull() ? null : ja.get(i-1).getAsString(),
+                    ja.get(i++).isJsonNull() ? null : ja.get(i-1).getAsString(),
+                    ja.get(i++).isJsonNull() ? null : ja.get(i-1).getAsString(),
+                    ja.get(i++).isJsonNull() ? null : ja.get(i-1).getAsString(),
+                    ja.get(i++).isJsonNull() ? null : ja.get(i-1).getAsString()
             );
             System.out.println(newDBE.toString());
             try {
@@ -641,17 +669,56 @@ public class CoreTest { //extends TestCase {
             }
 //            break;
         }
-//        INSERT INTO `rprj_dbversion` VALUES ;
-//
-//        INSERT INTO `rprj_folders` VALUES ;
-//
-//        INSERT INTO `rprj_groups` VALUES ;
-//
-//        INSERT INTO `rprj_pages` VALUES ;
-//
-//        INSERT INTO `rprj_users` VALUES [["-1","adm","adm","","Administrator","-2"]];
-//
-//        INSERT INTO `rprj_users_groups` VALUES ;
+
+        for(JsonElement jsonArray : initialDB.getAsJsonObject().get("pages").getAsJsonArray()) {
+            int i = 0;
+            JsonArray ja = (JsonArray) jsonArray;
+            System.out.println(" ja: " + ja);
+            DBEPage newDBE = new DBEPage(
+                    ja.get(i++).getAsString(), // id
+                    ja.get(i++).getAsString(), // owner
+                    ja.get(i++).getAsString(), // group_id
+                    ja.get(i++).getAsString(), // permissions
+                    // Creator
+                    ja.get(i++).getAsString(),
+                    ja.get(i++).isJsonNull() ? null : Timestamp.valueOf(ja.get(i-1).getAsString()),
+                    // Last modify
+                    ja.get(i++).isJsonNull() ? null : ja.get(i-1).getAsString(),
+                    ja.get(i++).isJsonNull() ? null : Timestamp.valueOf(ja.get(i-1).getAsString()),
+                    // Deleted by
+                    ja.get(i++).isJsonNull() ? null : ja.get(i-1).getAsString(),
+                    ja.get(i++).isJsonNull() || ja.get(i-1).getAsString().equals("0000-00-00 00:00:00") ? null : Timestamp.valueOf(ja.get(i-1).getAsString()),
+
+                    ja.get(i++).isJsonNull() ? null : ja.get(i-1).getAsString(), // father_id
+                    ja.get(i++).isJsonNull() ? null : ja.get(i-1).getAsString(), // name
+                    ja.get(i++).isJsonNull() ? null : ja.get(i-1).getAsString(), // description
+                    ja.get(i++).isJsonNull() ? null : ja.get(i-1).getAsString(), // html
+                    ja.get(i++).isJsonNull() ? null : ja.get(i-1).getAsString(), // fk_obj_id
+                    ja.get(i++).isJsonNull() ? null : ja.get(i-1).getAsString()  // language
+            );
+            System.out.println(newDBE.toString());
+            try {
+                objMgr.insert(newDBE);
+            } catch(DBException dbex) {
+                dbex.printStackTrace();
+                break;
+            }
+//            break;
+        }
+
+        for(JsonElement jsonArray : initialDB.getAsJsonObject().get("db_version").getAsJsonArray()) {
+            int i = 0;
+            JsonArray ja = (JsonArray) jsonArray;
+            DBEDBVersion newDBE = new DBEDBVersion(ja.get(0).getAsString(),ja.get(1).getAsInt());
+            try {
+                objMgr.insert(newDBE);
+            } catch(DBException dbex) {
+                dbex.printStackTrace();
+                break;
+            }
+            System.out.println(newDBE.toString());
+//            break;
+        }
     }
 
     private int _listUsers() {

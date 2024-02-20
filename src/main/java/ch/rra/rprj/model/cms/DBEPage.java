@@ -50,7 +50,15 @@ public class DBEPage extends DBEObject {
         super(name, description);
     }
 
-    public DBEPage(String id, String owner, String group_id, String permissions, String creator, Timestamp creation_date, String last_modify, Timestamp last_modify_date, String deleted_by, Timestamp deleted_date, String father_id, String name, String description, String html, String fk_obj_id, String language) {
+    public DBEPage(String id, String owner, String group_id, String permissions,
+                   String creator, Timestamp creation_date,
+                   String last_modify, Timestamp last_modify_date,
+                   String deleted_by, Timestamp deleted_date,
+                   String father_id,
+                   String name, String description,
+                   String html,
+                   String fk_obj_id,
+                   String language) {
         super(id, owner, group_id, permissions, creator, creation_date, last_modify, last_modify_date, deleted_by, deleted_date, father_id, name, description);
         this.html = html;
         this.fk_obj_id = fk_obj_id;
