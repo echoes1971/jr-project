@@ -33,7 +33,7 @@
 @REM MAVEN_SKIP_RC - flag to disable loading of mavenrc files
 @REM ----------------------------------------------------------------------------
 
-set JAVA_HOME=C:\Program Files\JetBrains\IntelliJ IDEA Community Edition 2023.1.3\jbr
+@rem set JAVA_HOME=C:\Program Files\JetBrains\IntelliJ IDEA Community Edition 2023.1.3\jbr
 
 
 @REM Begin all REM lines with '@' in case MAVEN_BATCH_ECHO is 'on'
