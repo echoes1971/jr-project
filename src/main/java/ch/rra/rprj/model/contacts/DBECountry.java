@@ -32,11 +32,11 @@ mysql> desc rprj_countrylist;
 @Table(name="rprj_countrylist")
 public class DBECountry extends DBEntity {
     @Id
-    @GeneratedValue(generator="UUID")
-    @GenericGenerator(
-            name="UUID",
-            strategy="ch.rra.rprj.model.core.IdGenerator"
-    )
+//    @GeneratedValue(generator="UUID")
+//    @GenericGenerator(
+//            name="UUID",
+//            strategy="ch.rra.rprj.model.core.IdGenerator"
+//    )
     @Column(name = "id", updatable = false, nullable = false, columnDefinition = "VARCHAR(16)")
     protected String id;
 
