@@ -35,11 +35,11 @@ import java.util.Set;
 @Table(name="rprj_users")
 public class User extends DBEntity {
     @Id
-    @GeneratedValue(generator="UUID")
-    @GenericGenerator(
-            name="UUID",
-            strategy="ch.rra.rprj.model.core.IdGenerator"
-    )
+//    @GeneratedValue(generator="UUID")
+//    @GenericGenerator(
+//            name="UUID",
+//            strategy="ch.rra.rprj.model.core.IdGenerator"
+//    )
     @Column(name = "id", updatable = false, nullable = false, columnDefinition = "VARCHAR(16)")
     private String id;
 
@@ -72,6 +72,14 @@ public class User extends DBEntity {
 
     public User() {}
     public User(String login, String pwd, String fullname, String group_id) {
+        this.login = login;
+        this.pwd = pwd;
+        this.pwd_salt = "";
+        this.fullname = fullname;
+        this.group_id = group_id;
+    }
+    public User(String id, String login, String pwd, String fullname, String group_id) {
+        this.id = id;
         this.login = login;
         this.pwd = pwd;
         this.pwd_salt = "";
@@ -159,6 +167,8 @@ public class User extends DBEntity {
                 dbMgr.delete(u1);
             }
         }
+
+        if(id==null || id.isEmpty()) id = getNextUuid();
     }
 
     @Override

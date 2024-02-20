@@ -28,13 +28,14 @@ import java.util.Set;
 @Table(name="rprj_groups")
 public class Group extends DBEntity {
     @Id
-    @GeneratedValue(generator="UUID")
-    @GenericGenerator(
-            name="UUID",
-            strategy="ch.rra.rprj.model.core.IdGenerator"
-    )
-    @Column(name = "id", updatable = false, nullable = false, columnDefinition = "VARCHAR(16)")
+//    @GeneratedValue(generator="UUID")
+//    @GenericGenerator(
+//            name="UUID",
+//            strategy="ch.rra.rprj.model.core.IdGenerator"
+//    )
+    @Column(name = "id", updatable = true, nullable = false, columnDefinition = "VARCHAR(16)")
     private String id;
+//    @Column(name = "id", updatable = false, nullable = false, columnDefinition = "VARCHAR(16)")
 
     @Column(name = "`name`", unique=true, updatable=false)
     private String name;
@@ -49,6 +50,11 @@ public class Group extends DBEntity {
 
     public Group() {}
     public Group(String name, String description) {
+        this.name = name;
+        this.description = description;
+    }
+    public Group(String id, String name, String description) {
+        this.id = id;
         this.name = name;
         this.description = description;
     }
@@ -99,6 +105,9 @@ public class Group extends DBEntity {
             }
              /**/
         }
+
+
+        if(id==null || id.isEmpty()) id = getNextUuid();
     }
 
     @Override
