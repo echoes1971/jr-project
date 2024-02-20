@@ -82,6 +82,22 @@ public class DBECountry extends DBEntity {
     public DBECountry() {
     }
 
+    public DBECountry(String _id, String common_Name, String formal_Name, String type, String sub_Type, String sovereignty, String capital, String ISO_4217_Currency_Code, String ISO_4217_Currency_Name, String ITU_T_Telephone_Code, String ISO_3166_1_2_Letter_Code, String ISO_3166_1_3_Letter_Code, String ISO_3166_1_Number, String IANA_Country_Code_TLD) {
+        this.id = _id;
+        Common_Name = common_Name;
+        Formal_Name = formal_Name;
+        Type = type;
+        Sub_Type = sub_Type;
+        Sovereignty = sovereignty;
+        Capital = capital;
+        this.ISO_4217_Currency_Code = ISO_4217_Currency_Code;
+        this.ISO_4217_Currency_Name = ISO_4217_Currency_Name;
+        this.ITU_T_Telephone_Code = ITU_T_Telephone_Code;
+        this.ISO_3166_1_2_Letter_Code = ISO_3166_1_2_Letter_Code;
+        this.ISO_3166_1_3_Letter_Code = ISO_3166_1_3_Letter_Code;
+        this.ISO_3166_1_Number = ISO_3166_1_Number;
+        this.IANA_Country_Code_TLD = IANA_Country_Code_TLD;
+    }
     public DBECountry(String common_Name, String formal_Name, String type, String sub_Type, String sovereignty, String capital, String ISO_4217_Currency_Code, String ISO_4217_Currency_Name, String ITU_T_Telephone_Code, String ISO_3166_1_2_Letter_Code, String ISO_3166_1_3_Letter_Code, String ISO_3166_1_Number, String IANA_Country_Code_TLD) {
         Common_Name = common_Name;
         Formal_Name = formal_Name;

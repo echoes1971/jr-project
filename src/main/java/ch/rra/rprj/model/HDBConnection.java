@@ -31,6 +31,7 @@ import java.util.Properties;
  *  https://thorben-janssen.com/flushmode-in-jpa-and-hibernate/
  *  https://vladmihalcea.com/hibernate-hbm2ddl-auto-schema/
  *  https://stackoverflow.com/questions/27899443/detached-entity-passed-to-persist-jpa-inheritance
+ *  https://discourse.hibernate.org/t/sqlite-not-working-with-hibernate-6-2/8174
  *
  */
 public class HDBConnection extends DBConnectionProvider {
@@ -74,6 +75,7 @@ public class HDBConnection extends DBConnectionProvider {
                 .configure()
                 .applySettings(props)
                 .build();
+
         try {
             MetadataSources sources = new MetadataSources(registry);
             Metadata metadata = sources.getMetadataBuilder().build();
