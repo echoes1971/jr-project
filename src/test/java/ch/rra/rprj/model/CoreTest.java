@@ -673,7 +673,7 @@ public class CoreTest { //extends TestCase {
         for(JsonElement jsonArray : initialDB.getAsJsonObject().get("pages").getAsJsonArray()) {
             int i = 0;
             JsonArray ja = (JsonArray) jsonArray;
-            System.out.println(" ja: " + ja);
+            //System.out.println(" ja: " + ja);
             DBEPage newDBE = new DBEPage(
                     ja.get(i++).getAsString(), // id
                     ja.get(i++).getAsString(), // owner
