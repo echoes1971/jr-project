@@ -84,6 +84,9 @@ maybe adding some memory before: `export MAVEN_OPTS=-Xmx1024m`
 
 **TECH INFO**
 
+Install maven wrapper: https://javastreets.com/blog/maven-wrapper.html
+`"C:\Program Files\JetBrains\IntelliJ IDEA Community Edition 2021.3.2\plugins\maven\lib\maven3\bin\mvn.cmd" wrapper:wrapper`
+
 Reduce log: see https://github.com/eugenp/tutorials/blob/master/persistence-modules/hibernate5-2/src/test/resources/logback.xml
 
 ## DB
