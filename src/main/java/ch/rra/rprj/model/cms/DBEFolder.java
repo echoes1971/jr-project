@@ -46,8 +46,7 @@ public class DBEFolder extends DBEObject {
     @Column(name = "childs_sort_order", columnDefinition = "TEXT")
     private String childs_sort_order;
 
-    public DBEFolder() {
-    }
+    public DBEFolder() {}
 
     public DBEFolder(String name, String description) {
         super(name, description);
