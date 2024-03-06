@@ -87,8 +87,10 @@ public class HttpRequest {
             requestHeaders.put("Content-Type", contentType);
             requestHeaders.put("Content-Length", ""+requestContent.length()); // Number in string format is needed
         }
-        requestHeaders.forEach({ x ->
-                conn.setRequestProperty(((Map.Entry) x).getKey(), ((Map.Entry) x).getValue())
+        for(Map.Entry me : requestHeaders.entrySet()) {
+            conn.setRequestProperty(me.getKey(), me.getValue());
+        }
+        requestHeaders.entrySet().stream().forEach({ x ->
         });
         rawRequestData = this.getRawRequestData();
 
