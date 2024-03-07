@@ -26,7 +26,6 @@ maybe adding some memory before: `export MAVEN_OPTS=-Xmx1024m`
       - getValue / setValue ?
   - CMS
     - DBEFile
-    - DBEEvent
   - Projects
     - DBEProject
     - DBEProjectCompanyRole
@@ -59,6 +58,7 @@ maybe adding some memory before: `export MAVEN_OPTS=-Xmx1024m`
     - getParentsList
 - dbschema.php
   - CMS
+    - DBEEvent
     - DBEFolder
     - DBELink
     - DBENews
