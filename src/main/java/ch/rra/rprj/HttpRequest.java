@@ -151,7 +151,7 @@ public class HttpRequest {
 
     // NOTE To avoid translating too much
     public HashMap<String,String> getResponseHeaders() {
-        responseHeaders["#status#"]=status;
+        responseHeaders.put("#status#", status);
         return responseHeaders;
     }
 
