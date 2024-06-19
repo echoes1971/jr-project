@@ -115,7 +115,7 @@ public class ObjectMgr extends DBMgr {
             _getClausesAndValues(search, uselike, hashMap, clauses);
 
             String sClauses = "";
-            if(clauses.size()>0) {
+            if(!clauses.isEmpty()) {
                 for(int i=0 ; i<clauses.size() ; i++) {
                     sClauses += clauses.get(i);
                     if(i < (clauses.size()-1))
@@ -136,11 +136,11 @@ public class ObjectMgr extends DBMgr {
                 Class myclass = registeredObjectTypes.stream().filter(k -> k.getSimpleName().equals(values[0])).collect(Collectors.toList()).get(0);
                 logger.debug("search: myclass="+myclass);
                 try {
-                    DBEObject _search = (DBEObject) myclass.newInstance();
+                    DBEObject _search = (DBEObject) myclass.getDeclaredConstructor().newInstance();
                     _search.setId((String) values[1]);
                     List<DBEntity> _res = super.search(_search, false, null);
                     if(_res.size()==1) res.add(_res.get(0));
-                } catch (InstantiationException | IllegalAccessException e) {
+                } catch (InvocationTargetException | InstantiationException | IllegalAccessException | NoSuchMethodException e) {
                     e.printStackTrace();
                 }
             }
@@ -159,8 +159,8 @@ public class ObjectMgr extends DBMgr {
         for (Class klass : registeredObjectTypes) {
             DBEntity dbe;
             try {
-                dbe = (DBEntity) klass.newInstance();
-            } catch (InstantiationException | IllegalAccessException e) {
+                dbe = (DBEntity) klass.getDeclaredConstructor().newInstance();
+            } catch (InvocationTargetException | NoSuchMethodException | InstantiationException | IllegalAccessException e) {
                 e.printStackTrace();
                 continue;
             }
@@ -186,8 +186,8 @@ public class ObjectMgr extends DBMgr {
         for (Class klass : typesWithId) {
             DBEntity dbe;
             try {
-                dbe = (DBEntity) klass.newInstance();
-            } catch (InstantiationException | IllegalAccessException e) {
+                dbe = (DBEntity) klass.getDeclaredConstructor().newInstance();
+            } catch (InvocationTargetException | NoSuchMethodException | InstantiationException | IllegalAccessException e) {
                 e.printStackTrace();
                 continue;
             }
@@ -205,7 +205,7 @@ public class ObjectMgr extends DBMgr {
 
         Class myclass = typesWithId.stream().filter(k -> k.getSimpleName().equals(values[0])).collect(Collectors.toList()).get(0);
         try {
-            DBEntity search = (DBEntity) myclass.newInstance();
+            DBEntity search = (DBEntity) myclass.getDeclaredConstructor().newInstance();
             Method method = myclass.getMethod("setId", String.class);
             method.invoke(search, id);
             List<DBEntity> res2 = this.search(search, false, null);
@@ -243,11 +243,11 @@ public class ObjectMgr extends DBMgr {
 
         Class myclass = registeredObjectTypes.stream().filter(k -> k.getSimpleName().equals(values[0])).collect(Collectors.toList()).get(0);
         try {
-            DBEObject search = (DBEObject) myclass.newInstance();
+            DBEObject search = (DBEObject) myclass.getDeclaredConstructor().newInstance();
             search.setId(id);
             List<DBEntity> res2 = this.search(search, false, null, ignore_deleted);
             if(res2.size()==1) ret = (DBEObject) res2.get(0);
-        } catch (InstantiationException | IllegalAccessException e) {
+        } catch (InvocationTargetException | NoSuchMethodException | InstantiationException | IllegalAccessException e) {
             e.printStackTrace();
         }
         return ret;
@@ -312,7 +312,7 @@ public class ObjectMgr extends DBMgr {
             Class myclass = registeredObjectTypes.stream().filter(k -> k.getSimpleName().equals(_values[0])).collect(Collectors.toList()).get(0);
             logger.debug("fullObjectById: myclass="+myclass);
             try {
-                DBEObject search = (DBEObject) myclass.newInstance();
+                DBEObject search = (DBEObject) myclass.getDeclaredConstructor().newInstance();
                 search.setId((String) _values[1]);
                 logger.debug("fullObjectByName: search="+search);
                 List<DBEntity> res2 = this.search(search, false, null, ignore_deleted);
@@ -321,7 +321,7 @@ public class ObjectMgr extends DBMgr {
                     logger.debug("fullObjectByName: dbe="+dbe);
                     ret.add((DBEObject) dbe);
                 }
-            } catch (InstantiationException | IllegalAccessException e) {
+            } catch (InvocationTargetException | NoSuchMethodException | InstantiationException | IllegalAccessException e) {
                 e.printStackTrace();
             }
         });

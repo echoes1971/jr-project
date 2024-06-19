@@ -6,6 +6,8 @@ import org.apache.logging.log4j.Logger;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.ProtocolException;
 import java.net.URL;
 import java.util.*;
 import java.util.function.BiConsumer;
@@ -27,7 +29,7 @@ public class HttpRequest {
     String url;
     HashMap<String,String> requestParameters;
     HashMap<String,String> requestHeaders;
-    HashMap<String,String> responseHeaders;
+    HashMap<String, List<String>> responseHeaders;
     /** application/json , multipart/formdata , text/plain */
     String contentType;
     String requestContent;
@@ -47,8 +49,8 @@ public class HttpRequest {
         // **** Input parameters: start.
         requestMethod = _args.containsKey("method") ? (String) _args.get("method") : "GET";
         url = _args.containsKey("url") ? (String) _args.get("url") : "";
-        requestParameters = _args.containsKey("params") ? (HashMap) _args.get("params") : new HashMap();
-        requestHeaders = _args.containsKey("headers") ? (HashMap) _args.get("headers") : new HashMap();
+        requestParameters = _args.containsKey("params") ? (HashMap<String,String>) _args.get("params") : new HashMap<>();
+        requestHeaders = _args.containsKey("headers") ? (HashMap<String,String>) _args.get("headers") : new HashMap<>();
         contentType = _args.containsKey("contentType") ? (String) _args.get("contentType") : "application/json";
         requestContent = _args.containsKey("body") ? (String) _args.get("body") : "";
         validStatusCodes = _args.containsKey("valid_status_codes") ? ((List<String>)_args.get("valid_status_codes")) : new ArrayList<String>();
@@ -60,14 +62,15 @@ public class HttpRequest {
 //            requestHeaders.put("Content-Length", ""+requestContent.length()); // Number in string format is needed
 //        }
 
-        log.debug("url: $url => " +url);
+        log.debug("url: $url => {}", url);
+//        log.debug("url: $url => " +url);
 
-        log.debug("params: " + requestParameters.entrySet().stream().map(
-                x -> ((Map.Entry) x).getKey()+"="+((Map.Entry) x).getValue()
+        log.debug("params: {}", requestParameters.entrySet().stream().map(
+                x -> ((Map.Entry<?, ?>) x).getKey()+"="+((Map.Entry<?, ?>) x).getValue()
         ).collect(Collectors.joining("&")));
-        queryString = requestMethod.toUpperCase() == "GET" && requestParameters.size() > 0 ?
+        queryString = requestMethod.toUpperCase() == "GET" && !requestParameters.isEmpty() ?
                 "?" + requestParameters.entrySet().stream().map(
-                        x -> ((Map.Entry) x).getKey()+"="+((Map.Entry) x).getValue()
+                        x -> ((Map.Entry<?, ?>) x).getKey()+"="+((Map.Entry<?, ?>) x).getValue()
                 ).collect(Collectors.joining("&"))
                 : "";
         log.debug("queryString: $queryString");
@@ -76,8 +79,16 @@ public class HttpRequest {
         log.debug("_url: $_url");
 
 
-        conn = (HttpURLConnection) new URL(_url).openConnection();
-        conn.setRequestMethod(requestMethod);
+        try {
+            conn = (HttpURLConnection) new URL(_url).openConnection();
+            conn.setRequestMethod(requestMethod);
+        } catch(MalformedURLException | ProtocolException e) {
+            e.printStackTrace();
+            return this;
+        } catch(IOException ioe) {
+            ioe.printStackTrace();
+            return this;
+        }
 
         // IF requestMethod in ['POST', 'PUT', 'DELETE']
         if (_postPutDelete.contains(requestMethod)) {
@@ -87,7 +98,7 @@ public class HttpRequest {
             requestHeaders.put("Content-Type", contentType);
             requestHeaders.put("Content-Length", ""+requestContent.length()); // Number in string format is needed
         }
-        for(Map.Entry me : requestHeaders.entrySet()) {
+        for(Map.Entry<String,String> me : requestHeaders.entrySet()) {
             conn.setRequestProperty((String) me.getKey(), (String) me.getValue());
         }
         rawRequestData = this.getRawRequestData();
@@ -104,27 +115,30 @@ public class HttpRequest {
         }
 
         try {
+            log.info("Status: "+conn.getResponseCode());
             responseContent = conn.getResponseCode()>=200 && conn.getResponseCode()<300 ?
                     new String(conn.getInputStream().readAllBytes()) :
                     new String(conn.getErrorStream().readAllBytes());
-            rawResponseData = getRawResponseData();
+
+            rawResponseData = conn.getResponseCode()>=200 && conn.getResponseCode()<300 ?
+                    getRawResponseData() : "";
         } catch (java.io.IOException ioe) {
             ioe.printStackTrace();
         }
         status = conn.getHeaderField(0);
 
-        responseHeaders = conn.getHeaderFields();
+        responseHeaders = new HashMap<String,List<String>>(conn.getHeaderFields());
         log.debug(status);
         log.debug(responseContent);
         return this;
     }
 
     public boolean hasValidStatus() {
-        if(validStatusCodes==null || validStatusCodes.size()==0) return true;
+        if(validStatusCodes==null || validStatusCodes.isEmpty()) return true;
         if(status==null) return false;
         boolean ret = false;
         for(String code : validStatusCodes) {
-            if(status.indexOf(code)<0) continue;
+            if(!status.contains(code)) continue;
             ret = true;
             break;
         }
@@ -134,24 +148,29 @@ public class HttpRequest {
     private String getRawRequestData() {
         ArrayList<String> ret = new ArrayList<String>();
         ret.add("${requestMethod} $_url" );
-        for(Map.Entry me : requestHeaders) {
+//        for(Map.Entry me : requestHeaders) {
+        for(Map.Entry<String, String> me : requestHeaders.entrySet()) {
             ret.add(me.getKey()+": "+me.getValue());
         }
         ret.add(requestContent);
-        return ret.stream().collect(Collectors.joining("\n"));
+        return String.join("\n", ret);
     }
     private String getRawResponseData() {
         ArrayList<String> ret = new ArrayList<String>();
-        for(Map.Entry me : responseHeaders) {
-            ret.add(me.getKey()+": "+me.getValue());
+        if(responseHeaders!=null) {
+            for (Map.Entry<String, List<String>> me : responseHeaders.entrySet()) {
+                ret.add(me.getKey() + ": " + String.join(",", me.getValue()));
+            }
         }
         ret.add(responseContent);
-        return ret.stream().collect(Collectors.joining("\n"));
+        return String.join("\n", ret);
     }
 
     // NOTE To avoid translating too much
-    public HashMap<String,String> getResponseHeaders() {
-        responseHeaders.put("#status#", status);
+    public HashMap<String,List<String>> getResponseHeaders() {
+        ArrayList<String> l = new ArrayList<>();
+        l.add(status);
+        responseHeaders.put("#status#", l);
         return responseHeaders;
     }
 
@@ -159,10 +178,11 @@ public class HttpRequest {
     public String toString() { return toString(""); }
     public String toString(String prefix) {
         ArrayList<String> ret = new ArrayList<String>();
-        ret.add("url: $_url");
+        ret.add("url: "+_url);
         ret.add(prefix+"responseHeaders:");
-        for(Map.Entry me : responseHeaders) {
-            ret.add(prefix + "  " + me.getKey() + ": " + me.getValue());
+//        for(Map.Entry me : responseHeaders) {
+        for(Map.Entry<String, List<String>> me : responseHeaders.entrySet()) {
+            ret.add(prefix + "  " + me.getKey() + ": " + String.join(", ", me.getValue()));
         }
         if(responseContent!=null) {
             ret.add(prefix+"responseContent:");
@@ -170,18 +190,19 @@ public class HttpRequest {
                 ret.add(prefix+"  "+s);
             }
         }
-        return ret.stream().collect(Collectors.joining("\n"));
+        return String.join("\n", ret);
+//        return ret.stream().collect(Collectors.joining("\n"));
     }
 
     public String textAction() {
         ArrayList<String> ret = new ArrayList<String>();
         ret.add("curl -v -i");
-        for(Map.Entry me : requestHeaders) {
+        for(Map.Entry<String,String> me : requestHeaders.entrySet()) {
             ret.add("-H \"" + me.getKey() + ": " + me.getValue() + "\"");
         }
         ret.add("TODO: add method"+requestMethod);
         ret.add(_url);
-        return ret.stream().collect(Collectors.joining(" "));
+        return String.join(" ", ret);
     }
 
 }
