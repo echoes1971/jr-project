@@ -58,9 +58,7 @@ public class HttpRequestTest {
 
         log.info(JSONWriter.valueToString(l));
 
-        l.forEach(o -> {
-            log.info(o);
-        });
+        l.forEach(log::info);
     }
 
 }
