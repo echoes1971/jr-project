@@ -194,6 +194,7 @@ public class HttpRequest {
 //        return ret.stream().collect(Collectors.joining("\n"));
     }
 
+
     public String textAction() {
         ArrayList<String> ret = new ArrayList<String>();
         ret.add("curl -v -i");
