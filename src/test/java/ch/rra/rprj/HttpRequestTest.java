@@ -27,8 +27,8 @@ public class HttpRequestTest {
         String body = "{method:'ping',params:[]}";
 
         LinkedHashMap<String,Object> hm = new LinkedHashMap<>();
-//        hm.put("url","http://localhost:8080/jsonserver.php");
-        hm.put("url","http://voyager:8080/jsonserver.php");
+        hm.put("url","http://localhost:8080/jsonserver.php");
+//        hm.put("url","http://voyager:8080/jsonserver.php");
 //        hm.put("url","https://www.roccoangeloni.it/rproject/jsonserver.php");
         hm.put("method","POST");
         hm.put("params",params);
@@ -49,6 +49,9 @@ public class HttpRequestTest {
         log.info(jo.toString(2));
 
         List<Object> l = jo.toList();
+        assert l.size() == 2 : "ERROR: received "+l.size()+" objects instead of 2." ;
+        assert l.get(1) =="pong" : "ERROR: received '"+l.get(1)+"' instead of 'pong'." ;
+
         // Decode error messages
 //        byte[] decodedBytes = Base64.getDecoder().decode((String) l.get(0));
 //        String decodedString = new String(decodedBytes);

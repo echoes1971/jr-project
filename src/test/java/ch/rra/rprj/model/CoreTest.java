@@ -12,6 +12,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.testng.annotations.*;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.Reader;
 import java.io.InputStreamReader;
@@ -36,17 +37,13 @@ public class CoreTest { //extends TestCase {
         props.load(getClass().getResourceAsStream("/application.properties"));
         try {
             props.load(getClass().getResourceAsStream("/local.properties"));
-        } catch(java.io.IOException ioe) {
-            ioe.printStackTrace();
-        } catch(NullPointerException npe) {
-            npe.printStackTrace();
+        } catch(IOException | NullPointerException ex) {
+            //ex.printStackTrace();
         }
         try {
             props.load(getClass().getResourceAsStream("/dev.properties"));
-        } catch(java.io.IOException ioe) {
-            ioe.printStackTrace();
-        } catch(NullPointerException npe) {
-            npe.printStackTrace();
+        } catch(IOException | NullPointerException ex) {
+            //ex.printStackTrace();
         }
 
         for(String k : props.stringPropertyNames()) {
