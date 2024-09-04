@@ -7,6 +7,12 @@ Run the tests with: `./mvnw -Dtest=ModelTest test`
 Run spring-boot: `./mvnw spring-boot:run`
 maybe adding some memory before: `export MAVEN_OPTS=-Xmx1024m`
 
+
+
+
+
+
+
 **TODO**
 - Angular FE
   - main component:
